@@ -1,0 +1,18 @@
+#!/bin/bash
+
+COMMIT_MSG_FILE=$1
+COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+
+VALID_PATTERN="^(feat|fix|chore): .+"
+
+if [[ ! $COMMIT_MSG =~ $VALID_PATTERN ]]; then
+    echo -e "\n❌ \033[31m[ERROR DE FORMATO] El mensaje del commit es inválido.\033[0m"
+    echo -e "Tu mensaje: \033[33m$COMMIT_MSG\033[0m"
+    echo -e "---------------------------------------------------"
+    echo -e "Debe empezar con uno de estos prefijos:"
+    echo -e "  ✅ \033[32mfeat:\033[0m  (Nuevas funcionalidades)"
+    echo -e "  ✅ \033[32mfix:\033[0m   (Corrección de errores)"
+    echo -e "  ✅ \033[32mchore:\033[0m (Mantenimiento, config, limpieza)"
+    echo -e "Ejemplo correcto: \033[36mfeat: agregar validación de email\033[0m\n"
+    exit 1
+fi
