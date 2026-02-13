@@ -1,0 +1,22 @@
+#!/bin/bash
+
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+VALID_PREFIXES="^(feat|bugfix|ops|chore)/"
+
+PROTECTED_BRANCHES="^(main|master|develop|staging)$"
+
+if [[ ! $CURRENT_BRANCH =~ $VALID_PREFIXES ]] && [[ ! $CURRENT_BRANCH =~ $PROTECTED_BRANCHES ]]; then
+    echo -e "\n⛔ \033[31m[ERROR DE RAMA] No se puede hacer push de esta rama.\033[0m"
+    echo -e "Rama actual: \033[33m$CURRENT_BRANCH\033[0m"
+    echo -e "---------------------------------------------------"
+    echo -e "Las ramas deben comenzar con una categoría válida:"
+    echo -e "  ✅ \033[32mfeat/...\033[0m"
+    echo -e "  ✅ \033[32mbugfix/...\033[0m"
+    echo -e "  ✅ \033[32mops/...\033[0m"
+    echo -e "  ✅ \033[32mchore/...\033[0m"
+    echo -e "Ejemplo: \033[36mops/configuracion-docker\033[0m\n"
+    exit 1
+fi
+
+exit 0

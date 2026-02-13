@@ -1,0 +1,34 @@
+#!/bin/bash
+
+echo -e "🔍 \033[36mEjecutando validaciones pre-commit...\033[0m"
+
+FILES=$(git diff --cached --name-only)
+
+
+EXIT_CODE=0
+
+if echo "$FILES" | xargs grep -lE "^<<<<<<< |^>>>>>>> " > /dev/null 2>&1; then
+    echo -e "❌ \033[31m[ERROR] Se encontraron marcadores de conflicto (<<<<<<<).\033[0m"
+    echo "Por favor, resuelve los conflictos de merge antes de commitear."
+    EXIT_CODE=1
+fi
+
+for file in $FILES; do
+    if [[ $file == *".env"* ]]; then
+        echo -e "❌ \033[31m[SEGURIDAD] Estás intentando subir un archivo .env\033[0m"
+        echo "Elimínalo del stage o agrégalo al .gitignore."
+        EXIT_CODE=1
+    fi
+done
+
+if echo "$FILES" | xargs grep -lE "console\.log|print\(" > /dev/null 2>&1; then
+    echo -e "⚠️  \033[33m[ADVERTENCIA] Se detectaron 'console.log' o 'print' en el código.\033[0m"
+    echo -e "   Asegúrate de que sean necesarios antes de continuar."
+    
+fi
+
+if [ $EXIT_CODE -ne 0 ]; then
+    echo -e "\n⛔ \033[31mCommit cancelado por errores de validación.\033[0m\n"
+fi
+
+exit $EXIT_CODE
