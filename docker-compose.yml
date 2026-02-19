@@ -1,6 +1,6 @@
 services:  
   front:  
-    build: ./frontCripta  
+    build: ./frontCripta
     container_name: criptaDoge-front 
     restart: always
     volumes:  
@@ -52,7 +52,7 @@ services:
       - mongo_data:/data/db  
   
   nginx:  
-    image: nginx:alpine
+    image: nginx:latest
     container_name: criptaDoge-nginx 
     restart: always 
     ports:  

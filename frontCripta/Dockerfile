@@ -3,7 +3,7 @@
 # ==============================================================================
 
 # Versión de Node configurable desde docker-compose
-FROM node:24-alpine
+FROM node:latest
 
 WORKDIR /app
 
@@ -17,6 +17,3 @@ COPY . .
 ENV VITE_PORT=5173
 
 EXPOSE ${VITE_PORT}
-
-# Comando de desarrollo
-CMD ["npm", "run", "dev"]
