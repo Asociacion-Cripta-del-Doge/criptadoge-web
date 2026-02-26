@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { EventsService } from './events.service';
 
 @Controller('eventos')
@@ -13,5 +13,10 @@ export class EventsController {
   @Get()
   async findAll() {
     return this.eventsService.findAll();
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return this.eventsService.findOne(id);
   }
 }

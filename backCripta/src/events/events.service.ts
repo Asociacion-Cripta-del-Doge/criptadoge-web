@@ -17,4 +17,8 @@ export class EventsService {
   async findAll(): Promise<Event[]> {
     return this.eventModel.find().exec();
   }
+
+  async findOne(id: string): Promise<Event | null> {
+    return this.eventModel.findById(id).exec();
+  }
 }
