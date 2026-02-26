@@ -25,4 +25,10 @@ export class EventsService {
   async remove(id: string): Promise<Event | null> {
     return this.eventModel.findByIdAndDelete(id).exec();
   }
+
+  async update(id: string, updateEventDto: any): Promise<Event | null> {
+    return this.eventModel
+      .findByIdAndUpdate(id, updateEventDto, { new: true })
+      .exec();
+  }
 }

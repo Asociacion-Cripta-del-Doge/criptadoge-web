@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Put,
+} from '@nestjs/common';
 import { EventsService } from './events.service';
 
 @Controller('eventos')
@@ -23,5 +31,10 @@ export class EventsController {
   @Delete(':id')
   async remove(@Param('id') id: string) {
     return this.eventsService.remove(id);
+  }
+
+  @Put(':id')
+  async update(@Param('id') id: string, @Body() updateEventDto: any) {
+    return this.eventsService.update(id, updateEventDto);
   }
 }
