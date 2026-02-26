@@ -6,22 +6,22 @@ export type EventDocument = HydratedDocument<Event>;
 @Schema({ timestamps: true })
 export class Event {
   @Prop({ required: true })
-  title: string;
+  title!: string;
+
+  @Prop()
+  description?: string;
 
   @Prop({ required: true })
-  description: string;
+  date!: string;
+
+  @Prop()
+  time?: string;
 
   @Prop({ required: true })
-  date: string;
-
-  @Prop({ required: true })
-  time: string;
-
-  @Prop({ required: true })
-  label: string;
+  label!: string;
 
   @Prop({ default: 'Próximo' })
-  status: string;
+  status!: string;
 }
 
 export const EventSchema = SchemaFactory.createForClass(Event);
