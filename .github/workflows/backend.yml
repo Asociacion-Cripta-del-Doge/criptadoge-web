@@ -1,0 +1,63 @@
+name: Backend CI
+
+on:
+  push:
+    branches: ["main", "dev"]
+  pull_request:
+    branches: ["main", "dev"]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: backCripta
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      mongo:
+        image: mongo:8
+        ports:
+          - 27017:27017
+
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Instalar dependencias
+        working-directory: ./backCripta
+        run: yarn install --immutable
+
+      - name: Sincronizar Prisma y Generar Cliente
+        working-directory: ./backCripta
+        run: |
+          npx prisma db push
+          npx prisma generate
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/backCripta
+
+      - name: Compilar NestJS
+        working-directory: ./backCripta
+        run: yarn build
+
+      - name: Ejecutar Tests Automáticos
+        working-directory: ./backCripta
+        run: yarn test
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/backCripta
+          MONGO_URL: mongodb://localhost:27017/cripta-db
+          JWT_SECRET: test_secret_key
