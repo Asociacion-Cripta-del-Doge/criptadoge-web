@@ -15,7 +15,7 @@ enum Role {
 
 model User {
   id             String  @id @default(uuid())
-  dni            String  @unique
+  dni            String? @unique
   name           String
   email          String  @unique
   password       String // Hasheada con bcrypt
