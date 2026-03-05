@@ -1,0 +1,29 @@
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../generated/prisma2"
+  moduleFormat  = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  MEMBER
+  ADMIN
+}
+
+model User {
+  id             String   @id @default(uuid())
+  dni            String   @unique
+  name           String
+  email          String   @unique
+  password       String   // Hasheada con bcrypt
+  role           Role     @default(MEMBER)
+  lastRenewal    String?  
+  expirationDate String?
+  status         String   @default("Pendiente")
+  
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
