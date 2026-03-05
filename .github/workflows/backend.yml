@@ -38,6 +38,9 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Activar Corepack
+        run: corepack enable
+
       - name: Instalar dependencias
         working-directory: ./backCripta
         run: yarn install --immutable
