@@ -1,0 +1,21 @@
+generator client {
+  provider     = "prisma-client-js"
+  output       = "../generated/prisma2"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Member {
+  id             String   @id @default(uuid())
+  dni            String   @unique
+  name           String
+  email          String   @unique
+  lastRenewal    String?
+  expirationDate String?
+  status         String   @default("Pendiente")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
