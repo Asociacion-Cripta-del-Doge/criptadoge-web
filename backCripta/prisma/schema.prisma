@@ -15,10 +15,10 @@ enum Role {
 
 model User {
   id             String   @id @default(uuid())
-  dni            String   @unique
+  dni            String?   @unique
   name           String
   email          String   @unique
-  password       String   // Hasheada con bcrypt
+  password       String   
   role           Role     @default(MEMBER)
   lastRenewal    String?  
   expirationDate String?
