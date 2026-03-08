@@ -7,7 +7,9 @@ import {
   Put,
   Delete,
   UseGuards,
+  Req,
 } from '@nestjs/common';
+import type { Request } from 'express';
 import { EventsService } from './events.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -48,5 +50,23 @@ export class EventsController {
   @Roles('ADMIN')
   async remove(@Param('id') id: string) {
     return this.eventsService.remove(id);
+  }
+
+  @Post(':id/asistentes')
+  @Roles('MEMBER')
+  async joinEvent(@Param('id') eventId: string, @Req() req: Request) {
+    return this.eventsService.joinEvent(eventId, (req.user as any).id);
+  }
+
+  @Delete(':id/asistentes')
+  @Roles('MEMBER')
+  async leaveEvent(@Param('id') eventId: string, @Req() req: Request) {
+    return this.eventsService.leaveEvent(eventId, (req.user as any).id);
+  }
+
+  @Get(':id/asistentes')
+  @Roles('ADMIN')
+  async getAttendees(@Param('id') eventId: string) {
+    return this.eventsService.getAttendees(eventId);
   }
 }

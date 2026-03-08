@@ -27,7 +27,7 @@ export class UsersController {
   }
 
   @Get()
-  @Roles('ADMIN') //
+  @Roles('ADMIN')
   async findAll() {
     return this.usersService.findAll();
   }
@@ -42,6 +42,12 @@ export class UsersController {
   @Roles('ADMIN')
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(id, updateUserDto);
+  }
+
+  @Put(':id/membresia')
+  @Roles('ADMIN')
+  async renewMembership(@Param('id') id: string) {
+    return this.usersService.renewMembership(id);
   }
 
   @Delete(':id')
