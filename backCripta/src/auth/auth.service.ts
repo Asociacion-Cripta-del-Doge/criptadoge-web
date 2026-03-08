@@ -1,6 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
+import { User } from '../../generated/prisma2';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -10,7 +11,10 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async validateUser(email: string, pass: string): Promise<any> {
+  async validateUser(
+    email: string,
+    pass: string,
+  ): Promise<Omit<User, 'password'>> {
     const user = await this.prisma.user.findUnique({ where: { email } });
 
     if (user && (await bcrypt.compare(pass, user.password))) {
@@ -21,7 +25,7 @@ export class AuthService {
     throw new UnauthorizedException('Credenciales incorrectas');
   }
 
-  async login(user: any) {
+  async login(user: Omit<User, 'password'>) {
     const payload = { email: user.email, sub: user.id, role: user.role };
 
     return {
