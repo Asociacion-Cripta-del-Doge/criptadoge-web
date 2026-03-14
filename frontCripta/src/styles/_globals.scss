@@ -9,7 +9,7 @@ body {
 }
 
 a{
-    color: v$color-primary;
+    color: v.$color-primary;
     text-decoration: none;
 
     transition: v.$transition-fast;
