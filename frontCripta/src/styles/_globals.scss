@@ -1,11 +1,59 @@
 @use "./variables" as v;
 
+@font-face{
+    font-family: "Minecraft";
+    src: url("../assets/fonts/Minecraft.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+*,
+*::before,
+*::after{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 body {
-    background: v.$color-bg-main;
+    background: linear-gradient(
+        135deg,
+        #0a0a1a,
+        #0b0b1a,
+        #0f0f2a
+    );
     color: v.$color-text-main;
     font-family: v.$font-primary;
 
     min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+}
+
+body::before{
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(circle at 30% 20%, v.$neon-blue 0%, transparent 40%),
+        radial-gradient(circle at 70% 80%, v.$neon-pink 0%, transparent 40%);
+    opacity: 0.15;
+    pointer-events: none;
+    z-index: -1;
+}
+
+body::after{
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image:
+        linear-gradient(v.$neon-blue 1px, transparent 1px),
+        linear-gradient(90deg, v.$neon-blue 1px, transparent 1px);
+    background-size: 50px 50px;
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: -1;
 }
 
 a{
@@ -21,4 +69,5 @@ a{
 
 h1, h2, h3{
     font-family: v.$font-display;
+    letter-spacing: 1px;
 }

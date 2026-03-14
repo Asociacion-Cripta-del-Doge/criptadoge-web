@@ -24,7 +24,7 @@ $neon-pink: #ff2e9a;
 /* --- TIPOGRAFIA --- */
 $font-primary: "Roboto", sans-serif;
 $font-mono: "Geist Mono", monospace;
-$font-display: "Minecraft", cursive;
+$font-display: "Minecraft", monospace;
 
 /* --- SPACING --- */
 $space-xs: 4px;
@@ -41,3 +41,5 @@ $radius-lg: 16px;
 /* --- TRANSICIONES --- */
 $transition-fast: 0.15s ease;
 $transition-normal: 0.25s ease;
+
+$blur-navbar: blur(10px);

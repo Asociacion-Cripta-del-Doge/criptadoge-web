@@ -1,0 +1,113 @@
+@use "../../styles/variables" as v;
+@use "sass:color";
+
+.navbar {
+  position: fixed;
+  top: 0; 
+  width: 100%;
+  z-index: 1000;
+  padding: v.$space-md v.$space-xl;
+  transition: v.$transition-normal;
+}
+
+.navbar-scrolled {
+  background: color.change(v.$color-bg-main, $alpha: 0.85);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(v.$neon-blue, 0.25);
+}
+
+.navbar-container{
+    max-width: 1200px;
+    margin: 0 auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.navbar-left{
+    display: flex;
+    align-items: center;
+    gap: v.$space-sm;
+
+    img{
+        width: 42px;
+        height: auto;
+
+        filter:
+            drop-shadow(0 0 4px rgba(0,191,255,0.6))
+            drop-shadow(0 0 10px rgba(0,191,255,0.3));
+    }
+}
+
+.brand-text{
+    font-size: 0.9rem;
+    color: v.$neon-blue;
+    font-weight: 600;
+}
+
+.navbar-links{
+    list-style: none;
+    display: flex;
+    gap: v.$space-lg;
+
+    li a{
+        position: relative;
+        color: rgba(v.$color-text-main, 0.7);
+        font-size: 0.85rem;
+        padding: 6px 10px;
+        border-radius: v.$transition-fast;
+
+        &:hover{
+            color: v.$neon-blue;
+            background: rgba(v.$neon-blue, 0.08);
+        }
+
+        &::after{
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: -3px;
+            width: 0%;
+            height: 1px;
+            background: v.$neon-blue;
+            transition: v.$transition-fast;
+        }
+
+        &:hover::after{
+            width: 100%;
+        }
+    }
+}
+
+.navbar-buttons{
+    display: flex;
+    gap: v.$space-sm;
+}
+
+.btn-outline{
+    border: 1px solid rgba(v.$neon-blue, 0.5);
+    padding: 6px 12px;
+    border-radius: v.$radius-sm;
+    color: v.$neon-blue;
+    font-size: 0.8rem;
+    transition: v.$transition-fast;
+
+    &:hover{
+        background: rgba(v.$neon-blue, 0.1);
+    }
+}
+
+.btn-pink{
+    background: v.$neon-pink;
+    color: white;
+    padding: 6px 12px;
+    border-radius: v.$radius-sm;
+    font-size: 0.8rem;
+    box-shadow: 0 0 12px v.$neon-pink;
+    transition: v.$transition-fast;
+
+    &:hover{
+        filter: brightness(1.1);
+    }
+}
