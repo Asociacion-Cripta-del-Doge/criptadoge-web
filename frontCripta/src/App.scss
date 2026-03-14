@@ -1,0 +1,79 @@
+@use "sass:color";
+@use "./styles/variables" as v;
+
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body{
+  min-height: 100vh;
+  background: linear-gradient(
+    135deg,
+    v.$color-bg-main,
+    v.$color-bg-main,
+    color.adjust(v.$color-bg-main, $lightness: -5%)
+  );
+
+  overflow-x: hidden;
+  position: relative;
+
+  color: v.$color-text-main;
+  font-family: v.$font-primary;
+
+  &::before{
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background: 
+      radial-gradient(circle at 30% 20%, v.$neon-blue 0%, transparent 40%),
+      radial-gradient(circle at 80% 80%, v.$neon-pink 0%, transparent 40%);
+
+    opacity: 0.15;
+
+    z-index: 0;
+    }
+
+  &::after{
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background-image:
+      linear-gradient(v.$neon-blue 1px, transparent 1px),
+      linear-gradient(90deg, v.$neon-blue 1px, transparent 1px);
+  
+    background-size: 50px 50px;
+
+    opacity: 0.03;
+
+    z-index: 0;
+  }
+}
+
+#root{
+  position: relative;
+  min-height: 100vh;
+  z-index: 1;
+}
+
+main{
+  padding-top: 120px;
+}
+
+h1, h2, h3{
+  font-family: v.$font-display;
+}
+
+a{
+  color: v.$color-primary;
+  text-decoration: none;
+  transition: v.$transition-fast;
+
+  &:hover{
+    color: v.$color-secondary;
+  }
+}
+
