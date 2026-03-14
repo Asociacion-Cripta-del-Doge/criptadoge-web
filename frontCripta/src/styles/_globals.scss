@@ -8,6 +8,22 @@
     font-display: swap;
 }
 
+@font-face{
+    font-family: "Roboto";
+    src: url(../assets/fonts/Roboto-VariableFont_wdth\,wght.ttf) format("truetype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face{
+    font-family: "Geist Mono";
+    src: url("../assets/fonts/GeistMono-VariableFont_wght.ttf") format("truetype");
+    font-weight: 400;
+    font-synthesis: normal;
+    font-display: swap;
+}
+
 *,
 *::before,
 *::after{
