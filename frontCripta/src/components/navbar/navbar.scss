@@ -7,6 +7,9 @@
   width: 100%;
   z-index: 1000;
   padding: v.$space-md v.$space-xl;
+  background: rgba(5, 5, 15, 0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(v.$neon-blue, 0.15);
   transition: v.$transition-normal;
 }
 
@@ -41,8 +44,11 @@
 }
 
 .brand-text{
+    font-family: v.$font-display;
     font-size: 0.9rem;
+    letter-spacing: 1px;
     color: v.$neon-blue;
+    text-shadow: 0 0 6px rgba(255,255,255,0.15);
     font-weight: 600;
 }
 

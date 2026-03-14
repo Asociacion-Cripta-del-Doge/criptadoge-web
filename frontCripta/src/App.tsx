@@ -6,12 +6,15 @@ function App() {
     <>
       <Navbar />
 
-      <main>
-        <section id="inicio">
-          <h1>La Cripta de Doge</h1>
-        </section>
-      </main>
-      
+      <section id="inicio" className="hero">
+        <h1 className="hero-title">
+          <span className="hero-highlight">Bienvenido</span> a <br/> La Cripta
+        </h1>
+        <p className="hero-subtitle">
+          Asociación sin ánimo de lucro dedicada al ocio alternativo para jóvenes.
+          Juegos de mesa, rol, videojuegos y mucho más.
+        </p>
+      </section>
     </>
   )
 }
