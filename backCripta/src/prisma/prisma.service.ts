@@ -1,9 +1,7 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { join } from 'node:path';
-
-const { PrismaClient } = require(join(process.cwd(), 'generated/prisma2'));
+import { PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class PrismaService
