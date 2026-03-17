@@ -97,23 +97,40 @@
     border-radius: v.$radius-sm;
     color: v.$neon-blue;
     font-size: 0.8rem;
-    transition: v.$transition-fast;
+    box-shadow: 0 0 6px rgba(v.$neon-blue, 0.2);
+    transition:
+        background v.$transition-fast,
+        box-shadow v.$transition-fast,
+        transform v.$transition-fast;
 
     &:hover{
-        background: rgba(v.$neon-blue, 0.1);
+        color: v.$neon-blue;
+        background: rgba(v.$neon-blue, 0.12);
+        box-shadow: 0 0 10px rgba(v.$neon-blue,0.3);
+        transform: translateY(-1px);
     }
 }
 
 .btn-pink{
     background: v.$neon-pink;
     color: white;
-    padding: 6px 12px;
+    padding: 10px 18px;
     border-radius: v.$radius-sm;
-    font-size: 0.8rem;
-    box-shadow: 0 0 12px v.$neon-pink;
-    transition: v.$transition-fast;
+    font-size: 0.9rem;
+    box-shadow:
+        0 0 15px v.$neon-pink,
+        0 0 30px rgba(v.$neon-pink,0.4);
+    transition:
+        transform v.$transition-fast,
+        box-shadow v.$transition-fast,
+        filter v.$transition-fast;
 
     &:hover{
+        color: white;
+        transform: translateY(-2px);
+        box-shadow:
+            0 0 20px v.$neon-pink,
+            0 0 40px rgba(v.$neon-pink,0.5);
         filter: brightness(1.1);
     }
 }
