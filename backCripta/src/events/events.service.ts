@@ -24,7 +24,7 @@ export class EventsService {
   }
 
   async findAll(): Promise<Event[]> {
-    return this.eventModel.find().populate('label').exec();
+    return this.eventModel.find().exec();
   }
 
   async findOne(id: string): Promise<Event> {
@@ -32,7 +32,7 @@ export class EventsService {
       throw new BadRequestException('ID de evento inválido');
     }
 
-    const event = await this.eventModel.findById(id).populate('label').exec();
+    const event = await this.eventModel.findById(id).exec();
 
     if (!event) {
       throw new NotFoundException('Evento no encontrado');
@@ -62,7 +62,6 @@ export class EventsService {
 
     const event = await this.eventModel
       .findByIdAndUpdate(id, updateEventDto, { new: true })
-      .populate('label')
       .exec();
 
     if (!event) {
@@ -95,7 +94,7 @@ export class EventsService {
     event.attendees.push({ userId, joinedAt: new Date() });
     await event.save();
 
-    return event.populate('label');
+    return event;
   }
 
   async leaveEvent(eventId: string, userId: string): Promise<Event> {
@@ -116,7 +115,7 @@ export class EventsService {
     event.attendees.splice(index, 1);
     await event.save();
 
-    return event.populate('label');
+    return event;
   }
 
   async getAttendees(eventId: string) {

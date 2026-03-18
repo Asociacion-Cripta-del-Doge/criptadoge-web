@@ -1,10 +1,8 @@
 require('dotenv').config();
-const { join } = require('path');
 const { Pool } = require('pg');
 const { PrismaPg } = require('@prisma/adapter-pg');
 const bcrypt = require('bcrypt');
-
-const { PrismaClient } = require(join(process.cwd(), 'generated/prisma2'));
+const { PrismaClient } = require('@prisma/client');
 
 async function main() {
   console.log('Iniciando el seeder de socios de prueba en La Cripta...');
