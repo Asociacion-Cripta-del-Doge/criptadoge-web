@@ -1,10 +1,18 @@
 import "./App.scss"
 import { Navbar } from "./components/navbar/navbar"
+import Login from "./components/login/login"
 
 function App() {
+  const path = window.location.pathname 
+
+  if(path === "/login")
+  {
+    return <Login />
+  }
+
   return (
     <>
-      <Navbar />
+      <Navbar /> 
 
       <section id="inicio" className="hero">
         <h1 className="hero-title">
