@@ -2,6 +2,7 @@ import "./App.scss"
 import { Navbar } from "./components/navbar/navbar"
 import Login from "./components/login/login"
 import { Footer } from "./components/footer/footer"
+import { CalendarSection } from "./components/calendar/calendar"
 
 function App() {
   const path = window.location.pathname 
@@ -36,6 +37,8 @@ function App() {
           <img src="" alt="" />
         </div>
       </section>
+
+      <CalendarSection />
 
       <Footer />
     </>
