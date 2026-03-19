@@ -88,6 +88,16 @@
         transform: translateY(-1px);
         box-shadow: 0 0 20px v.$neon-blue;
     }
+
+    &.login{
+        background: v.$neon-blue;
+        box-shadow: 0 0 15px v.$neon-blue;
+    }
+
+    &.register{
+        background: v.$neon-pink;
+        box-shadow: 0 0 15px v.$neon-pink;
+    }
 }
 
 .login-card{
@@ -250,5 +260,21 @@
 
     &:hover{
         color: v.$color-primary;
+    }
+}
+
+.register-text{
+    margin-top: v.$space-md;
+    text-align: center;
+    color: v.$color-text-muted;
+
+    span{
+        color: v.$color-primary;
+        cursor: pointer;
+        transition: v.$transition-fast;
+
+        &:hover{
+            color: v.$color-secondary;
+        }
     }
 }
