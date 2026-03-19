@@ -22,7 +22,7 @@ export const Footer = () => {
                     <h4>Enlaces</h4>
                     <a href="#inicio">Inicio</a>
                     <a href="#">Eventos</a>
-                    <a href="#">InicNosotrosio</a>
+                    <a href="#">Nosotros</a>
                     <a href="#">Únete al club</a>
                 </div>
 
