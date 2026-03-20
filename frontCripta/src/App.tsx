@@ -1,33 +1,46 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import "./App.scss"
+import { Navbar } from "./components/navbar/navbar"
+import Login from "./components/login/login"
+import { Footer } from "./components/footer/footer"
+import { CalendarSection } from "./components/calendar/calendar"
 
 function App() {
-  const [count, setCount] = useState(0)
+  const path = window.location.pathname 
+
+  if(path === "/login")
+  {
+    return <Login />
+  }
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
+      <Navbar /> 
+
+      <section id="inicio" className="hero">
+        <h1 className="hero-title">
+          <span className="hero-highlight">Bienvenido</span> a <br/> La Cripta
+        </h1>
+        <p className="hero-subtitle">
+          Asociación sin ánimo de lucro dedicada al ocio alternativo para jóvenes.
+          Juegos de mesa, rol, videojuegos y mucho más.
         </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+
+        <div className="hero-buttons">
+          <a className="btn-pink">Únete al Club</a>
+          <a className="btn-outline">Ver Eventos</a>
+        </div>
+
+      {/* #wip */}
+        <div className="hero-carousel">
+          <img src="" alt="" />
+          <img src="" alt="" />
+          <img src="" alt="" />
+        </div>
+      </section>
+
+      <CalendarSection />
+
+      <Footer />
     </>
   )
 }
