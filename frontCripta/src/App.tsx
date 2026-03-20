@@ -3,9 +3,10 @@ import { Navbar } from "./components/navbar/navbar"
 import Login from "./components/login/login"
 import { Footer } from "./components/footer/footer"
 import { CalendarSection } from "./components/calendar/calendar"
+import { ContactoSection } from "./components/contact/contacto"
 
 function App() {
-  const path = window.location.pathname 
+  const path = window.location.pathname
 
   if(path === "/login")
   {
@@ -14,7 +15,7 @@ function App() {
 
   return (
     <>
-      <Navbar /> 
+      <Navbar />
 
       <section id="inicio" className="hero">
         <h1 className="hero-title">
@@ -30,7 +31,7 @@ function App() {
           <a className="btn-outline">Ver Eventos</a>
         </div>
 
-      {/* #wip */}
+        {/* #wip */}
         <div className="hero-carousel">
           <img src="" alt="" />
           <img src="" alt="" />
@@ -39,6 +40,8 @@ function App() {
       </section>
 
       <CalendarSection />
+
+      <ContactoSection />
 
       <Footer />
     </>
