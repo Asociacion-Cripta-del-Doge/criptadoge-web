@@ -1,5 +1,6 @@
 import "./login.scss"
 import { useState } from "react"
+import toast from 'react-hot-toast'
 
 const API_BASE = "/api"
 
@@ -11,22 +12,20 @@ export default function Login(){
     const [name, setName] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
     const [showPassword, setShowPassword] = useState(false)
-    const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        setError("")
 
         if(mode === "register" && password !== confirmPassword)
         {
-            alert("Las contraseñas no coinciden")
+            toast.error("Las contraseñas no coinciden")
             return
         }
         
         if(mode === "register" && password.length < 8)
         {
-            setError("La contraseña debe tener al menos 8 caracteres")
+            toast.error("La contraseña debe tener al menos 8 caracteres")
             return
         }
             setLoading(true)
@@ -45,7 +44,7 @@ export default function Login(){
 
                 if(!res.ok)
                 {
-                    setError(data.message || "Credenciales incorrectas")
+                    toast.error(data.message || "Credenciales incorrectas")
                     return
                 }
 
@@ -65,7 +64,7 @@ export default function Login(){
 
                 if(!res.ok)
                 {
-                    setError(data.message || "Error al crear la cuenta")
+                    toast.error(data.message || "Error al crear la cuenta")
                     return
                 }
 
@@ -73,8 +72,7 @@ export default function Login(){
                 setMode("login")
                 setEmail(email)
                 setPassword("")
-                setError("")
-                alert("¡Cuenta creada! Ya puedes iniciar sesión.")
+                toast.success("¡Cuenta creada! Ya puedes iniciar sesión.")
             }
         } catch {
             setError("Error de conexión. Inténtalo de nuevo")
@@ -148,8 +146,6 @@ export default function Login(){
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required />
                 )}
-
-                {error && <p className="error-message">{error}</p>}
 
                 <button className={`submit ${mode}`} disabled={loading}>
                     {loading

@@ -3,17 +3,24 @@ import { Navbar } from "./components/navbar/navbar"
 import Login from "./components/login/login"
 import { Footer } from "./components/footer/footer"
 import { CalendarSection } from "./components/calendar/calendar"
+import { Toaster } from 'react-hot-toast'
 
 function App() {
   const path = window.location.pathname 
 
   if(path === "/login")
   {
-    return <Login />
+    return (
+      <>
+        <Toaster position="top-right"/>
+        <Login/>
+      </>
+    )
   }
 
   return (
     <>
+    <Toaster position="top-right"/>
       <Navbar /> 
 
       <section id="inicio" className="hero">
