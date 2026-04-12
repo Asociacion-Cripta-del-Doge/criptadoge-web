@@ -8,6 +8,20 @@ import { Toaster } from 'react-hot-toast'
 function App() {
   const path = window.location.pathname 
 
+  if(path == "/auth/callback")
+  {
+    const params = new URLSearchParams(window.location.search)
+    const token = params.get('token')
+    const user = params.get('user')
+
+    if(token && user)
+    {
+      localStorage.setItem("access_token", token)
+      localStorage.setItem("user", user)
+    }
+    window.location.href ="/"
+  }
+
   if(path === "/login")
   {
     return (

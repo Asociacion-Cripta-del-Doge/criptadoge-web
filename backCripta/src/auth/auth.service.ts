@@ -54,4 +54,34 @@ export class AuthService {
       select: { id: true, name: true, role: true, status: true }
     });
   }
+
+  async loginWithGoogle(data: { email: string, name: string })
+  {
+    let user = await this.prisma.user.findUnique({
+      where: { email: data.email }
+    });
+
+    if(!user)
+    {
+      user = await this.prisma.user.create({
+        data: {
+          name: data.name,
+          email: data.email,
+          password: ''
+        }
+      });
+    }
+
+    const payload = { email: user.email, sub: user.id, role: user.role };
+
+    return {
+      access_token: this.jwtService.sign(payload),
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }
+    };
+  }
 }

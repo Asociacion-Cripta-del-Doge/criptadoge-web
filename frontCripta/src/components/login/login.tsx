@@ -75,7 +75,7 @@ export default function Login(){
                 toast.success("¡Cuenta creada! Ya puedes iniciar sesión.")
             }
         } catch {
-            setError("Error de conexión. Inténtalo de nuevo")
+            toast.error("Error de conexión. Inténtalo de nuevo")
         } finally {
             setLoading(false)
         }
@@ -83,7 +83,6 @@ export default function Login(){
 
     const handleModeChange = (newMode: "login" | "register") => {
         setMode(newMode)
-        setError("")
     }
 
     return(
@@ -158,7 +157,7 @@ export default function Login(){
                 <span>o continúa con</span>
             </div>
 
-            <button className="google-btn">
+            <button className="google-btn" onClick={() => window.location.href = '/api/auth/google'}>
                 Continuar con Google
             </button>
 
