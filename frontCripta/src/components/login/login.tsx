@@ -90,7 +90,7 @@ export default function Login(){
                 <div className="password-field">
                     <input
                         type="password"
-                        placeholder="Contarseña"
+                        placeholder="Contraseña"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required />
