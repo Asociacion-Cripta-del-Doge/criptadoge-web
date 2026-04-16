@@ -17,7 +17,7 @@ export const UbicacionSection = () => (
       <h2 className="ub-title">
         ¿Dónde <span className="ub-title-highlight">Encontrarnos</span>?
       </h2>
-      <p className="ub-subtitle">Estamos en el corazón de Puertollano, fácilmente accesible.</p>
+      <p className="ub-subtitle">Estamos en Puertollano, fácilmente accesible para todo el mundo.</p>
     </div>
 
     <div className="ub-layout">
