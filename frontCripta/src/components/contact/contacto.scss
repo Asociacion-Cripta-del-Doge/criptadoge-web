@@ -1,0 +1,435 @@
+@use "../../styles/variables" as v;
+
+.ct-section {
+  padding: 80px v.$space-xl;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.ct-header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.ct-tag {
+  display: inline-block;
+  border: 1px solid v.$color-secondary;
+  color: v.$color-secondary;
+  font-family: v.$font-mono;
+  font-size: 0.75rem;
+  padding: 4px 14px;
+  border-radius: 20px;
+  margin-bottom: 16px;
+  letter-spacing: 0.5px;
+}
+
+.ct-title {
+  font-family: v.$font-display;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  color: v.$color-text-main;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+}
+
+.ct-title-highlight {
+  color: v.$color-accent;
+  text-shadow: 0 0 20px rgba(234, 179, 8, 0.4);
+}
+
+.ct-subtitle {
+  color: v.$color-text-muted;
+  font-family: v.$font-primary;
+  font-size: 0.95rem;
+}
+
+.ct-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ct-card {
+  background: v.$color-bg-surface;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-lg;
+  padding: v.$space-lg v.$space-lg;
+}
+
+.ct-card-title {
+  font-family: v.$font-primary;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: v.$color-text-main;
+  margin-bottom: 4px;
+}
+
+.ct-card-sub {
+  font-size: 0.8rem;
+  color: v.$color-text-muted;
+  margin-bottom: v.$space-md;
+}
+
+.ct-form {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-md;
+}
+
+.ct-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: v.$space-md;
+
+  @media (max-width: 500px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ct-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-family: v.$font-primary;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: v.$color-text-main;
+  }
+
+  input,
+  textarea {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-sm;
+    color: v.$color-text-main;
+    font-family: v.$font-primary;
+    font-size: 0.85rem;
+    padding: 10px 12px;
+    outline: none;
+    transition: border-color v.$transition-fast;
+    resize: none;
+
+    &::placeholder {
+      color: rgba(148, 163, 184, 0.45);
+    }
+
+    &:focus {
+      border-color: rgba(v.$neon-blue, 0.5);
+      background: rgba(0, 191, 255, 0.04);
+    }
+  }
+}
+
+.ct-submit {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: v.$radius-md;
+  background: v.$neon-pink;
+  color: #fff;
+  font-family: v.$font-primary;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 0 16px rgba(255, 46, 154, 0.35);
+  transition: filter v.$transition-fast, opacity v.$transition-fast;
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.1);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  &.ok {
+    background: #16a34a;
+    box-shadow: 0 0 16px rgba(22, 163, 74, 0.3);
+  }
+
+  &.error {
+    background: v.$color-error;
+    box-shadow: 0 0 16px rgba(239, 68, 68, 0.3);
+  }
+}
+
+.ct-submit-icon {
+  font-size: 0.85rem;
+  transform: rotate(45deg);
+  display: inline-block;
+}
+
+.ct-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: ct-spin 0.7s linear infinite;
+}
+
+@keyframes ct-spin {
+  to { transform: rotate(360deg); }
+}
+
+.ct-right {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.ct-redes {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ct-red-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: v.$radius-md;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  text-decoration: none;
+  transition: background v.$transition-fast, border-color v.$transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.12);
+
+    .ct-red-arrow {
+      color: var(--red-color, v.$neon-blue);
+    }
+  }
+}
+
+.ct-red-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--red-color, v.$neon-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+
+.ct-red-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.ct-red-nombre {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: v.$color-text-main;
+}
+
+.ct-red-handle {
+  font-size: 0.75rem;
+  color: v.$color-text-muted;
+}
+
+.ct-red-arrow {
+  font-size: 1.1rem;
+  color: v.$color-text-muted;
+  transition: color v.$transition-fast;
+}
+
+.ct-twitch-card {
+  border-color: rgba(145, 70, 255, 0.3);
+}
+
+.ct-twitch-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: v.$space-md;
+}
+
+.ct-twitch-brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #9146FF;
+}
+
+.ct-live-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #ef4444;
+  color: #fff;
+  font-family: v.$font-mono;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+
+  &--offline {
+    background: #4b5563;
+  }
+}
+
+.ct-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #fff;
+  animation: ct-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes ct-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.ct-twitch-preview {
+  display: block;
+  text-decoration: none;
+  margin-bottom: v.$space-md;
+}
+
+.ct-twitch-thumbnail {
+  background: #0e0e10;
+  border-radius: v.$radius-md;
+  height: 170px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 10px;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(145, 70, 255, 0.12) 0%, transparent 70%);
+  }
+}
+
+.ct-twitch-play {
+  color: rgba(145, 70, 255, 0.8);
+  svg { width: 48px; height: 48px; }
+}
+
+.ct-twitch-overlay {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.ct-twitch-live-pill {
+  background: #ef4444;
+  color: #fff;
+  font-family: v.$font-mono;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+
+  &--offline {
+    background: #4b5563;
+  }
+}
+
+.ct-twitch-viewers {
+  font-family: v.$font-mono;
+  font-size: 0.72rem;
+  color: v.$color-text-muted;
+  background: rgba(0,0,0,0.6);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.ct-twitch-title {
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: v.$color-text-main;
+  margin-bottom: 4px;
+}
+
+.ct-twitch-game {
+  font-size: 0.78rem;
+  color: v.$color-text-muted;
+}
+
+.ct-twitch-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px;
+  background: #9146FF;
+  color: #fff;
+  border-radius: v.$radius-md;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: filter v.$transition-fast;
+
+  &:hover {
+    filter: brightness(1.1);
+    color: #fff;
+  }
+}
+
+.ct-insta-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-top: v.$space-md;
+}
+
+.ct-insta-post {
+  aspect-ratio: 1;
+  border-radius: v.$radius-sm;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 4px;
+  opacity: 0.85;
+  transition: opacity v.$transition-fast, transform v.$transition-fast;
+
+  &:hover {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+}
+
+.ct-insta-likes {
+  font-family: v.$font-mono;
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.9);
+  background: rgba(0,0,0,0.5);
+  padding: 2px 5px;
+  border-radius: 4px;
+}

@@ -18,53 +18,56 @@ import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 
 @Controller('eventos')
-@UseGuards(JwtAuthGuard, RolesGuard)
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
-  @Post()
-  @Roles('ADMIN')
-  async create(@Body() createEventDto: CreateEventDto) {
-    return this.eventsService.create(createEventDto);
-  }
-
   @Get()
-  @Roles('ADMIN', 'MEMBER')
   async findAll() {
     return this.eventsService.findAll();
   }
 
   @Get(':id')
-  @Roles('ADMIN', 'MEMBER')
   async findOne(@Param('id') id: string) {
     return this.eventsService.findOne(id);
   }
 
+  @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  async create(@Body() createEventDto: CreateEventDto) {
+    return this.eventsService.create(createEventDto);
+  }
+
   @Put(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   async update(@Param('id') id: string, @Body() updateEventDto: UpdateEventDto) {
     return this.eventsService.update(id, updateEventDto);
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   async remove(@Param('id') id: string) {
     return this.eventsService.remove(id);
   }
 
   @Post(':id/asistentes')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('MEMBER')
   async joinEvent(@Param('id') eventId: string, @Req() req: Request) {
     return this.eventsService.joinEvent(eventId, (req.user as any).id);
   }
 
   @Delete(':id/asistentes')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('MEMBER')
   async leaveEvent(@Param('id') eventId: string, @Req() req: Request) {
     return this.eventsService.leaveEvent(eventId, (req.user as any).id);
   }
 
   @Get(':id/asistentes')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   async getAttendees(@Param('id') eventId: string) {
     return this.eventsService.getAttendees(eventId);
