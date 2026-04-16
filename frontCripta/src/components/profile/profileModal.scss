@@ -1,0 +1,356 @@
+@use "../../styles/variables" as *;
+
+.profile-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(6px);
+    z-index: 1000;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    padding: 4.5rem $space-md 0;
+}
+
+.profile-modal {
+    position: relative;
+    background: $color-bg-surface;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    width: 340px;
+    overflow: hidden;
+    box-shadow:
+        0 0 0 1px rgba($neon-blue, 0.15),
+        0 0 30px rgba($neon-blue, 0.08),
+        0 25px 50px rgba(0, 0, 0, 0.6);
+    animation: slideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+    &__scanlines {
+        position: absolute;
+        inset: 0;
+        background: repeating-linear-gradient(0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.03) 2px,
+                rgba(0, 0, 0, 0.03) 4px);
+        pointer-events: none;
+        z-index: 10;
+    }
+
+    &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, $color-primary, $neon-blue, $color-secondary);
+        z-index: 11;
+    }
+
+    &__header {
+        display: flex;
+        align-items: center;
+        gap: $space-md;
+        padding: $space-md;
+        background: linear-gradient(135deg, $color-bg-main 60%, rgba($color-primary, 0.2));
+        position: relative;
+    }
+
+    &__avatar-wrap {
+        position: relative;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        grid-area: 6px;
+    }
+
+    &__avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: $radius-sm;
+        background: linear-gradient(135deg, $color-primary, darken($color-primary, 10%));
+        color: $color-text-main;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: $font-display;
+        font-size: 1rem;
+        font-weight: 700;
+        border: 2px solid rgba($neon-blue, 0.4);
+        box-shadow: 0 0 12px rgba($neon-blue, 0.2);
+        // image-rendering: pixelated;
+    }
+
+    &__status-bubble {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        background: $color-bg-surface;
+        border: 1px solid var(--bubble-color);
+        border-radius: 20px;
+        padding: 2px 7px;
+        white-space: nowrap;
+        font-size: 0.58rem;
+        font-family: $font-mono;
+        color: var(--bubble-color);
+        box-shadow: 0 0 8px var(--bubble-glow);
+    }
+
+    &__status-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--bubble-color);
+        box-shadow: 0 0 4px var(--bubble-color);
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    &__info {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        padding-top: 2px;
+    }
+
+    &__name-row {
+        display: flex;
+        align-items: center;
+        gap: $space-sm;
+    }
+
+    &__name {
+        font-family: $font-display;
+        font-size: 1rem;
+        color: $color-text-main;
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-shadow: 0 0 20px rgba($neon-blue, 0.4);
+    }
+
+    &__badge {
+        font-family: $font-mono;
+        font-size: 0.55rem;
+        padding: 2px 5px;
+        border-radius: 3px;
+        font-weight: 700;
+        background: $color-accent;
+        color: $color-bg-main;
+        letter-spacing: 0.05em;
+        flex-shrink: 0;
+    }
+
+    &__email {
+        font-family: $font-mono;
+        font-size: 0.7rem;
+        color: $color-text-muted;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &__since {
+        font-size: 0.65rem;
+        color: rgba($color-text-muted, 0.6);
+        font-family: $font-mono;
+    }
+
+    &__close {
+        position: absolute;
+        top: $space-sm;
+        right: $space-sm;
+        background: none;
+        border: none;
+        color: $color-text-muted;
+        cursor: pointer;
+        font-size: 0.75rem;
+        padding: $space-xs;
+        line-height: 1;
+        transition: color $transition-fast, text-shadow $transition-fast;
+        z-index: 12;
+
+        &:hover {
+            color: $color-text-main;
+            text-shadow: 0 0 8px $neon-pink;
+        }
+    }
+
+    &__section {
+        padding: $space-md;
+        border-top: 1px solid $color-border;
+    }
+
+    &__section-header {
+        display: flex;
+        align-items: center;
+        gap: $space-xs;
+        margin-bottom: $space-sm;
+    }
+
+    &__section-icon {
+        font-size: 0.75rem;
+        filter: grayscale(0.3);
+    }
+
+    &__section-title {
+        font-family: $font-mono;
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: $color-text-muted;
+        margin: 0;
+    }
+
+    &__membership {
+        display: flex;
+        flex-direction: column;
+        gap: $space-sm;
+    }
+
+    &__membership-rows {
+        background: $color-bg-main;
+        border-radius: $radius-sm;
+        padding: $space-sm $space-md;
+        display: flex;
+        flex-direction: column;
+        gap: $space-xs;
+        border: 1px solid rgba($color-border, 0.5);
+    }
+
+    &__row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.78rem;
+    }
+
+    &__label {
+        color: $color-text-muted;
+        font-family: $font-mono;
+        font-size: 0.72rem;
+    }
+
+    &__value {
+        color: $color-text-main;
+        font-weight: 600;
+        font-family: $font-mono;
+        font-size: 0.72rem;
+    }
+
+    // Barra de vida estilo RPG
+    &__bar-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    &__bar-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.68rem;
+        font-family: $font-mono;
+        color: $color-text-muted;
+    }
+
+    &__bar-days--warn {
+        color: $color-accent;
+    }
+
+    &__bar-track {
+        height: 6px;
+        background: $color-bg-main;
+        border-radius: 3px;
+        overflow: hidden;
+        border: 1px solid $color-border;
+    }
+
+    &__bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, $color-primary, $neon-blue);
+        border-radius: 3px;
+        transition: width 0.6s ease;
+        box-shadow: 0 0 6px rgba($neon-blue, 0.5);
+
+        &--warn {
+            background: linear-gradient(90deg, #b45309, $color-accent);
+            box-shadow: 0 0 6px rgba($color-accent, 0.5);
+        }
+    }
+
+    &__cta {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: $space-xs;
+        background: linear-gradient(135deg, $color-secondary, $neon-pink);
+        color: $color-text-main;
+        padding: $space-sm $space-md;
+        border-radius: $radius-sm;
+        font-family: $font-display;
+        font-size: 0.8rem;
+        text-decoration: none;
+        transition: opacity $transition-fast, box-shadow $transition-fast;
+        box-shadow: 0 0 16px rgba($neon-pink, 0.3);
+
+        &:hover {
+            opacity: 0.9;
+            box-shadow: 0 0 24px rgba($neon-pink, 0.5);
+        }
+    }
+
+    &__footer {
+        padding: $space-sm $space-md $space-md;
+        border-top: 1px solid $color-border;
+    }
+
+    &__logout {
+        width: 100%;
+        background: transparent;
+        border: 1px solid rgba($color-border, 0.8);
+        color: $color-text-muted;
+        padding: $space-sm;
+        border-radius: $radius-sm;
+        font-family: $font-mono;
+        font-size: 0.75rem;
+        cursor: pointer;
+        transition: all $transition-fast;
+        letter-spacing: 0.05em;
+
+        &:hover {
+            background: rgba($color-error, 0.08);
+            border-color: $color-error;
+            color: $color-error;
+            box-shadow: 0 0 10px rgba($color-error, 0.15);
+        }
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.4;
+    }
+}
