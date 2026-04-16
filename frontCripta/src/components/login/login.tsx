@@ -1,52 +1,89 @@
 import "./login.scss"
 import { useState } from "react"
+import toast from 'react-hot-toast'
+
+const API_BASE = "/api"
 
 export default function Login(){
     const [mode, setMode] = useState<"login" | "register">("login")
 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
-    const [username, setUsername] = useState("")
+    const [name, setName] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
+    const [showPassword, setShowPassword] = useState(false)
+    const [loading, setLoading] = useState(false)
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
         if(mode === "register" && password !== confirmPassword)
         {
-            alert("Las contraseñas no coinciden")
+            toast.error("Las contraseñas no coinciden")
             return
         }
+        
+        if(mode === "register" && password.length < 8)
+        {
+            toast.error("La contraseña debe tener al menos 8 caracteres")
+            return
+        }
+            setLoading(true)
 
         try 
         {
-            const endpoint = 
-                mode === "login"
-                    ?  "http://localhost:8080/api/login"
-                    : "http://localhost:8080/api/register"
+            if(mode === "login")
+            {
+                const res = await fetch(`${API_BASE}/auth/login`, {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json" },
+                    body: JSON.stringify({ email, password })
+                })
 
-                    const res = await fetch(endpoint, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
-                            email,
-                            password,
-                            username
-                        })
-                    })
+                const data = await res.json()
 
-            const data = await res.json()
+                if(!res.ok)
+                {
+                    toast.error(data.message || "Credenciales incorrectas")
+                    return
+                }
 
-            if (mode === "login" && data.access_token) {
+                localStorage.setItem("access_token", data.access_token)
                 localStorage.setItem("token", data.access_token)
+                localStorage.setItem("user", JSON.stringify(data.user))
                 window.location.href = "/"
             }
-        } catch(error)
-        {
-            console.error("Error:", error)
+            else 
+            {
+                const res = await fetch(`${API_BASE}/auth/register`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name, email, password })
+                })
+
+                const data = await res.json()
+
+                if(!res.ok)
+                {
+                    toast.error(data.message || "Error al crear la cuenta")
+                    return
+                }
+
+                
+                setMode("login")
+                setEmail(email)
+                setPassword("")
+                toast.success("¡Cuenta creada! Ya puedes iniciar sesión.")
+            }
+        } catch {
+            toast.error("Error de conexión. Inténtalo de nuevo")
+        } finally {
+            setLoading(false)
         }
+    }
+
+    const handleModeChange = (newMode: "login" | "register") => {
+        setMode(newMode)
     }
 
     return(
@@ -57,12 +94,12 @@ export default function Login(){
                 <div className="tabs">
                     <button
                         className={mode === "login" ? "active blue" : ""}
-                        onClick={() => setMode("login")}>
+                        onClick={() => handleModeChange("login")}>
                             Iniciar sesión
                     </button>
                     <button
                         className={mode === "register" ? "active pink" : ""}
-                        onClick={() => setMode("register")}>
+                        onClick={() => handleModeChange("register")}>
                             Registrarse
                     </button>
                 </div>
@@ -76,8 +113,8 @@ export default function Login(){
                         <input
                             type="text"
                             placeholder="Nombre de usuario"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)} />
+                            value={name}
+                            onChange={(e) => setName(e.target.value)} required />
                     )}
 
                 <input
@@ -93,12 +130,12 @@ export default function Login(){
 
                 <div className="password-field">
                     <input
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         placeholder="Contraseña"
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={(e) => setPassword(e.target.value)} 
                         required />
-                    <button type="button">👁️</button>
+                    <button type="button" onClick={() => setShowPassword(!showPassword)}>{showPassword ? "🙈" : "👁️"}</button>
                 </div>
 
                 {mode === "register" && (
@@ -110,8 +147,10 @@ export default function Login(){
                     required />
                 )}
 
-                <button className={`submit ${mode}`}>
-                    {mode === "login" ? "Iniciar sesión" : "Crear cuenta"}
+                <button className={`submit ${mode}`} disabled={loading}>
+                    {loading
+                        ? "Cargando..."
+                        : mode === "login" ? "Iniciar sesión" : "Crear cuenta"}
                 </button>
             </form>
 
@@ -119,18 +158,18 @@ export default function Login(){
                 <span>o continúa con</span>
             </div>
 
-            <button className="google-btn">
+            <button className="google-btn" onClick={() => window.location.href = '/api/auth/google'}>
                 Continuar con Google
             </button>
 
             <p className="register-text">
                 {mode === "login" ? (
                     <>
-                        ¿No tienes cuenta? <span onClick={() => setMode("register")}>Regístrate</span>
+                        ¿No tienes cuenta? <span onClick={() => handleModeChange("register")}>Regístrate</span>
                     </>
                 ) : (
                     <>
-                        ¿Ya tienes cuenta? <span onClick={() => setMode("login")}>Inicia sesión</span>
+                        ¿Ya tienes cuenta? <span onClick={() => handleModeChange("login")}>Inicia sesión</span>
                     </>
                 )}  
             </p>

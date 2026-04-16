@@ -1,0 +1,444 @@
+@use "../../styles/variables" as v;
+@use "sass:color";
+
+.profile-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: v.$space-md;
+}
+
+.profile-modal {
+  position: relative;
+  background: v.$color-bg-main;
+  border: 1px solid rgba(v.$neon-blue, 0.25);
+  border-radius: v.$radius-md;
+  width: min(460px, 100%);
+  max-width: 100%;
+  max-height: 90vh;
+  overflow: hidden auto;
+  box-shadow:
+    0 0 15px rgba(v.$neon-blue, 0.15),
+    0 0 40px rgba(v.$neon-blue, 0.08),
+    0 30px 60px rgba(0, 0, 0, 0.7);
+  animation: slideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, v.$neon-blue, v.$neon-pink, transparent);
+    z-index: 11;
+  }
+
+  &__scanlines {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 4px
+    );
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: v.$space-lg;
+    padding: v.$space-xl v.$space-lg v.$space-lg;
+    background: color.change(v.$color-bg-surface, $alpha: 0.5);
+    border-bottom: 1px solid rgba(v.$neon-blue, 0.15);
+    position: relative;
+  }
+
+  &__avatar-wrap {
+    position: relative;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: v.$space-sm;
+  }
+
+  &__avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: v.$color-bg-surface;
+    color: v.$neon-blue;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: v.$font-display;
+    font-size: 1.4rem;
+    border: 1px solid rgba(v.$neon-blue, 0.5);
+    box-shadow: 0 0 10px rgba(v.$neon-blue, 0.2);
+    transition: box-shadow v.$transition-fast;
+
+    &:hover {
+      box-shadow: 0 0 16px rgba(v.$neon-blue, 0.35);
+    }
+  }
+
+  &__status-bubble {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: v.$color-bg-surface;
+    border: 1px solid var(--bubble-color);
+    border-radius: 20px;
+    padding: 2px 8px;
+    white-space: nowrap;
+    font-size: 0.6rem;
+    font-family: v.$font-mono;
+    color: var(--bubble-color);
+    box-shadow: 0 0 6px var(--bubble-glow);
+  }
+
+  &__status-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--bubble-color);
+    box-shadow: 0 0 4px var(--bubble-color);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__name-row {
+    display: flex;
+    align-items: center;
+    gap: v.$space-sm;
+    flex-wrap: wrap;
+  }
+
+  &__name {
+    font-family: v.$font-display;
+    font-size: 1.1rem;
+    color: v.$neon-blue;
+    margin: 0;
+    text-shadow: 0 0 8px rgba(v.$neon-blue, 0.4);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__badge {
+    font-family: v.$font-mono;
+    font-size: 0.55rem;
+    padding: 2px 6px;
+    border-radius: v.$radius-sm;
+    font-weight: 700;
+    background: v.$color-accent;
+    color: v.$color-bg-main;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+
+  &__edit-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.7rem;
+    opacity: 0.4;
+    padding: 2px;
+    transition: opacity v.$transition-fast;
+    line-height: 1;
+
+    &:hover { opacity: 1; }
+  }
+
+  &__name-edit {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+  }
+
+  &__name-input {
+    flex: 1;
+    background: v.$color-bg-surface;
+    border: 1px solid rgba(v.$neon-blue, 0.5);
+    border-radius: v.$radius-sm;
+    color: v.$neon-blue;
+    font-family: v.$font-display;
+    font-size: 0.95rem;
+    padding: 3px 8px;
+    outline: none;
+    min-width: 0;
+    box-shadow: 0 0 6px rgba(v.$neon-blue, 0.15);
+    transition: border-color v.$transition-fast, box-shadow v.$transition-fast;
+
+    &:focus {
+      border-color: v.$neon-blue;
+      box-shadow: 0 0 10px rgba(v.$neon-blue, 0.3);
+    }
+
+    &--error {
+      border-color: v.$color-error;
+      box-shadow: 0 0 8px rgba(v.$color-error, 0.3);
+    }
+  }
+
+  &__name-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: v.$radius-sm;
+    border: 1px solid;
+    cursor: pointer;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: box-shadow v.$transition-fast, transform v.$transition-fast;
+
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    &--save {
+      background: transparent;
+      border-color: rgba(v.$neon-blue, 0.5);
+      color: v.$neon-blue;
+
+      &:hover:not(:disabled) {
+        background: rgba(v.$neon-blue, 0.12);
+        box-shadow: 0 0 10px rgba(v.$neon-blue, 0.3);
+        transform: translateY(-1px);
+      }
+    }
+
+    &--cancel {
+      background: transparent;
+      border-color: rgba(v.$color-error, 0.5);
+      color: v.$color-error;
+
+      &:hover {
+        background: rgba(v.$color-error, 0.1);
+        box-shadow: 0 0 8px rgba(v.$color-error, 0.2);
+        transform: translateY(-1px);
+      }
+    }
+  }
+
+  &__name-error {
+    font-family: v.$font-mono;
+    font-size: 0.62rem;
+    color: v.$color-error;
+  }
+
+  &__email {
+    font-family: v.$font-mono;
+    font-size: 0.72rem;
+    color: rgba(v.$color-text-main, 0.5);
+  }
+
+  &__since {
+    font-family: v.$font-mono;
+    font-size: 0.65rem;
+    color: rgba(v.$color-text-main, 0.3);
+  }
+
+  &__close {
+    position: absolute;
+    top: v.$space-sm;
+    right: v.$space-sm;
+    background: none;
+    border: none;
+    color: rgba(v.$color-text-main, 0.4);
+    cursor: pointer;
+    font-size: 0.8rem;
+    padding: v.$space-xs;
+    line-height: 1;
+    transition: color v.$transition-fast, text-shadow v.$transition-fast;
+    z-index: 12;
+
+    &:hover {
+      color: v.$neon-pink;
+      text-shadow: 0 0 8px v.$neon-pink;
+    }
+  }
+
+  &__section {
+    padding: v.$space-lg;
+    border-bottom: 1px solid rgba(v.$neon-blue, 0.1);
+  }
+
+  &__section-header {
+    display: flex;
+    align-items: center;
+    gap: v.$space-xs;
+    margin-bottom: v.$space-md;
+  }
+
+  &__section-icon { font-size: 0.75rem; }
+
+  &__section-title {
+    font-family: v.$font-mono;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: rgba(v.$color-text-main, 0.4);
+    margin: 0;
+  }
+
+  &__membership {
+    display: flex;
+    flex-direction: column;
+    gap: v.$space-md;
+  }
+
+  &__membership-rows {
+    background: v.$color-bg-surface;
+    border-radius: v.$radius-sm;
+    padding: v.$space-sm v.$space-md;
+    display: flex;
+    flex-direction: column;
+    gap: v.$space-xs;
+    border: 1px solid rgba(v.$neon-blue, 0.1);
+  }
+
+  &__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__label {
+    font-family: v.$font-mono;
+    font-size: 0.72rem;
+    color: rgba(v.$color-text-main, 0.4);
+  }
+
+  &__value {
+    font-family: v.$font-mono;
+    font-size: 0.72rem;
+    color: v.$color-text-main;
+    font-weight: 600;
+  }
+
+  &__bar-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-family: v.$font-mono;
+    font-size: 0.68rem;
+    color: rgba(v.$color-text-main, 0.4);
+  }
+
+  &__bar-days--warn { color: v.$color-accent; }
+
+  &__bar-track {
+    height: 4px;
+    background: v.$color-bg-surface;
+    border-radius: 2px;
+    overflow: hidden;
+    border: 1px solid rgba(v.$neon-blue, 0.15);
+  }
+
+  &__bar-fill {
+    height: 100%;
+    background: v.$neon-blue;
+    border-radius: 2px;
+    transition: width 0.6s ease;
+    box-shadow: 0 0 6px rgba(v.$neon-blue, 0.5);
+
+    &--warn {
+      background: v.$color-accent;
+      box-shadow: 0 0 6px rgba(v.$color-accent, 0.5);
+    }
+  }
+
+  &__cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: v.$space-xs;
+    background: v.$neon-pink;
+    color: white;
+    padding: 10px 18px;
+    border-radius: v.$radius-sm;
+    font-family: v.$font-display;
+    font-size: 0.85rem;
+    text-decoration: none;
+    box-shadow:
+      0 0 15px v.$neon-pink,
+      0 0 30px rgba(v.$neon-pink, 0.4);
+    transition:
+      transform v.$transition-fast,
+      box-shadow v.$transition-fast,
+      filter v.$transition-fast;
+
+    &:hover {
+      color: white;
+      transform: translateY(-2px);
+      box-shadow:
+        0 0 20px v.$neon-pink,
+        0 0 40px rgba(v.$neon-pink, 0.5);
+      filter: brightness(1.1);
+    }
+  }
+
+  &__footer {
+    padding: v.$space-md v.$space-lg;
+  }
+
+  &__logout {
+    width: 100%;
+    background: transparent;
+    border: 1px solid v.$color-border;
+    color: v.$color-error;
+    padding: 10px 12px;
+    border-radius: v.$radius-sm;
+    font-family: v.$font-mono;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition:
+      background v.$transition-fast,
+      border-color v.$transition-fast,
+      box-shadow v.$transition-fast,
+      transform v.$transition-fast;
+
+    &:hover {
+      background: rgba(v.$color-error, 0.1);
+      border-color: v.$color-error;
+      box-shadow: 0 0 10px rgba(v.$color-error, 0.2);
+      transform: translateY(-1px);
+    }
+  }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
