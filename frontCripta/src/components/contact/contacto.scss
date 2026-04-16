@@ -286,6 +286,10 @@
   padding: 3px 10px;
   border-radius: 4px;
   letter-spacing: 0.5px;
+
+  &--offline {
+    background: #4b5563;
+  }
 }
 
 .ct-live-dot {
@@ -348,6 +352,10 @@
   font-weight: 700;
   padding: 2px 8px;
   border-radius: 4px;
+
+  &--offline {
+    background: #4b5563;
+  }
 }
 
 .ct-twitch-viewers {

@@ -53,11 +53,25 @@ export const ContactoSection = () => {
   const [mensaje, setMensaje] = useState("")
   const [formState, setFormState] = useState<FormState>("idle")
   const [redes, setRedes] = useState<RedSocial[]>([])
+  const [twitch, setTwitch] = useState<{
+    live: boolean
+    titulo: string | null
+    juego: string | null
+    viewers: number
+    thumbnail: string | null
+    url: string
+  } | null>(null)
 
   useEffect(() => {
     fetch(`${API_BASE}/contacto/redes`)
       .then(res => res.json())
       .then(setRedes)
+      .catch(() => {})
+
+    fetch(`${API_BASE}/contacto/twitch`)
+      .then(res => res.json())
+      .then(setTwitch)
+      .catch(() => {})
   }, [])
 
   const handleSubmit = async (e: FormEvent) => {
@@ -187,42 +201,50 @@ export const ContactoSection = () => {
             </ul>
           </div>
 
-          {(() => {
-            const twitch = redes.find(r => r.icon === "twitch")
-            if (!twitch) return null
-            return (
-              <div className="ct-card ct-twitch-card">
-                <div className="ct-twitch-header">
-                  <span className="ct-twitch-brand">
-                    <IconTwitch /> Twitch
-                  </span>
-                </div>
-
-                <a
-                  href={twitch.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="ct-twitch-preview"
-                >
-                  <div className="ct-twitch-thumbnail">
-                    <span className="ct-twitch-play">
-                      <IconTwitch />
-                    </span>
-                  </div>
-                  <p className="ct-twitch-title">{twitch.handle}</p>
-                </a>
-
-                <a
-                  href={twitch.url}
-                  className="ct-twitch-btn"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <IconTwitch /> Ver Canal
-                </a>
+          {twitch && (
+            <div className="ct-card ct-twitch-card">
+              <div className="ct-twitch-header">
+                <span className="ct-twitch-brand">
+                  <IconTwitch /> Twitch
+                </span>
+                {twitch.live
+                  ? <span className="ct-live-badge"><span className="ct-live-dot" /> EN VIVO</span>
+                  : <span className="ct-live-badge ct-live-badge--offline">⚫ OFFLINE</span>
+                }
               </div>
-            )
-          })()}
+
+              <a
+                href={twitch.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ct-twitch-preview"
+              >
+                <div className="ct-twitch-thumbnail">
+                  {twitch.thumbnail
+                    ? <img src={twitch.thumbnail} alt="canal" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "8px" }} />
+                    : <span className="ct-twitch-play"><IconTwitch /></span>
+                  }
+                  <div className="ct-twitch-overlay">
+                    {twitch.live
+                      ? <><span className="ct-twitch-live-pill">🔴 LIVE</span><span className="ct-twitch-viewers">👁 {twitch.viewers.toLocaleString()}</span></>
+                      : <span className="ct-twitch-live-pill ct-twitch-live-pill--offline">⚫ Offline</span>
+                    }
+                  </div>
+                </div>
+                {twitch.titulo && <p className="ct-twitch-title">{twitch.titulo}</p>}
+                {twitch.juego && <p className="ct-twitch-game">{twitch.juego}</p>}
+              </a>
+
+              <a
+                href={twitch.url}
+                className="ct-twitch-btn"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <IconTwitch /> {twitch.live ? "Ver Directo" : "Ver Canal"}
+              </a>
+            </div>
+          )}
 
           {(() => {
             const instagram = redes.find(r => r.icon === "instagram")

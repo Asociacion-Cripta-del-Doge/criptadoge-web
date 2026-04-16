@@ -16,4 +16,9 @@ export class ContactController {
   async getSocialLinks() {
     return this.contactService.getSocialLinks();
   }
+
+  @Get('twitch')
+  async getTwitchStream() {
+    return this.contactService.getTwitchStream();
+  }
 }
