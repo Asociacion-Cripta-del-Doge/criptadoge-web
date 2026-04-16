@@ -1,0 +1,197 @@
+@use "../../styles/variables" as v;
+
+.ub-section {
+  padding: 80px v.$space-xl;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.ub-header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.ub-tag {
+  display: inline-block;
+  border: 1px solid v.$color-secondary;
+  color: v.$color-secondary;
+  font-family: v.$font-mono;
+  font-size: 0.75rem;
+  padding: 4px 14px;
+  border-radius: 20px;
+  margin-bottom: 16px;
+  letter-spacing: 0.5px;
+}
+
+.ub-title {
+  font-family: v.$font-display;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  color: v.$color-text-main;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+
+  &-highlight {
+    color: v.$color-accent;
+  }
+}
+
+.ub-subtitle {
+  color: v.$color-text-muted;
+  font-size: 1rem;
+}
+
+// ── Layout ──────────────────────────────────────────────
+
+.ub-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ── Card base ───────────────────────────────────────────
+
+.ub-map-card,
+.ub-card {
+  background: v.$color-bg-surface;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-lg;
+  overflow: hidden;
+}
+
+// ── Mapa ────────────────────────────────────────────────
+
+.ub-map {
+  width: 100%;
+  height: 340px;
+
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+  }
+}
+
+.ub-address {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 20px 24px;
+  border-top: 1px solid v.$color-border;
+}
+
+.ub-address-icon {
+  font-size: 1.2rem;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.ub-address-name {
+  font-weight: 700;
+  color: v.$color-text-main;
+  margin-bottom: 4px;
+}
+
+.ub-address-line {
+  color: v.$color-text-muted;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+// ── Info column ─────────────────────────────────────────
+
+.ub-info {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.ub-card {
+  padding: 28px;
+}
+
+.ub-card-title {
+  font-family: v.$font-display;
+  font-size: 1rem;
+  color: v.$color-text-main;
+  letter-spacing: 1px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ub-icon-clock {
+  font-size: 1rem;
+}
+
+// ── Horario ─────────────────────────────────────────────
+
+.ub-horario {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.ub-horario-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid v.$color-border;
+  font-size: 0.95rem;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.ub-horario-dia {
+  color: v.$color-text-main;
+}
+
+.ub-horario-horas {
+  color: v.$color-text-muted;
+  font-family: v.$font-mono;
+  font-size: 0.85rem;
+}
+
+// ── Contacto rápido ─────────────────────────────────────
+
+.ub-contacto {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  a {
+    color: v.$color-text-muted;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: color v.$transition-fast;
+
+    &:hover {
+      color: v.$color-secondary;
+    }
+  }
+}
+
+.ub-contacto-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
