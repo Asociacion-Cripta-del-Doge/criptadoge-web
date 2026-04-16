@@ -11,6 +11,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { EventLabelsModule } from './event-labels/event-labels.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TasksModule } from './tasks/tasks.module';
+import { ContactModule } from './contact/contact.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { TasksModule } from './tasks/tasks.module';
     UsersModule,
     AuthModule,
     TasksModule,
+    ContactModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -26,15 +26,15 @@ export const REDES_MOCK: RedSocial[] = [
   {
     id: "twitch",
     nombre: "Twitch",
-    handle: "@criptadogeclub",
-    url: "https://www.twitch.tv/criptadogeclub",
+    handle: "@lacriptadedogeclub",
+    url: "https://www.twitch.tv/lacriptadedogeclub",
     color: "#9146FF",
     icon: "twitch",
   },
   {
     id: "instagram",
     nombre: "Instagram",
-    handle: "@criptadogeclub",
+    handle: "@lacriptadedoge",
     url: "https://www.instagram.com/lacriptadedoge/",
     color: "#E1306C",
     icon: "instagram",
@@ -62,7 +62,7 @@ export const TWITCH_MOCK: TwitchStream = {
   juego: "Jugando a Magic: The Gathering Arena",
   viewers: 127,
   live: true,
-  url: "https://www.twitch.tv/criptadogeclub",
+  url: "https://www.twitch.tv/lacriptadedogeclub",
 }
 
 export const INSTAGRAM_POSTS_MOCK: InstagramPost[] = [
