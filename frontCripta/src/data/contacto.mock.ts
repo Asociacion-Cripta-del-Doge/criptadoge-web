@@ -26,16 +26,16 @@ export const REDES_MOCK: RedSocial[] = [
   {
     id: "twitch",
     nombre: "Twitch",
-    handle: "@criptadogeclub",
-    url: "https://twitch.tv/criptadogeclub",
+    handle: "@lacriptadedogeclub",
+    url: "https://www.twitch.tv/lacriptadedogeclub",
     color: "#9146FF",
     icon: "twitch",
   },
   {
     id: "instagram",
     nombre: "Instagram",
-    handle: "@criptadogeclub",
-    url: "https://instagram.com/criptadogeclub",
+    handle: "@lacriptadedoge",
+    url: "https://www.instagram.com/lacriptadedoge/",
     color: "#E1306C",
     icon: "instagram",
   },
@@ -43,7 +43,7 @@ export const REDES_MOCK: RedSocial[] = [
     id: "discord",
     nombre: "Discord",
     handle: "Cripta de Doge",
-    url: "https://discord.gg/criptadoge",
+    url: "#",
     color: "#5865F2",
     icon: "discord",
   },
@@ -51,7 +51,7 @@ export const REDES_MOCK: RedSocial[] = [
     id: "whatsapp",
     nombre: "WhatsApp",
     handle: "Grupo Comunidad",
-    url: "https://wa.me/grupo",
+    url: "#",
     color: "#25D366",
     icon: "whatsapp",
   },
@@ -62,7 +62,7 @@ export const TWITCH_MOCK: TwitchStream = {
   juego: "Jugando a Magic: The Gathering Arena",
   viewers: 127,
   live: true,
-  url: "https://twitch.tv/criptadogeclub",
+  url: "https://www.twitch.tv/lacriptadedogeclub",
 }
 
 export const INSTAGRAM_POSTS_MOCK: InstagramPost[] = [

@@ -1,8 +1,17 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import type { CSSProperties, FormEvent } from "react"
-import { REDES_MOCK, TWITCH_MOCK, INSTAGRAM_POSTS_MOCK } from "../../data/contacto.mock"
-import type { RedSocial } from "../../data/contacto.mock"
 import "./contacto.scss"
+
+const API_BASE = "http://localhost:8080/api"
+
+interface RedSocial {
+  _id: string
+  nombre: string
+  handle: string
+  url: string
+  color: string
+  icon: "twitch" | "instagram" | "discord" | "whatsapp"
+}
 
 const IconTwitch = () => (
   <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
@@ -43,17 +52,48 @@ export const ContactoSection = () => {
   const [asunto, setAsunto] = useState("")
   const [mensaje, setMensaje] = useState("")
   const [formState, setFormState] = useState<FormState>("idle")
+  const [redes, setRedes] = useState<RedSocial[]>([])
+  const [twitch, setTwitch] = useState<{
+    live: boolean
+    titulo: string | null
+    juego: string | null
+    viewers: number
+    thumbnail: string | null
+    url: string
+  } | null>(null)
+
+  useEffect(() => {
+    fetch(`${API_BASE}/contacto/redes`)
+      .then(res => res.json())
+      .then(setRedes)
+      .catch(() => {})
+
+    fetch(`${API_BASE}/contacto/twitch`)
+      .then(res => res.json())
+      .then(setTwitch)
+      .catch(() => {})
+  }, [])
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     setFormState("sending")
-    await new Promise(r => setTimeout(r, 1200))
-    setFormState("ok")
-    setNombre("")
-    setEmail("")
-    setAsunto("")
-    setMensaje("")
-    setTimeout(() => setFormState("idle"), 3000)
+    try {
+      const res = await fetch(`${API_BASE}/contacto`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nombre, email, asunto, mensaje }),
+      })
+      if (!res.ok) throw new Error()
+      setFormState("ok")
+      setNombre("")
+      setEmail("")
+      setAsunto("")
+      setMensaje("")
+      setTimeout(() => setFormState("idle"), 3000)
+    } catch {
+      setFormState("error")
+      setTimeout(() => setFormState("idle"), 3000)
+    }
   }
 
   return (
@@ -140,8 +180,8 @@ export const ContactoSection = () => {
             <p className="ct-card-sub">Mantente al día con todas las novedades</p>
 
             <ul className="ct-redes">
-              {REDES_MOCK.map((red: RedSocial) => (
-                <li key={red.id}>
+              {redes.map((red: RedSocial) => (
+                <li key={red._id}>
                   <a
                     href={red.url}
                     className="ct-red-item"
@@ -161,66 +201,72 @@ export const ContactoSection = () => {
             </ul>
           </div>
 
-          <div className="ct-card ct-twitch-card">
-            <div className="ct-twitch-header">
-              <span className="ct-twitch-brand">
-                <IconTwitch /> Twitch
-              </span>
-              {TWITCH_MOCK.live && (
-                <span className="ct-live-badge">
-                  <span className="ct-live-dot" /> EN VIVO
+          {twitch && (
+            <div className="ct-card ct-twitch-card">
+              <div className="ct-twitch-header">
+                <span className="ct-twitch-brand">
+                  <IconTwitch /> Twitch
                 </span>
-              )}
-            </div>
-
-            <a
-              href={TWITCH_MOCK.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="ct-twitch-preview"
-            >
-              <div className="ct-twitch-thumbnail">
-                <span className="ct-twitch-play">
-                  <IconTwitch />
-                </span>
-                <div className="ct-twitch-overlay">
-                  <span className="ct-twitch-live-pill">🔴 LIVE</span>
-                  <span className="ct-twitch-viewers">👁 {TWITCH_MOCK.viewers}</span>
-                </div>
+                {twitch.live
+                  ? <span className="ct-live-badge"><span className="ct-live-dot" /> EN VIVO</span>
+                  : <span className="ct-live-badge ct-live-badge--offline">⚫ OFFLINE</span>
+                }
               </div>
-              <p className="ct-twitch-title">{TWITCH_MOCK.titulo}</p>
-              <p className="ct-twitch-game">{TWITCH_MOCK.juego}</p>
-            </a>
 
-            <a
-              href={TWITCH_MOCK.url}
-              className="ct-twitch-btn"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <IconTwitch /> Ver Directo
-            </a>
-          </div>
+              <a
+                href={twitch.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ct-twitch-preview"
+              >
+                <div className="ct-twitch-thumbnail">
+                  {twitch.thumbnail
+                    ? <img src={twitch.thumbnail} alt="canal" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "8px" }} />
+                    : <span className="ct-twitch-play"><IconTwitch /></span>
+                  }
+                  <div className="ct-twitch-overlay">
+                    {twitch.live
+                      ? <><span className="ct-twitch-live-pill">🔴 LIVE</span><span className="ct-twitch-viewers">👁 {twitch.viewers.toLocaleString()}</span></>
+                      : <span className="ct-twitch-live-pill ct-twitch-live-pill--offline">⚫ Offline</span>
+                    }
+                  </div>
+                </div>
+                {twitch.titulo && <p className="ct-twitch-title">{twitch.titulo}</p>}
+                {twitch.juego && <p className="ct-twitch-game">{twitch.juego}</p>}
+              </a>
 
-          <div className="ct-card">
-            <h3 className="ct-card-title">
-              <span style={{ opacity: 0.7 }}><IconInstagram /></span> Últimas Publicaciones
-            </h3>
-            <div className="ct-insta-grid">
-              {INSTAGRAM_POSTS_MOCK.map(post => (
+              <a
+                href={twitch.url}
+                className="ct-twitch-btn"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <IconTwitch /> {twitch.live ? "Ver Directo" : "Ver Canal"}
+              </a>
+            </div>
+          )}
+
+          {(() => {
+            const instagram = redes.find(r => r.icon === "instagram")
+            if (!instagram) return null
+            return (
+              <div className="ct-card">
+                <h3 className="ct-card-title">
+                  <span style={{ opacity: 0.7 }}><IconInstagram /></span> Instagram
+                </h3>
+                <p className="ct-card-sub">{instagram.handle}</p>
                 <a
-                  key={post.id}
-                  href={post.url}
-                  className="ct-insta-post"
-                  style={{ background: post.imagen }}
+                  href={instagram.url}
+                  className="ct-twitch-btn"
                   target="_blank"
                   rel="noopener noreferrer"
+                  style={{ background: instagram.color }}
                 >
-                  <span className="ct-insta-likes">♥ {post.likes}</span>
+                  <IconInstagram /> Ver Perfil
                 </a>
-              ))}
-            </div>
-          </div>
+              </div>
+            )
+          })()}
         </div>
       </div>
     </section>

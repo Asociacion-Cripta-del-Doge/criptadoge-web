@@ -2,7 +2,7 @@ import "./App.scss"
 import { Navbar } from "./components/navbar/navbar"
 import Login from "./components/login/login"
 import { Footer } from "./components/footer/footer"
-import { CalendarSection } from "./components/calendar/calendar"
+import { EventCalendar } from "./components/EventCalendar/EventCalendar"
 import { ContactoSection } from "./components/contact/contacto"
 
 function App() {
@@ -39,7 +39,7 @@ function App() {
         </div>
       </section>
 
-      <CalendarSection />
+      <EventCalendar />
 
       <ContactoSection />
 
