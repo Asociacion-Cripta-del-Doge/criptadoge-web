@@ -198,7 +198,7 @@ export const ProfileModal = ({ onClose }: Props) => {
             </div>
           ) : (
             <a href="/membresia" className="profile-modal__cta" onClick={onClose}>
-              <span>⚡</span> Hazte miembro
+                Hazte miembro
             </a>
           )}
         </div>

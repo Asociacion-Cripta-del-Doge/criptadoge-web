@@ -39,7 +39,7 @@ export const Navbar = () => {
           <div className="navbar-buttons">
             {!loading && (
               user ? (
-                <button className="btn-outline" onClick={() => setShowProfile(true)}>
+                <button className="btn-outline" onClick={() => setShowProfile(true)} style={{ cursor: "pointer" }}>
                   {user.name.split(" ")[0]}
                 </button>
               ) : (
