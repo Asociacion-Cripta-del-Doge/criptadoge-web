@@ -7,17 +7,18 @@
     backdrop-filter: blur(6px);
     z-index: 1000;
     display: flex;
-    align-items: flex-start;
-    justify-content: flex-end;
-    padding: 4.5rem $space-md 0;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
 }
 
 .profile-modal {
     position: relative;
     background: $color-bg-surface;
     border: 1px solid $color-border;
-    border-radius: $radius-md;
-    width: 340px;
+    border-radius: $radius-lg;
+    width: 460px;
+    max-width: 95vw;
     overflow: hidden;
     box-shadow:
         0 0 0 1px rgba($neon-blue, 0.15),
@@ -51,8 +52,8 @@
     &__header {
         display: flex;
         align-items: center;
-        gap: $space-md;
-        padding: $space-md;
+        gap: $space-lg;
+        padding: $space-xl $space-lg $space-lg;
         background: linear-gradient(135deg, $color-bg-main 60%, rgba($color-primary, 0.2));
         position: relative;
     }
@@ -67,8 +68,8 @@
     }
 
     &__avatar {
-        width: 48px;
-        height: 48px;
+        width: 64px;
+        height: 64px;
         border-radius: $radius-sm;
         background: linear-gradient(135deg, $color-primary, darken($color-primary, 10%));
         color: $color-text-main;

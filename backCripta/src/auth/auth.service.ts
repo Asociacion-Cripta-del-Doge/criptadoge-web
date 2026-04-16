@@ -103,4 +103,24 @@ export class AuthService {
     if(!user) throw new UnauthorizedException('Usario no encontrado')
       return user
   }
+
+  async updateProfile(userId: string, name: string) {
+  if (!name || name.trim().length < 2) {
+    throw new UnauthorizedException('El nombre debe tener al menos 2 caracteres')
+  }
+  return this.prisma.user.update({
+    where: { id: userId },
+    data: { name: name.trim() },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      status: true,
+      lastRenewal: true,
+      expirationDate: true,
+      createdAt: true,
+    },
+  })
+}
 }

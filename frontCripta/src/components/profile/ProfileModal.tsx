@@ -1,54 +1,89 @@
 import { useAuth } from "../../context/AuthContext";
+import { useState } from "react";
 import "./profileModal.scss";
 
 interface Props {
-  onClose: () => void;
+    onClose: () => void;
 }
 
 const getRemainingDays = (expirationDate: string | null): number | null => {
-  if (!expirationDate) return null;
-  const diff = new Date(expirationDate).getTime() - Date.now();
-  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+    if (!expirationDate) return null;
+    const diff = new Date(expirationDate).getTime() - Date.now();
+    return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
 };
 
 const getInitials = (name: string) =>
-  name
+    name
     .split(" ")
     .map((n) => n[0])
     .join("")
     .toUpperCase()
     .slice(0, 2);
 
-const STATUS_CONFIG: Record<
-  string,
-  { label: string; color: string; glow: string }
-> = {
-  Activo: { label: "Activo", color: "#4ade80", glow: "#4ade8066" },
-  Pendiente: {
-    label: "Pendiente de activación",
-    color: "#eab308",
-    glow: "#eab30866",
-  },
+const STATUS_CONFIG: Record<string, { label: string; color: string; glow: string }> = {
+    Activo: { label: "Activo", color: "#4ade80", glow: "#4ade8066" },
+    Pendiente: { label: "Pendiente de activación", color: "#eab308", glow: "#eab30866"},
   Expirado: { label: "Expirado", color: "#ef4444", glow: "#ef444466" },
   Cancelado: { label: "Cancelado", color: "#94a3b8", glow: "#94a3b833" },
 };
 
 export const ProfileModal = ({ onClose }: Props) => {
-  const { user, logout } = useAuth();
-  if (!user) return null;
+    const { user, logout, refreshUser } = useAuth();
+    const [editingName, setEditingName] = useState(false);
+    const [nameValue, setNameValue] = useState(user?.name ?? "")
+    const [saving, setSaving] = useState(false)
+    const [nameError, setNameError] = useState("")
 
-  const daysLeft = getRemainingDays(user.expirationDate);
-  const hasMembership =
-    user.status === "Activo" && daysLeft !== null && daysLeft > 0;
-  const isExpiringSoon = hasMembership && daysLeft !== null && daysLeft <= 7;
-  const statusCfg = STATUS_CONFIG[user.status] ?? STATUS_CONFIG.Pendiente;
-  const memberPercent =
-    daysLeft !== null ? Math.min(100, Math.round((daysLeft / 30) * 100)) : 0;
+    if (!user) return null;
 
-  return (
+    const daysLeft = getRemainingDays(user.expirationDate);
+    const hasMembership = user.status === "Activo" && daysLeft !== null && daysLeft > 0;
+    const isExpiringSoon = hasMembership && daysLeft !== null && daysLeft <= 7;
+    const statusCfg = STATUS_CONFIG[user.status] ?? STATUS_CONFIG.Pendiente;
+    const memberPercent = daysLeft !== null ? Math.min(100, Math.round((daysLeft / 30) * 100)) : 0;
+
+    const handleSaveName = async () => {
+        if(nameValue.trim().length < 2)
+        {
+            setNameError("Mínimo 2 caracteres")
+            return
+        }
+        setSaving(true)
+        setNameError("")
+
+        try{
+            const token = localStorage.getItem("access_token")
+            const res = await fetch("/api/auth/profile", {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ name: nameValue.trim() })
+            })
+            if(!res.ok) throw new Error()
+                await refreshUser()
+            setEditingName(false)
+        }catch {
+            setNameError("Error al guardar, inténtalo de nuevo")
+        }finally {
+            setSaving(false)
+        }
+    }
+    
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if(e.key === "Enter") handleSaveName()
+        if(e.key === "Escape") {
+            setEditingName(false)
+            setNameValue(user.name)
+            setNameError("")
+        }
+    }
+
+    return (
     <div className="profile-overlay" onClick={onClose}>
       <div className="profile-modal" onClick={(e) => e.stopPropagation()}>
-        {/* Scanline effect */}
+
         <div className="profile-modal__scanlines" />
 
         {/* Header */}
@@ -59,12 +94,7 @@ export const ProfileModal = ({ onClose }: Props) => {
             </div>
             <div
               className="profile-modal__status-bubble"
-              style={
-                {
-                  "--bubble-color": statusCfg.color,
-                  "--bubble-glow": statusCfg.glow,
-                } as React.CSSProperties
-              }
+              style={{ "--bubble-color": statusCfg.color, "--bubble-glow": statusCfg.glow } as React.CSSProperties}
             >
               <span className="profile-modal__status-dot" />
               {statusCfg.label}
@@ -73,24 +103,54 @@ export const ProfileModal = ({ onClose }: Props) => {
 
           <div className="profile-modal__info">
             <div className="profile-modal__name-row">
-              <h2 className="profile-modal__name">{user.name}</h2>
-              {user.role === "ADMIN" && (
+              {editingName ? (
+                <div className="profile-modal__name-edit">
+                  <input
+                    className={`profile-modal__name-input ${nameError ? "profile-modal__name-input--error" : ""}`}
+                    value={nameValue}
+                    onChange={(e) => setNameValue(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    autoFocus
+                    maxLength={32}
+                  />
+                  <button
+                    className="profile-modal__name-btn profile-modal__name-btn--save"
+                    onClick={handleSaveName}
+                    disabled={saving}
+                  >
+                    {saving ? "..." : "✓"}
+                  </button>
+                  <button
+                    className="profile-modal__name-btn profile-modal__name-btn--cancel"
+                    onClick={() => { setEditingName(false); setNameValue(user.name); setNameError("") }}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <h2 className="profile-modal__name">{user.name}</h2>
+                  <button
+                    className="profile-modal__edit-btn"
+                    onClick={() => { setEditingName(true); setNameValue(user.name) }}
+                    title="Editar nombre"
+                  >
+                    ✏️
+                  </button>
+                </>
+              )}
+              {user.role === "ADMIN" && !editingName && (
                 <span className="profile-modal__badge">ADMIN</span>
               )}
             </div>
+            {nameError && <span className="profile-modal__name-error">{nameError}</span>}
             <span className="profile-modal__email">{user.email}</span>
             <span className="profile-modal__since">
-              Miembro desde{" "}
-              {new Date(user.createdAt).toLocaleDateString("es-ES", {
-                month: "long",
-                year: "numeric",
-              })}
+              Miembro desde {new Date(user.createdAt).toLocaleDateString("es-ES", { month: "long", year: "numeric" })}
             </span>
           </div>
 
-          <button className="profile-modal__close" onClick={onClose}>
-            ✕
-          </button>
+          <button className="profile-modal__close" onClick={onClose}>✕</button>
         </div>
 
         {/* Membresía */}
@@ -115,25 +175,16 @@ export const ProfileModal = ({ onClose }: Props) => {
                   <div className="profile-modal__row">
                     <span className="profile-modal__label">Expira el</span>
                     <span className="profile-modal__value">
-                      {new Date(user.expirationDate).toLocaleDateString(
-                        "es-ES",
-                      )}
+                      {new Date(user.expirationDate).toLocaleDateString("es-ES")}
                     </span>
                   </div>
                 )}
               </div>
 
-              {/* Barra de vida */}
               <div className="profile-modal__bar-wrap">
                 <div className="profile-modal__bar-label">
-                  <span>
-                    {isExpiringSoon ? "⚠️ Expira pronto" : "Tiempo restante"}
-                  </span>
-                  <span
-                    className={
-                      isExpiringSoon ? "profile-modal__bar-days--warn" : ""
-                    }
-                  >
+                  <span>{isExpiringSoon ? "⚠️ Expira pronto" : "Tiempo restante"}</span>
+                  <span className={isExpiringSoon ? "profile-modal__bar-days--warn" : ""}>
                     {daysLeft}d
                   </span>
                 </div>
@@ -146,12 +197,8 @@ export const ProfileModal = ({ onClose }: Props) => {
               </div>
             </div>
           ) : (
-            <a
-              href="/membresia"
-              className="profile-modal__cta"
-              onClick={onClose}
-            >
-            Hazte miembro
+            <a href="/membresia" className="profile-modal__cta" onClick={onClose}>
+              <span>⚡</span> Hazte miembro
             </a>
           )}
         </div>
@@ -162,7 +209,8 @@ export const ProfileModal = ({ onClose }: Props) => {
             Cerrar sesión
           </button>
         </div>
+
       </div>
     </div>
-  );
+  )
 };

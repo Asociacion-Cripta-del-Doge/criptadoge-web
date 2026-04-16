@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, Get, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, Get, Req, Res, UseGuards, Patch } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -45,5 +45,12 @@ export class AuthController {
     res.redirect(
       `http://localhost:8080/auth/callback?token=${access_token}&user=${encodeURIComponent(JSON.stringify(user))}`
     )
+  }
+
+  @Patch('profile')
+  @UseGuards(JwtAuthGuard)
+  async updateProfile(@Req() req: any, @Body() body: { name: string })
+  {
+    return this.authService.updateProfile(req.user.id, body.name)
   }
 }
