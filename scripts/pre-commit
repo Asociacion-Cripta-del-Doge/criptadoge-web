@@ -1,5 +1,4 @@
-#!/bin/bash
-
+#!/bin/sh
 echo -e "🔍 \033[36mEjecutando validaciones pre-commit...\033[0m"
 
 FILES=$(git diff --cached --name-only)
