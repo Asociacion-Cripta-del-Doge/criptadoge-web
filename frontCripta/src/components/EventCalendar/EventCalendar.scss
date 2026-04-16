@@ -323,3 +323,14 @@
     color: #ef4444;
   }
 }
+
+.ec-status {
+  text-align: center;
+  padding: 12px;
+  color: #9ca3af;
+  font-size: 0.9rem;
+
+  &--error {
+    color: #ef4444;
+  }
+}

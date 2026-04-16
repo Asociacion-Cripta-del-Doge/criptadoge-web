@@ -38,7 +38,11 @@ export default function Login(){
                     })
 
             const data = await res.json()
-            console.log(data)
+
+            if (mode === "login" && data.access_token) {
+                localStorage.setItem("token", data.access_token)
+                window.location.href = "/"
+            }
         } catch(error)
         {
             console.error("Error:", error)

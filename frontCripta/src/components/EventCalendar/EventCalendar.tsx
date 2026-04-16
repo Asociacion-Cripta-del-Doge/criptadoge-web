@@ -1,6 +1,5 @@
 import { useMemo, useState, type CSSProperties } from "react"
-import { EVENTOS_MOCK } from "../../data/eventos.mock"
-import type { CategoriaEvento, Evento } from "../../data/eventos.mock"
+import { useEvents, type Evento } from "../../hooks/useEvents"
 import "./EventCalendar.scss"
 
 // ─── helpers ────────────────────────────────────────────────────────────────
@@ -12,16 +11,14 @@ const MESES_ES = [
 
 const DIAS_SEMANA = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"]
 
-const CATEGORIA_COLOR: Record<CategoriaEvento, string> = {
+const LABEL_COLORS: Record<string, string> = {
   cartas: "#ec4899",
   rol:    "#3b82f6",
   mesa:   "#eab308",
 }
 
-const CATEGORIA_LABEL: Record<CategoriaEvento, string> = {
-  cartas: "Cartas",
-  rol:    "Rol",
-  mesa:   "Mesa",
+function getLabelColor(label: string): string {
+  return LABEL_COLORS[label.toLowerCase()] ?? "#6b7280"
 }
 
 function isoDate(year: number, month: number, day: number): string {
@@ -33,13 +30,6 @@ function formatFecha(isoStr: string): string {
   return `${parseInt(d)} ${MESES_ES[parseInt(m) - 1].slice(0, 3).toLowerCase()}`
 }
 
-function plazasLabel(e: Evento): string | null {
-  if (e.plazas == null) return null
-  const libres = e.plazas - (e.plazasOcupadas ?? 0)
-  if (libres === 0) return "Completo"
-  return `${libres} plazas libres`
-}
-
 // ─── componente ─────────────────────────────────────────────────────────────
 
 export const EventCalendar = () => {
@@ -47,12 +37,13 @@ export const EventCalendar = () => {
   const [year, setYear]   = useState(today.getFullYear())
   const [month, setMonth] = useState(today.getMonth())
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
-  const [filterCat, setFilterCat] = useState<CategoriaEvento | null>(null)
+  const [filterLabel, setFilterLabel] = useState<string | null>(null)
+
+  const { eventos, loading, error } = useEvents()
 
   // días del mes
   const { cells } = useMemo(() => {
     const firstDay = new Date(year, month, 1)
-    // lunes = 0 … domingo = 6
     let startOffset = firstDay.getDay() - 1
     if (startOffset < 0) startOffset = 6
     const daysInMonth = new Date(year, month + 1, 0).getDate()
@@ -63,15 +54,20 @@ export const EventCalendar = () => {
     return { cells }
   }, [year, month])
 
+  // labels únicos presentes en los eventos
+  const labels = useMemo(() => {
+    return [...new Set(eventos.map(e => e.label))]
+  }, [eventos])
+
   // índice eventos por fecha
   const eventosPorFecha = useMemo(() => {
     const map: Record<string, Evento[]> = {}
-    for (const ev of EVENTOS_MOCK) {
+    for (const ev of eventos) {
       if (!map[ev.fecha]) map[ev.fecha] = []
       map[ev.fecha].push(ev)
     }
     return map
-  }, [])
+  }, [eventos])
 
   const todayIso = isoDate(today.getFullYear(), today.getMonth(), today.getDate())
 
@@ -87,7 +83,7 @@ export const EventCalendar = () => {
   }
 
   const eventosDelDia: Evento[] = selectedDate
-    ? (eventosPorFecha[selectedDate] ?? []).filter(e => !filterCat || e.categoria === filterCat)
+    ? (eventosPorFecha[selectedDate] ?? []).filter(e => !filterLabel || e.label === filterLabel)
     : []
 
   const titleDate = selectedDate
@@ -105,6 +101,9 @@ export const EventCalendar = () => {
         </h2>
         <p className="ec-subtitle">Descubre todas las actividades que tenemos preparadas para ti</p>
       </div>
+
+      {loading && <p className="ec-status">Cargando eventos...</p>}
+      {error && <p className="ec-status ec-status--error">No se pudieron cargar los eventos.</p>}
 
       <div className="ec-layout">
         {/* ── Calendario ── */}
@@ -126,7 +125,7 @@ export const EventCalendar = () => {
               if (!day) return <div key={`empty-${idx}`} className="ec-cal-cell ec-cal-cell--empty" />
 
               const iso = isoDate(year, month, day)
-              const eventos = eventosPorFecha[iso] ?? []
+              const evs = eventosPorFecha[iso] ?? []
               const isToday    = iso === todayIso
               const isSelected = iso === selectedDate
               const isWeekend  = (idx % 7) >= 5
@@ -139,21 +138,20 @@ export const EventCalendar = () => {
                     isToday    && "ec-cal-cell--today",
                     isSelected && "ec-cal-cell--selected",
                     isWeekend  && "ec-cal-cell--weekend",
-                    eventos.length && "ec-cal-cell--has-events",
+                    evs.length && "ec-cal-cell--has-events",
                   ].filter(Boolean).join(" ")}
                   onClick={() => setSelectedDate(prev => prev === iso ? null : iso)}
                   aria-label={`${day} de ${MESES_ES[month]}`}
                   aria-pressed={isSelected}
                 >
                   <span className="ec-cal-day-num">{day}</span>
-                  {eventos.length > 0 && (
+                  {evs.length > 0 && (
                     <span className="ec-cal-dots">
-                      {/* máximo 3 puntos, uno por categoría presente */}
-                      {[...new Set(eventos.map(e => e.categoria))].slice(0, 3).map(cat => (
+                      {[...new Set(evs.map(e => e.label))].slice(0, 3).map(label => (
                         <span
-                          key={cat}
+                          key={label}
                           className="ec-cal-dot"
-                          style={{ background: CATEGORIA_COLOR[cat] }}
+                          style={{ background: getLabelColor(label) }}
                         />
                       ))}
                     </span>
@@ -164,19 +162,21 @@ export const EventCalendar = () => {
           </div>
 
           {/* leyenda */}
-          <div className="ec-legend">
-            {(["cartas", "rol", "mesa"] as CategoriaEvento[]).map(cat => (
-              <button
-                key={cat}
-                className={`ec-legend-item ${filterCat === cat ? "ec-legend-item--active" : ""}`}
-                onClick={() => setFilterCat(prev => prev === cat ? null : cat)}
-                style={{ "--dot-color": CATEGORIA_COLOR[cat] } as CSSProperties}
-              >
-                <span className="ec-legend-dot" />
-                {CATEGORIA_LABEL[cat]}
-              </button>
-            ))}
-          </div>
+          {labels.length > 0 && (
+            <div className="ec-legend">
+              {labels.map(label => (
+                <button
+                  key={label}
+                  className={`ec-legend-item ${filterLabel === label ? "ec-legend-item--active" : ""}`}
+                  onClick={() => setFilterLabel(prev => prev === label ? null : label)}
+                  style={{ "--dot-color": getLabelColor(label) } as CSSProperties}
+                >
+                  <span className="ec-legend-dot" />
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* ── Panel lateral ── */}
@@ -193,41 +193,33 @@ export const EventCalendar = () => {
               {eventosDelDia.length === 0 ? (
                 <div className="ec-panel-empty">
                   <div className="ec-panel-empty-icon">🎲</div>
-                  <p>No hay eventos este día{filterCat ? ` de la categoría "${CATEGORIA_LABEL[filterCat]}"` : ""}</p>
+                  <p>No hay eventos este día{filterLabel ? ` de la categoría "${filterLabel}"` : ""}</p>
                 </div>
               ) : (
                 <ul className="ec-events-list">
-                  {eventosDelDia.map(ev => {
-                    const libre = plazasLabel(ev)
-                    const completo = libre === "Completo"
-                    return (
-                      <li key={ev.id} className="ec-event-card">
-                        <div className="ec-event-card-top">
-                          <span className="ec-event-title">{ev.titulo}</span>
-                          <span
-                            className="ec-event-badge"
-                            style={{ background: CATEGORIA_COLOR[ev.categoria] }}
-                          >
-                            {CATEGORIA_LABEL[ev.categoria]}
+                  {eventosDelDia.map(ev => (
+                    <li key={ev.id} className="ec-event-card">
+                      <div className="ec-event-card-top">
+                        <span className="ec-event-title">{ev.titulo}</span>
+                        <span
+                          className="ec-event-badge"
+                          style={{ background: getLabelColor(ev.label) }}
+                        >
+                          {ev.label}
+                        </span>
+                      </div>
+                      {ev.descripcion && <p className="ec-event-desc">{ev.descripcion}</p>}
+                      <div className="ec-event-meta">
+                        <span title="Fecha">📅 {formatFecha(ev.fecha)}</span>
+                        {ev.hora && <span title="Hora">🕐 {ev.hora}</span>}
+                        {ev.asistentes > 0 && (
+                          <span className="ec-event-plazas" title="Asistentes">
+                            👥 {ev.asistentes} asistente{ev.asistentes !== 1 ? "s" : ""}
                           </span>
-                        </div>
-                        <p className="ec-event-desc">{ev.descripcion}</p>
-                        <div className="ec-event-meta">
-                          <span title="Fecha">📅 {formatFecha(ev.fecha)}</span>
-                          <span title="Hora">🕐 {ev.hora}</span>
-                          <span title="Lugar">📍 {ev.lugar}</span>
-                          {libre && (
-                            <span
-                              className={`ec-event-plazas ${completo ? "ec-event-plazas--full" : ""}`}
-                              title="Plazas"
-                            >
-                              {completo ? "🔴" : "🟢"} {libre}
-                            </span>
-                          )}
-                        </div>
-                      </li>
-                    )
-                  })}
+                        )}
+                      </div>
+                    </li>
+                  ))}
                 </ul>
               )}
             </>
