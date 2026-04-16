@@ -64,7 +64,7 @@ export const UbicacionSection = () => (
           <ul className="ub-contacto">
             <li>
               <span className="ub-contacto-icon">📞</span>
-              <a href="tel:+34600000000">+34 600 000 000</a>
+              <a href="tel:+34 657 53 84 30">+34 657 53 84 30</a>
             </li>
             <li>
               <span className="ub-contacto-icon">✉️</span>
