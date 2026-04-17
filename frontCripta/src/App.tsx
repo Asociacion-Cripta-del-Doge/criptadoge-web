@@ -6,6 +6,7 @@ import { Footer } from "./components/footer/footer";
 import { Toaster } from "react-hot-toast";
 import { EventCalendar } from "./components/EventCalendar/EventCalendar";
 import { ContactoSection } from "./components/contact/contacto";
+import { UbicacionSection } from "./components/ubicacion/Ubicacion";
 
 function App() {
   const path = window.location.pathname;
@@ -58,6 +59,8 @@ function App() {
       </section>
 
       <EventCalendar />
+
+      <UbicacionSection />
 
       <ContactoSection />
 
