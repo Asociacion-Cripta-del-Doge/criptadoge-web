@@ -8,6 +8,7 @@ export interface Evento {
   fecha: string
   hora?: string
   label: string
+  estado: string
   asistentes: number
 }
 
@@ -19,6 +20,7 @@ function mapEvento(e: EventoAPI): Evento {
     fecha: e.date,
     hora: e.time,
     label: e.label,
+    estado: e.status,
     asistentes: e.attendees.length,
   }
 }
