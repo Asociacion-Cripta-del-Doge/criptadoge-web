@@ -23,6 +23,10 @@ export class ContactService {
     return this.messageModel.create(dto);
   }
 
+  async getMessages() {
+    return this.messageModel.find();
+  }
+
   async getSocialLinks() {
     return this.socialLinkModel.find().sort({ orden: 1 });
   }

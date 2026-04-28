@@ -83,7 +83,9 @@ export const ContactoSection = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nombre, email, asunto, mensaje }),
       })
-      if (!res.ok) throw new Error()
+      if (!res.ok) {
+        throw new Error()
+      }
       setFormState("ok")
       setNombre("")
       setEmail("")
