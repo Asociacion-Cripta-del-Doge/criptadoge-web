@@ -40,8 +40,11 @@ export const Navbar = () => {
           <div className="navbar-buttons">
             {!loading && (
               user ? (
-                <button className="btn-outline" onClick={() => setShowProfile(true)} style={{ cursor: "pointer" }}>
-                  {user.name.split(" ")[0]}
+                <button className="navbar-user-btn" onClick={() => setShowProfile(true)}>
+                  {user.avatar ? (
+                    <img src={user.avatar} alt={user.name} className="navbar-user-avatar" />
+                  ) : null}
+                  <span className="navbar-user-initial">{user.name.split(" ")[0]}</span>
                 </button>
               ) : (
                 <a href="/login" className="btn-outline">Iniciar sesión</a>
