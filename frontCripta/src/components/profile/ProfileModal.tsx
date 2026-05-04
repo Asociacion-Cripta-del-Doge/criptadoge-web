@@ -23,8 +23,8 @@ const getInitials = (name: string) =>
 const STATUS_CONFIG: Record<string, { label: string; color: string; glow: string }> = {
     Activo: { label: "Activo", color: "#4ade80", glow: "#4ade8066" },
     Pendiente: { label: "Pendiente de activación", color: "#eab308", glow: "#eab30866"},
-  Expirado: { label: "Expirado", color: "#ef4444", glow: "#ef444466" },
-  Cancelado: { label: "Cancelado", color: "#94a3b8", glow: "#94a3b833" },
+    Expirado: { label: "Expirado", color: "#ef4444", glow: "#ef444466" },
+    Cancelado: { label: "Cancelado", color: "#94a3b8", glow: "#94a3b833" },
 };
 
 export const ProfileModal = ({ onClose }: Props) => {
@@ -33,6 +33,7 @@ export const ProfileModal = ({ onClose }: Props) => {
     const [nameValue, setNameValue] = useState(user?.name ?? "")
     const [saving, setSaving] = useState(false)
     const [nameError, setNameError] = useState("")
+    const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
 
     if (!user) return null;
 
@@ -43,15 +44,13 @@ export const ProfileModal = ({ onClose }: Props) => {
     const memberPercent = daysLeft !== null ? Math.min(100, Math.round((daysLeft / 30) * 100)) : 0;
 
     const handleSaveName = async () => {
-        if(nameValue.trim().length < 2)
-        {
+        if(nameValue.trim().length < 2) {
             setNameError("Mínimo 2 caracteres")
             return
         }
         setSaving(true)
         setNameError("")
-
-        try{
+        try {
             const token = localStorage.getItem("access_token")
             const res = await fetch("/api/auth/profile", {
                 method: "PATCH",
@@ -62,15 +61,15 @@ export const ProfileModal = ({ onClose }: Props) => {
                 body: JSON.stringify({ name: nameValue.trim() })
             })
             if(!res.ok) throw new Error()
-                await refreshUser()
+            await refreshUser()
             setEditingName(false)
-        }catch {
+        } catch {
             setNameError("Error al guardar, inténtalo de nuevo")
-        }finally {
+        } finally {
             setSaving(false)
         }
     }
-    
+
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if(e.key === "Enter") handleSaveName()
         if(e.key === "Escape") {
@@ -86,7 +85,30 @@ export const ProfileModal = ({ onClose }: Props) => {
 
         <div className="profile-modal__scanlines" />
 
-        {/* Header */}
+        {showLogoutConfirm && (
+          <div className="profile-modal__confirm-overlay">
+            <div className="profile-modal__confirm-box">
+              <span className="profile-modal__confirm-icon">⚠️</span>
+              <p className="profile-modal__confirm-title">¿Cerrar sesión?</p>
+              <p className="profile-modal__confirm-sub">Tendrás que volver a iniciar sesión para acceder.</p>
+              <div className="profile-modal__confirm-actions">
+                <button
+                  className="profile-modal__confirm-btn profile-modal__confirm-btn--cancel"
+                  onClick={() => setShowLogoutConfirm(false)}
+                >
+                  Cancelar
+                </button>
+                <button
+                  className="profile-modal__confirm-btn profile-modal__confirm-btn--confirm"
+                  onClick={logout}
+                >
+                  Cerrar sesión
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="profile-modal__header">
           <div className="profile-modal__avatar-wrap">
             <div className="profile-modal__avatar">
@@ -153,7 +175,6 @@ export const ProfileModal = ({ onClose }: Props) => {
           <button className="profile-modal__close" onClick={onClose}>✕</button>
         </div>
 
-        {/* Membresía */}
         <div className="profile-modal__section">
           <div className="profile-modal__section-header">
             <span className="profile-modal__section-icon">⚔️</span>
@@ -203,9 +224,11 @@ export const ProfileModal = ({ onClose }: Props) => {
           )}
         </div>
 
-        {/* Footer */}
         <div className="profile-modal__footer">
-          <button className="profile-modal__logout" onClick={logout}>
+          <button
+            className="profile-modal__logout"
+            onClick={() => setShowLogoutConfirm(true)}
+          >
             Cerrar sesión
           </button>
         </div>
