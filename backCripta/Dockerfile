@@ -16,8 +16,8 @@ RUN yarn install --immutable
 # Copiamos el resto del proyecto
 COPY . .
 
-# Generamos el cliente Prisma
-RUN npx prisma generate
+# Verificamos dependencias tras copiar el proyecto y generamos el cliente Prisma
+RUN yarn install --immutable && yarn prisma generate
 
 # Exponemos el puerto
 EXPOSE 3000
