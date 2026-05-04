@@ -53,4 +53,12 @@ export class AuthController {
   {
     return this.authService.updateProfile(req.user.id, body.name)
   }
+
+  @Patch('avatar')
+  @UseGuards(JwtAuthGuard)
+  async uploadAvatar(@Req() req: any, @Body() body: { avatar: string })
+  {
+    const url = await this.authService.uploadAvatar(req.user.id, body.avatar)
+    return { avatar: url };
+  }
 }

@@ -1,5 +1,5 @@
 import { useAuth } from "../../context/AuthContext";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import "./profileModal.scss";
 
 interface Props {
@@ -34,6 +34,8 @@ export const ProfileModal = ({ onClose }: Props) => {
     const [saving, setSaving] = useState(false)
     const [nameError, setNameError] = useState("")
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+    const [uploadingAvatar, setUploadingAvatar] = useState(false)
+    const fileInputRef = useRef<HTMLInputElement>(null)
 
     if (!user) return null;
 
@@ -79,6 +81,38 @@ export const ProfileModal = ({ onClose }: Props) => {
         }
     }
 
+    const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0]
+      if(!file) return
+
+      setUploadingAvatar(true)
+      try 
+      {
+        const base64 = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader()
+          reader.onload = () => resolve(reader.result as string)
+          reader.onerror = reject
+          reader.readAsDataURL(file)
+        })
+
+        const token = localStorage.getItem("access_token")
+        const res = await fetch("/api/auth/avatar", {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({ avatar: base64 })
+        })
+        if(!res.ok) throw new Error()
+          await refreshUser()
+      }catch 
+      {}finally 
+      {
+        setUploadingAvatar(false)
+      }
+    }
+
     return (
     <div className="profile-overlay" onClick={onClose}>
       <div className="profile-modal" onClick={(e) => e.stopPropagation()}>
@@ -111,9 +145,27 @@ export const ProfileModal = ({ onClose }: Props) => {
 
         <div className="profile-modal__header">
           <div className="profile-modal__avatar-wrap">
-            <div className="profile-modal__avatar">
-              {getInitials(user.name)}
-            </div>
+            <button
+              className={`profile-modal__avatar ${uploadingAvatar ? "profile-modal__avatar--uploading" : ""}`}
+              onClick={() => fileInputRef.current?.click()}
+              title="Cambiar foto de perfil"
+            >
+              {uploadingAvatar ? (
+                <span className="profile-modal__avatar-spinner" />
+              ) : user.avatar ? (
+                <img src={user.avatar} alt={user.name} className="profile-modal__avatar-img" />
+              ) : (
+                getInitials(user.name)
+              )}
+              <span className="profile-modal__avatar-overlay">📷</span>
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="profile-modal__avatar-input"
+              onChange={handleAvatarChange}
+            />
             <div
               className="profile-modal__status-bubble"
               style={{ "--bubble-color": statusCfg.color, "--bubble-glow": statusCfg.glow } as React.CSSProperties}
