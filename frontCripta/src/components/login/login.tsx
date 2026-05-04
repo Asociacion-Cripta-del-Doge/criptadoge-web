@@ -2,7 +2,7 @@ import "./login.scss"
 import { useState } from "react"
 import toast from 'react-hot-toast'
 
-const API_BASE = "/api"
+const API_BASE = "http://localhost:3000"
 
 export default function Login(){
     const [mode, setMode] = useState<"login" | "register">("login")
