@@ -27,29 +27,24 @@ a{
 }
 
 
-.hero{
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 160px v.$space-xl 120px;
-}
-
-.hero-content{
-  max-width: 1200px;
-  margin: auto;
+.hero {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 160px v.$space-xl 120px;
   display: grid;
-  grid-template-columns: 1.1fr 1fr;
+  grid-template-columns: 1fr 420px;
   align-items: center;
   gap: v.$space-xl;
 }
 
-.hero-title{
-    font-family: v.$font-display;
-    font-size: clamp(3rem, 6vw, 4.5rem);
-    line-height: 1.1;
-    margin-bottom: v.$space-lg;
-    text-shadow:
-        0 0 8px rgba(255,255,255,0.1),
-        0 0 16px rgba(v.$neon-blue, 0.15);
+.hero-title {
+  font-family: v.$font-display;
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  line-height: 1.1;
+  margin-bottom: v.$space-lg;
+  text-shadow:
+    0 0 8px rgba(255,255,255,0.1),
+    0 0 16px rgba(v.$neon-blue, 0.15);
 }
 
 .hero-highlight{
