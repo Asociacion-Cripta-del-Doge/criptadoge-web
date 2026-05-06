@@ -7,10 +7,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './jwt.strategy';
 import { GoogleStrategy } from './google.strategy';
 import { PrismaModule } from 'src/prisma/prisma.module';
+import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 
 @Module({
   imports: [
     PassportModule,
+    CloudinaryModule,
     JwtModule.registerAsync({
       imports: [ConfigModule, PrismaModule],
       inject: [ConfigService],
