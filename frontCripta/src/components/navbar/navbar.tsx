@@ -35,6 +35,7 @@ export const Navbar = () => {
             {!loading && (
               user ? (
                 <button
+                  key={user.name}
                   className="btn-outline navbar-profile-btn"
                   onClick={() => setShowProfile(true)}
                 >

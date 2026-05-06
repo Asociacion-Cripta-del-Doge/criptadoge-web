@@ -31,10 +31,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     try {
       const res = await fetch("/api/auth/me", {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Cache-Control": "no-cache",
+        },
       })
       if (!res.ok) throw new Error()
       const data = await res.json()
+      console.log("fetchMe data:", data)
       setUser(data)
     } catch {
       localStorage.removeItem("access_token")
