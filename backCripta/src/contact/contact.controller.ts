@@ -12,6 +12,11 @@ export class ContactController {
     return this.contactService.createMessage(dto);
   }
 
+  @Get('mensajes')
+  async getMessages() {
+    return this.contactService.getMessages();
+  }
+
   @Get('redes')
   async getSocialLinks() {
     return this.contactService.getSocialLinks();

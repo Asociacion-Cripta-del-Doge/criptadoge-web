@@ -3,14 +3,12 @@ import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
-import { CloudinaryService } from '../cloudinary/cloudinary.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
-    private cloudinaryService: CloudinaryService,
   ) {}
 
   async validateUser(
@@ -21,7 +19,9 @@ export class AuthService {
 
     if (user && (await bcrypt.compare(pass, user.password))) {
       const { password, ...result } = user;
-      return result;
+      if (user.status !== "Desactivado") {
+        return result;
+      }
     }
 
     throw new UnauthorizedException('Credenciales incorrectas');
@@ -72,6 +72,8 @@ export class AuthService {
           password: ''
         }
       });
+    } else if (user.status === "Desactivado") {
+      throw new UnauthorizedException('Usuario no encontrado');
     }
 
     const payload = { email: user.email, sub: user.id, role: user.role };
@@ -100,11 +102,13 @@ export class AuthService {
         lastRenewal: true,
         expirationDate: true,
         createdAt: true,
-        avatar: true,
       }
     })
-    if(!user) throw new UnauthorizedException('Usario no encontrado')
-      return user
+    if(!user) throw new UnauthorizedException('Usuario no encontrado')
+
+    if (user.status === "Desactivado") throw new UnauthorizedException('Usuario no encontrado')
+
+    return user;
   }
 
   async updateProfile(userId: string, name: string) {
@@ -123,18 +127,7 @@ export class AuthService {
       lastRenewal: true,
       expirationDate: true,
       createdAt: true,
-      avatar: true,
     },
   })
-}
-
-async uploadAvatar(userId: string, base64Image: string): Promise<string>
-{
-  const url = await this.cloudinaryService.uploadAvatar(base64Image, userId)
-  await this.prisma.user.update({
-    where: { id: userId },
-    data: { avatar: url }
-  });
-  return url
 }
 }

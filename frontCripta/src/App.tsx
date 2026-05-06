@@ -7,6 +7,8 @@ import { Toaster } from "react-hot-toast";
 import { EventCalendar } from "./components/EventCalendar/EventCalendar";
 import { ContactoSection } from "./components/contact/contacto";
 import { UbicacionSection } from "./components/ubicacion/Ubicacion";
+import AboutUs from "./components/aboutUs/aboutUs";
+import SectionDivider from "./components/sectionDivider/SectionDivider";
 
 function App() {
   const path = window.location.pathname;
@@ -58,9 +60,19 @@ function App() {
         </div>
       </section>
 
+      <SectionDivider />
+
+      <AboutUs/>
+
+      <SectionDivider />
+
       <EventCalendar />
 
+      <SectionDivider />
+
       <UbicacionSection />
+
+      <SectionDivider />
 
       <ContactoSection />
 

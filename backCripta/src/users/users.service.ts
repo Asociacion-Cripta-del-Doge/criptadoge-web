@@ -144,11 +144,21 @@ export class UsersService {
     }
   }
 
-  async remove(id: string) {
+  async deactivate(id: string) {
     try {
-      return await this.prisma.user.delete({
+      return await this.prisma.user.update({
         where: { id },
-        select: { id: true, email: true },
+        data: {
+          status: 'Desactivado',
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          status: true,
+          lastRenewal: true,
+          expirationDate: true,
+        },
       });
     } catch (error) {
       if (error.code === 'P2025') {

@@ -10,7 +10,6 @@ interface User
     lastRenewal: string | null 
     expirationDate: string | null 
     createdAt: string
-    avatar: string | null
 }
 
 interface AuthContextType 
@@ -22,6 +21,7 @@ interface AuthContextType
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
+const API_BASE = "http://localhost:3000"
 
 export const AuthProvider = ({ children } : { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null)
@@ -33,7 +33,7 @@ export const AuthProvider = ({ children } : { children: React.ReactNode }) => {
         if(!token) { setLoading(false); return }
 
         try {
-            const res = await fetch("/api/auth/me", {
+            const res = await fetch(`${API_BASE}/auth/me`, {
                 headers: { Authorization: `Bearer ${token}`},
             })
             console.log("2. STATUS:", res.status)

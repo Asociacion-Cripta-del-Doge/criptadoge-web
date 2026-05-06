@@ -17,7 +17,6 @@ model User {
   name           String
   email          String   @unique
   password       String   
-  avatar         String?
   role           Role     @default(MEMBER)
   lastRenewal    String?  
   expirationDate String?

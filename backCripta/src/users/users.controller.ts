@@ -53,7 +53,7 @@ export class UsersController {
 
   @Delete(':id')
   @Roles('ADMIN')
-  async remove(@Param('id') id: string) {
-    return this.usersService.remove(id);
+  async deactivate(@Param('id') id: string) {
+    return this.usersService.deactivate(id);
   }
 }
