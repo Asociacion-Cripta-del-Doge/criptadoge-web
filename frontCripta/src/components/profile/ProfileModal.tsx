@@ -37,6 +37,7 @@ export const ProfileModal = ({ onClose }: Props) => {
   const isExpiringSoon = hasMembership && daysLeft !== null && daysLeft <= 7
   const statusCfg = STATUS_CONFIG[user.status] ?? STATUS_CONFIG.Pendiente
   const memberPercent = daysLeft !== null ? Math.min(100, Math.round((daysLeft / 30) * 100)) : 0
+  const joinYear = new Date(user.createdAt).toLocaleDateString("es-ES", { month: "long", year: "numeric" })
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -51,10 +52,7 @@ export const ProfileModal = ({ onClose }: Props) => {
       })
       const res = await fetch("/api/auth/avatar", {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ base64 }),
       })
       if (!res.ok) throw new Error()
@@ -97,29 +95,23 @@ export const ProfileModal = ({ onClose }: Props) => {
       <div className="profile-modal" onClick={(e) => e.stopPropagation()}>
         <div className="profile-modal__scanlines" />
 
-        {/* Header */}
-        <div className="profile-modal__header">
+        {/* Hero header */}
+        <div className="profile-modal__hero">
+          <div className="profile-modal__hero-bg" />
+          <button className="profile-modal__close" onClick={onClose}>✕</button>
+
           <div className="profile-modal__avatar-wrap">
-            <div
-              className="profile-modal__avatar"
-              onClick={() => document.getElementById("avatar-input")?.click()}
-            >
+            <div className="profile-modal__avatar" onClick={() => document.getElementById("avatar-input")?.click()}>
               {user.avatar ? (
                 <img src={user.avatar} alt={user.name} className="profile-modal__avatar-img" />
               ) : (
                 getInitials(user.name)
               )}
               <div className="profile-modal__avatar-overlay">
-                {uploadingAvatar ? "..." : "📷"}
+                {uploadingAvatar ? "⏳" : "📷"}
               </div>
             </div>
-            <input
-              id="avatar-input"
-              type="file"
-              accept="image/*"
-              style={{ display: "none" }}
-              onChange={handleAvatarChange}
-            />
+            <input id="avatar-input" type="file" accept="image/*" style={{ display: "none" }} onChange={handleAvatarChange} />
             <div
               className="profile-modal__status-bubble"
               style={{ "--bubble-color": statusCfg.color, "--bubble-glow": statusCfg.glow } as React.CSSProperties}
@@ -129,7 +121,7 @@ export const ProfileModal = ({ onClose }: Props) => {
             </div>
           </div>
 
-          <div className="profile-modal__info">
+          <div className="profile-modal__hero-info">
             <div className="profile-modal__name-row">
               {editingName ? (
                 <div className="profile-modal__name-edit">
@@ -151,21 +143,34 @@ export const ProfileModal = ({ onClose }: Props) => {
               ) : (
                 <>
                   <h2 className="profile-modal__name">{user.name}</h2>
-                  <button className="profile-modal__edit-btn" onClick={() => { setEditingName(true); setNameValue(user.name) }} title="Editar nombre">✏️</button>
+                  <button className="profile-modal__edit-btn" onClick={() => { setEditingName(true); setNameValue(user.name) }}>✏️</button>
                 </>
               )}
-              {user.role === "ADMIN" && !editingName && (
-                <span className="profile-modal__badge">ADMIN</span>
-              )}
+              {user.role === "ADMIN" && !editingName && <span className="profile-modal__badge">ADMIN</span>}
             </div>
             {nameError && <span className="profile-modal__name-error">{nameError}</span>}
             <span className="profile-modal__email">{user.email}</span>
-            <span className="profile-modal__since">
-              Miembro desde {new Date(user.createdAt).toLocaleDateString("es-ES", { month: "long", year: "numeric" })}
-            </span>
           </div>
+        </div>
 
-          <button className="profile-modal__close" onClick={onClose}>✕</button>
+        {/* Stats */}
+        <div className="profile-modal__stats">
+          <div className="profile-modal__stat">
+            <span className="profile-modal__stat-value">0</span>
+            <span className="profile-modal__stat-label">Eventos</span>
+          </div>
+          <div className="profile-modal__stat-divider" />
+          <div className="profile-modal__stat">
+            <span className="profile-modal__stat-value">{joinYear}</span>
+            <span className="profile-modal__stat-label">Miembro desde</span>
+          </div>
+          <div className="profile-modal__stat-divider" />
+          <div className="profile-modal__stat">
+            <span className="profile-modal__stat-value" style={{ color: statusCfg.color }}>
+              {user.status}
+            </span>
+            <span className="profile-modal__stat-label">Estado</span>
+          </div>
         </div>
 
         {/* Membresía */}

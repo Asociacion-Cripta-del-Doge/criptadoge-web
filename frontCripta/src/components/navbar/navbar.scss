@@ -135,3 +135,18 @@
         filter: brightness(1.1);
     }
 }
+
+.navbar-profile-btn {
+  display: flex;
+  align-items: center;
+  gap: v.$space-xs;
+}
+
+.navbar-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(v.$neon-blue, 0.5);
+  flex-shrink: 0;
+}
