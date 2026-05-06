@@ -9,6 +9,7 @@ import { ContactoSection } from "./components/contact/contacto";
 import { UbicacionSection } from "./components/ubicacion/Ubicacion";
 import AboutUs from "./components/aboutUs/aboutUs";
 import SectionDivider from "./components/sectionDivider/SectionDivider";
+import { HeroCarousel } from "./components/heroCarousel/HeroCarousel";
 
 function App() {
   const path = window.location.pathname;
@@ -39,26 +40,21 @@ function App() {
       <Navbar />
 
       <section id="inicio" className="hero">
-        <h1 className="hero-title">
-          <span className="hero-highlight">Bienvenido</span> a <br /> La Cripta
-        </h1>
-        <p className="hero-subtitle">
-          Asociación sin ánimo de lucro dedicada al ocio alternativo para
-          jóvenes. Juegos de mesa, rol, videojuegos y mucho más.
-        </p>
-
-        <div className="hero-buttons">
-          <a className="btn-pink">Únete al Club</a>
-          <a className="btn-outline">Ver Eventos</a>
-        </div>
-
-        {/* #wip */}
-        <div className="hero-carousel">
-          <img src="" alt="" />
-          <img src="" alt="" />
-          <img src="" alt="" />
-        </div>
-      </section>
+  <div className="hero-left">
+    <h1 className="hero-title">
+      <span className="hero-highlight">Bienvenido</span> a <br /> La Cripta
+    </h1>
+    <p className="hero-subtitle">
+      Asociación sin ánimo de lucro dedicada al ocio alternativo para
+      jóvenes. Juegos de mesa, rol, videojuegos y mucho más.
+    </p>
+    <div className="hero-buttons">
+      <a className="btn-pink">Únete al Club</a>
+      <a href="#eventos" className="btn-outline">Ver Eventos</a>
+    </div>
+  </div>
+  <HeroCarousel />
+</section>
 
       <SectionDivider />
 
@@ -66,7 +62,9 @@ function App() {
 
       <SectionDivider />
 
-      <EventCalendar />
+      <section id="eventos">
+        <EventCalendar />
+      </section>
 
       <SectionDivider />
 
