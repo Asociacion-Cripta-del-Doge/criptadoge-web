@@ -39,7 +39,6 @@
     z-index: 10;
   }
 
-  // Hero section
   &__hero {
     position: relative;
     padding: v.$space-xl v.$space-lg v.$space-lg;
@@ -265,7 +264,6 @@
     color: rgba(v.$color-text-main, 0.5);
   }
 
-  // Stats bar
   &__stats {
     display: flex;
     align-items: center;
@@ -305,7 +303,6 @@
     flex-shrink: 0;
   }
 
-  // Secciones
   &__section {
     padding: v.$space-lg;
     border-bottom: 1px solid rgba(v.$neon-blue, 0.1);
@@ -406,6 +403,50 @@
     cursor: pointer;
     transition: background v.$transition-fast, border-color v.$transition-fast, box-shadow v.$transition-fast, transform v.$transition-fast;
     &:hover { background: rgba(v.$color-error, 0.1); border-color: v.$color-error; box-shadow: 0 0 10px rgba(v.$color-error, 0.2); transform: translateY(-1px); }
+  }
+
+  &__logout-confirm {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: v.$space-md;
+  }
+
+  &__logout-text {
+    font-family: v.$font-mono;
+    font-size: 0.8rem;
+    color: v.$color-error;
+  }
+
+  &__logout-actions {
+    display: flex;
+    gap: v.$space-sm;
+  }
+
+  &__logout-yes {
+    background: rgba(v.$color-error, 0.15);
+    border: 1px solid v.$color-error;
+    color: v.$color-error;
+    padding: 6px 14px;
+    border-radius: v.$radius-sm;
+    font-family: v.$font-mono;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: background v.$transition-fast, transform v.$transition-fast;
+    &:hover { background: rgba(v.$color-error, 0.25); transform: translateY(-1px); }
+  }
+
+  &__logout-no {
+    background: transparent;
+    border: 1px solid v.$color-border;
+    color: v.$color-text-muted;
+    padding: 6px 14px;
+    border-radius: v.$radius-sm;
+    font-family: v.$font-mono;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: background v.$transition-fast, transform v.$transition-fast;
+    &:hover { background: rgba(v.$color-text-muted, 0.1); transform: translateY(-1px); }
   }
 }
 

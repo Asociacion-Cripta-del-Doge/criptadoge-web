@@ -29,6 +29,7 @@ export const ProfileModal = ({ onClose }: Props) => {
   const [saving, setSaving] = useState(false)
   const [nameError, setNameError] = useState("")
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
+  const [confirmLogout, setConfirmLogout] = useState(false)
 
   if (!user) return null
 
@@ -91,133 +92,150 @@ export const ProfileModal = ({ onClose }: Props) => {
   }
 
   return (
-    <div className="profile-overlay" onClick={onClose}>
-      <div className="profile-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="profile-modal__scanlines" />
+  <div className="profile-overlay" onClick={onClose}>
+    <div className="profile-modal" onClick={(e) => e.stopPropagation()}>
+      <div className="profile-modal__scanlines" />
 
-        {/* Hero header */}
-        <div className="profile-modal__hero">
-          <div className="profile-modal__hero-bg" />
-          <button className="profile-modal__close" onClick={onClose}>✕</button>
+      {/* Hero header */}
+      <div className="profile-modal__hero">
+        <div className="profile-modal__hero-bg" />
+        <button className="profile-modal__close" onClick={onClose}>✕</button>
 
-          <div className="profile-modal__avatar-wrap">
-            <div className="profile-modal__avatar" onClick={() => document.getElementById("avatar-input")?.click()}>
-              {user.avatar ? (
-                <img src={user.avatar} alt={user.name} className="profile-modal__avatar-img" />
-              ) : (
-                getInitials(user.name)
-              )}
-              <div className="profile-modal__avatar-overlay">
-                {uploadingAvatar ? "⏳" : "📷"}
-              </div>
-            </div>
-            <input id="avatar-input" type="file" accept="image/*" style={{ display: "none" }} onChange={handleAvatarChange} />
-            <div
-              className="profile-modal__status-bubble"
-              style={{ "--bubble-color": statusCfg.color, "--bubble-glow": statusCfg.glow } as React.CSSProperties}
-            >
-              <span className="profile-modal__status-dot" />
-              {statusCfg.label}
+        <div className="profile-modal__avatar-wrap">
+          <div className="profile-modal__avatar" onClick={() => document.getElementById("avatar-input")?.click()}>
+            {user.avatar ? (
+              <img src={user.avatar} alt={user.name} className="profile-modal__avatar-img" />
+            ) : (
+              getInitials(user.name)
+            )}
+            <div className="profile-modal__avatar-overlay">
+              {uploadingAvatar ? "⏳" : "📷"}
             </div>
           </div>
-
-          <div className="profile-modal__hero-info">
-            <div className="profile-modal__name-row">
-              {editingName ? (
-                <div className="profile-modal__name-edit">
-                  <input
-                    className={`profile-modal__name-input ${nameError ? "profile-modal__name-input--error" : ""}`}
-                    value={nameValue}
-                    onChange={(e) => setNameValue(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    autoFocus
-                    maxLength={32}
-                  />
-                  <button className="profile-modal__name-btn profile-modal__name-btn--save" onClick={handleSaveName} disabled={saving}>
-                    {saving ? "..." : "✓"}
-                  </button>
-                  <button className="profile-modal__name-btn profile-modal__name-btn--cancel" onClick={() => { setEditingName(false); setNameValue(user.name); setNameError("") }}>
-                    ✕
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <h2 className="profile-modal__name">{user.name}</h2>
-                  <button className="profile-modal__edit-btn" onClick={() => { setEditingName(true); setNameValue(user.name) }}>✏️</button>
-                </>
-              )}
-              {user.role === "ADMIN" && !editingName && <span className="profile-modal__badge">ADMIN</span>}
-            </div>
-            {nameError && <span className="profile-modal__name-error">{nameError}</span>}
-            <span className="profile-modal__email">{user.email}</span>
+          <input id="avatar-input" type="file" accept="image/*" style={{ display: "none" }} onChange={handleAvatarChange} />
+          <div
+            className="profile-modal__status-bubble"
+            style={{ "--bubble-color": statusCfg.color, "--bubble-glow": statusCfg.glow } as React.CSSProperties}
+          >
+            <span className="profile-modal__status-dot" />
+            {statusCfg.label}
           </div>
         </div>
 
-        {/* Stats */}
-        <div className="profile-modal__stats">
-          <div className="profile-modal__stat">
-            <span className="profile-modal__stat-value">0</span>
-            <span className="profile-modal__stat-label">Eventos</span>
-          </div>
-          <div className="profile-modal__stat-divider" />
-          <div className="profile-modal__stat">
-            <span className="profile-modal__stat-value">{joinYear}</span>
-            <span className="profile-modal__stat-label">Miembro desde</span>
-          </div>
-          <div className="profile-modal__stat-divider" />
-          <div className="profile-modal__stat">
-            <span className="profile-modal__stat-value" style={{ color: statusCfg.color }}>
-              {user.status}
-            </span>
-            <span className="profile-modal__stat-label">Estado</span>
-          </div>
-        </div>
-
-        {/* Membresía */}
-        <div className="profile-modal__section">
-          <div className="profile-modal__section-header">
-            <span className="profile-modal__section-icon">⚔️</span>
-            <h3 className="profile-modal__section-title">Membresía</h3>
-          </div>
-
-          {hasMembership ? (
-            <div className="profile-modal__membership">
-              <div className="profile-modal__membership-rows">
-                {user.lastRenewal && (
-                  <div className="profile-modal__row">
-                    <span className="profile-modal__label">Último pago</span>
-                    <span className="profile-modal__value">{new Date(user.lastRenewal).toLocaleDateString("es-ES")}</span>
-                  </div>
-                )}
-                {user.expirationDate && (
-                  <div className="profile-modal__row">
-                    <span className="profile-modal__label">Expira el</span>
-                    <span className="profile-modal__value">{new Date(user.expirationDate).toLocaleDateString("es-ES")}</span>
-                  </div>
-                )}
+        <div className="profile-modal__hero-info">
+          <div className="profile-modal__name-row">
+            {editingName ? (
+              <div className="profile-modal__name-edit">
+                <input
+                  className={`profile-modal__name-input ${nameError ? "profile-modal__name-input--error" : ""}`}
+                  value={nameValue}
+                  onChange={(e) => setNameValue(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  autoFocus
+                  maxLength={32}
+                />
+                <button className="profile-modal__name-btn profile-modal__name-btn--save" onClick={handleSaveName} disabled={saving}>
+                  {saving ? "..." : "✓"}
+                </button>
+                <button className="profile-modal__name-btn profile-modal__name-btn--cancel" onClick={() => { setEditingName(false); setNameValue(user.name); setNameError("") }}>
+                  ✕
+                </button>
               </div>
-              <div className="profile-modal__bar-wrap">
-                <div className="profile-modal__bar-label">
-                  <span>{isExpiringSoon ? "⚠️ Expira pronto" : "Tiempo restante"}</span>
-                  <span className={isExpiringSoon ? "profile-modal__bar-days--warn" : ""}>{daysLeft}d</span>
-                </div>
-                <div className="profile-modal__bar-track">
-                  <div className={`profile-modal__bar-fill ${isExpiringSoon ? "profile-modal__bar-fill--warn" : ""}`} style={{ width: `${memberPercent}%` }} />
-                </div>
-              </div>
-            </div>
-          ) : (
-            <a href="/membresia" className="profile-modal__cta" onClick={onClose}>
-              <span>⚡</span> Hazte miembro
-            </a>
-          )}
-        </div>
-
-        {/* Footer */}
-        <div className="profile-modal__footer">
-          <button className="profile-modal__logout" onClick={logout}>Cerrar sesión</button>
+            ) : (
+              <>
+                <h2 className="profile-modal__name">{user.name}</h2>
+                <button className="profile-modal__edit-btn" onClick={() => { setEditingName(true); setNameValue(user.name) }}>✏️</button>
+              </>
+            )}
+            {user.role === "ADMIN" && !editingName && <span className="profile-modal__badge">ADMIN</span>}
+          </div>
+          {nameError && <span className="profile-modal__name-error">{nameError}</span>}
+          <span className="profile-modal__email">{user.email}</span>
         </div>
       </div>
+
+      {/* Stats */}
+      <div className="profile-modal__stats">
+        <div className="profile-modal__stat">
+          <span className="profile-modal__stat-value">0</span>
+          <span className="profile-modal__stat-label">Eventos</span>
+        </div>
+        <div className="profile-modal__stat-divider" />
+        <div className="profile-modal__stat">
+          <span className="profile-modal__stat-value">{joinYear}</span>
+          <span className="profile-modal__stat-label">Miembro desde</span>
+        </div>
+        <div className="profile-modal__stat-divider" />
+        <div className="profile-modal__stat">
+          <span className="profile-modal__stat-value" style={{ color: statusCfg.color }}>
+            {user.status}
+          </span>
+          <span className="profile-modal__stat-label">Estado</span>
+        </div>
+      </div>
+
+      {/* Membresía */}
+      <div className="profile-modal__section">
+        <div className="profile-modal__section-header">
+          <span className="profile-modal__section-icon">⚔️</span>
+          <h3 className="profile-modal__section-title">Membresía</h3>
+        </div>
+
+        {hasMembership ? (
+          <div className="profile-modal__membership">
+            <div className="profile-modal__membership-rows">
+              {user.lastRenewal && (
+                <div className="profile-modal__row">
+                  <span className="profile-modal__label">Último pago</span>
+                  <span className="profile-modal__value">{new Date(user.lastRenewal).toLocaleDateString("es-ES")}</span>
+                </div>
+              )}
+              {user.expirationDate && (
+                <div className="profile-modal__row">
+                  <span className="profile-modal__label">Expira el</span>
+                  <span className="profile-modal__value">{new Date(user.expirationDate).toLocaleDateString("es-ES")}</span>
+                </div>
+              )}
+            </div>
+            <div className="profile-modal__bar-wrap">
+              <div className="profile-modal__bar-label">
+                <span>{isExpiringSoon ? "⚠️ Expira pronto" : "Tiempo restante"}</span>
+                <span className={isExpiringSoon ? "profile-modal__bar-days--warn" : ""}>{daysLeft}d</span>
+              </div>
+              <div className="profile-modal__bar-track">
+                <div className={`profile-modal__bar-fill ${isExpiringSoon ? "profile-modal__bar-fill--warn" : ""}`} style={{ width: `${memberPercent}%` }} />
+              </div>
+            </div>
+          </div>
+        ) : (
+          <a href="/membresia" className="profile-modal__cta" onClick={onClose}>
+            <span>⚡</span> Hazte miembro
+          </a>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="profile-modal__footer">
+        {confirmLogout ? (
+          <div className="profile-modal__logout-confirm">
+            <span className="profile-modal__logout-text">¿Estás seguro?</span>
+            <div className="profile-modal__logout-actions">
+              <button className="profile-modal__logout-yes" onClick={logout}>
+                Sí, salir
+              </button>
+              <button className="profile-modal__logout-no" onClick={() => setConfirmLogout(false)}>
+                Cancelar
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button className="profile-modal__logout" onClick={() => setConfirmLogout(true)}>
+            Cerrar sesión
+          </button>
+        )}
+      </div>
+
     </div>
-  )
+  </div>
+)
 }
