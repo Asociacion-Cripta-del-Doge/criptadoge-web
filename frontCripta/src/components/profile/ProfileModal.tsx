@@ -205,8 +205,11 @@ export const ProfileModal = ({ onClose }: Props) => {
 
         {/* Footer */}
         <div className="profile-modal__footer">
-          <button className="profile-modal__logout" onClick={logout}>
-            Cerrar sesión
+          <button
+            className="profile-modal__logout"
+            onClick={() => setShowLogoutConfirm(true)}
+          >
+            Cerrar sesión PRUEBA
           </button>
         </div>
 
