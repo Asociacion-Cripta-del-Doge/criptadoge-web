@@ -10,7 +10,6 @@ interface User
     lastRenewal: string | null 
     expirationDate: string | null 
     createdAt: string
-    avatar: string | null
 }
 
 interface AuthContextType 
