@@ -1,25 +1,19 @@
 import { useEffect, useState } from "react"
+import { createPortal } from "react-dom"
 import "./navbar.scss"
 import logo from "../../assets/logo.png"
 import { useAuth } from "../../context/AuthContext"
 import { ProfileModal } from "../profile/ProfileModal"
 
 export const Navbar = () => {
-
   const [scrolled, setScrolled] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
   const { user, loading } = useAuth()
 
   useEffect(() => {
-
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50)
-    }
-
+    const handleScroll = () => setScrolled(window.scrollY > 50)
     window.addEventListener("scroll", handleScroll)
-
     return () => window.removeEventListener("scroll", handleScroll)
-
   }, [])
 
   return (
@@ -40,7 +34,14 @@ export const Navbar = () => {
           <div className="navbar-buttons">
             {!loading && (
               user ? (
-                <button className="btn-outline" onClick={() => setShowProfile(true)} style={{ cursor: "pointer" }}>
+                <button
+                  key={user.name}
+                  className="btn-outline navbar-profile-btn"
+                  onClick={() => setShowProfile(true)}
+                >
+                  {user.avatar && (
+                    <img src={user.avatar} alt={user.name} className="navbar-avatar" />
+                  )}
                   {user.name.split(" ")[0]}
                 </button>
               ) : (
@@ -52,7 +53,10 @@ export const Navbar = () => {
         </div>
       </nav>
 
-      {showProfile && <ProfileModal onClose={() => setShowProfile(false)} />}
+      {showProfile && createPortal(
+        <ProfileModal onClose={() => setShowProfile(false)} />,
+        document.body
+      )}
     </>
   )
 }
