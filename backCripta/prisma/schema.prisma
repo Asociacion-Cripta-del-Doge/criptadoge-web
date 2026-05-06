@@ -21,6 +21,7 @@ model User {
   lastRenewal    String?  
   expirationDate String?
   status         String   @default("Pendiente")
+  avatar         String?
   
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt

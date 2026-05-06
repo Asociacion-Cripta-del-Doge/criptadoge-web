@@ -10,8 +10,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-sizing: border-box;
   padding: v.$space-md;
+  box-sizing: border-box;
 }
 
 .profile-modal {
@@ -20,7 +20,6 @@
   border: 1px solid rgba(v.$neon-blue, 0.25);
   border-radius: v.$radius-md;
   width: min(460px, 100%);
-  max-width: 100%;
   max-height: 90vh;
   overflow: hidden auto;
   box-shadow:
@@ -86,12 +85,35 @@
     font-size: 1.4rem;
     border: 1px solid rgba(v.$neon-blue, 0.5);
     box-shadow: 0 0 10px rgba(v.$neon-blue, 0.2);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
     transition: box-shadow v.$transition-fast;
 
-    &:hover {
-      box-shadow: 0 0 16px rgba(v.$neon-blue, 0.35);
-    }
+    &:hover { box-shadow: 0 0 16px rgba(v.$neon-blue, 0.35); }
   }
+
+  &__avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+
+  &__avatar-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    opacity: 0;
+    transition: opacity v.$transition-fast;
+  }
+
+  &__avatar:hover &__avatar-overlay { opacity: 1; }
 
   &__status-bubble {
     display: flex;
@@ -164,7 +186,6 @@
     padding: 2px;
     transition: opacity v.$transition-fast;
     line-height: 1;
-
     &:hover { opacity: 1; }
   }
 
@@ -219,7 +240,6 @@
       background: transparent;
       border-color: rgba(v.$neon-blue, 0.5);
       color: v.$neon-blue;
-
       &:hover:not(:disabled) {
         background: rgba(v.$neon-blue, 0.12);
         box-shadow: 0 0 10px rgba(v.$neon-blue, 0.3);
@@ -231,7 +251,6 @@
       background: transparent;
       border-color: rgba(v.$color-error, 0.5);
       color: v.$color-error;
-
       &:hover {
         background: rgba(v.$color-error, 0.1);
         box-shadow: 0 0 8px rgba(v.$color-error, 0.2);
@@ -271,11 +290,7 @@
     line-height: 1;
     transition: color v.$transition-fast, text-shadow v.$transition-fast;
     z-index: 12;
-
-    &:hover {
-      color: v.$neon-pink;
-      text-shadow: 0 0 8px v.$neon-pink;
-    }
+    &:hover { color: v.$neon-pink; text-shadow: 0 0 8px v.$neon-pink; }
   }
 
   &__section {
@@ -324,24 +339,10 @@
     align-items: center;
   }
 
-  &__label {
-    font-family: v.$font-mono;
-    font-size: 0.72rem;
-    color: rgba(v.$color-text-main, 0.4);
-  }
+  &__label { font-family: v.$font-mono; font-size: 0.72rem; color: rgba(v.$color-text-main, 0.4); }
+  &__value { font-family: v.$font-mono; font-size: 0.72rem; color: v.$color-text-main; font-weight: 600; }
 
-  &__value {
-    font-family: v.$font-mono;
-    font-size: 0.72rem;
-    color: v.$color-text-main;
-    font-weight: 600;
-  }
-
-  &__bar-wrap {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
+  &__bar-wrap { display: flex; flex-direction: column; gap: 6px; }
 
   &__bar-label {
     display: flex;
@@ -367,11 +368,7 @@
     border-radius: 2px;
     transition: width 0.6s ease;
     box-shadow: 0 0 6px rgba(v.$neon-blue, 0.5);
-
-    &--warn {
-      background: v.$color-accent;
-      box-shadow: 0 0 6px rgba(v.$color-accent, 0.5);
-    }
+    &--warn { background: v.$color-accent; box-shadow: 0 0 6px rgba(v.$color-accent, 0.5); }
   }
 
   &__cta {
@@ -386,27 +383,17 @@
     font-family: v.$font-display;
     font-size: 0.85rem;
     text-decoration: none;
-    box-shadow:
-      0 0 15px v.$neon-pink,
-      0 0 30px rgba(v.$neon-pink, 0.4);
-    transition:
-      transform v.$transition-fast,
-      box-shadow v.$transition-fast,
-      filter v.$transition-fast;
-
+    box-shadow: 0 0 15px v.$neon-pink, 0 0 30px rgba(v.$neon-pink, 0.4);
+    transition: transform v.$transition-fast, box-shadow v.$transition-fast, filter v.$transition-fast;
     &:hover {
       color: white;
       transform: translateY(-2px);
-      box-shadow:
-        0 0 20px v.$neon-pink,
-        0 0 40px rgba(v.$neon-pink, 0.5);
+      box-shadow: 0 0 20px v.$neon-pink, 0 0 40px rgba(v.$neon-pink, 0.5);
       filter: brightness(1.1);
     }
   }
 
-  &__footer {
-    padding: v.$space-md v.$space-lg;
-  }
+  &__footer { padding: v.$space-md v.$space-lg; }
 
   &__logout {
     width: 100%;
@@ -418,12 +405,7 @@
     font-family: v.$font-mono;
     font-size: 0.8rem;
     cursor: pointer;
-    transition:
-      background v.$transition-fast,
-      border-color v.$transition-fast,
-      box-shadow v.$transition-fast,
-      transform v.$transition-fast;
-
+    transition: background v.$transition-fast, border-color v.$transition-fast, box-shadow v.$transition-fast, transform v.$transition-fast;
     &:hover {
       background: rgba(v.$color-error, 0.1);
       border-color: v.$color-error;

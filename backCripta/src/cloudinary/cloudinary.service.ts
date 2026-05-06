@@ -1,0 +1,27 @@
+import { Injectable } from '@nestjs/common';
+import { v2 as cloudinary } from 'cloudinary';
+import { ConfigService } from '@nestjs/config';
+
+@Injectable()
+export class CloudinaryService {
+  constructor(private config: ConfigService) {
+    cloudinary.config({
+      cloud_name: config.get('CLOUDINARY_CLOUD_NAME'),
+      api_key: config.get('CLOUDINARY_API_KEY'),
+      api_secret: config.get('CLOUDINARY_API_SECRET'),
+    });
+  }
+
+  async uploadAvatar(base64: string, userId: string): Promise<string> {
+    const result = await cloudinary.uploader.upload(base64, {
+      folder: 'avatars',
+      public_id: `avatar_${userId}`,
+      overwrite: true,
+      transformation: [
+        { width: 200, height: 200, crop: 'fill', gravity: 'face' },
+        { quality: 'auto', fetch_format: 'auto' },
+      ],
+    })
+    return result.secure_url
+  }
+}
