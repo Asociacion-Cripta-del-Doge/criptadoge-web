@@ -1,6 +1,17 @@
-import { Controller, Get, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+  UseGuards,
+} from '@nestjs/common';
 import { ContactService } from './contact.service';
 import { CreateMessageDto } from './dto/create-message.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
 
 @Controller('contacto')
 export class ContactController {
@@ -12,8 +23,10 @@ export class ContactController {
     return this.contactService.createMessage(dto);
   }
 
-  @Get('mensajes')
-  async getMessages() {
+  @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  async getContactMessages() {
     return this.contactService.getMessages();
   }
 

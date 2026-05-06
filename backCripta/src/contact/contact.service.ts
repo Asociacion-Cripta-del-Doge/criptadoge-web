@@ -24,7 +24,7 @@ export class ContactService {
   }
 
   async getMessages() {
-    return this.messageModel.find();
+    return this.messageModel.find().sort({ createdAt: -1 });
   }
 
   async getSocialLinks() {
