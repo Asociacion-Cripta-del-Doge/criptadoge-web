@@ -70,7 +70,7 @@ const AboutUs = () => {
                             <span className="about-us__stat-label">Sin ánimo de lucro</span>
                         </div>
                         <div className="about-us__stat">
-                            <span className="about-us__stat-number">Purl.</span>
+                            <span className="about-us__stat-number">Puer.</span>
                             <span className="about-us__stat-label">Puertollano</span>
                         </div>
                     </div>
