@@ -1,0 +1,23 @@
+@use '../../styles/variables' as v;
+
+.section-divider
+{
+    width: 100%;
+    padding: 0 v.$space-xl;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &__line 
+    {
+        width: 70%;
+        height: 1px;
+        background: linear-gradient(
+            to right,
+            transparent 0%,
+            v.$neon-blue 30%,
+            v.$neon-pink 70%,
+            transparent 100%
+        );
+    }
+}
