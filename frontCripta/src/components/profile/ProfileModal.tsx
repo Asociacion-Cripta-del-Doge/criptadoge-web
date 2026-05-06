@@ -281,7 +281,7 @@ export const ProfileModal = ({ onClose }: Props) => {
             className="profile-modal__logout"
             onClick={() => setShowLogoutConfirm(true)}
           >
-            Cerrar sesión
+            Cerrar sesión PRUEBA
           </button>
         </div>
 
