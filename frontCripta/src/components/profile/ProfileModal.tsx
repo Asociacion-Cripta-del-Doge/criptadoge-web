@@ -1,5 +1,6 @@
 import { useAuth } from "../../context/AuthContext"
 import { useState } from "react"
+import MembershipModal from "../membershipSection/MembershipModal";
 import "./profileModal.scss"
 
 interface Props {
@@ -30,6 +31,7 @@ export const ProfileModal = ({ onClose }: Props) => {
   const [nameError, setNameError] = useState("")
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
   const [confirmLogout, setConfirmLogout] = useState(false)
+  const [showMembershipModal, setShowMembershipModal] = useState(false);
 
   if (!user) return null
 
@@ -92,6 +94,7 @@ export const ProfileModal = ({ onClose }: Props) => {
   }
 
   return (
+    <>
   <div className="profile-overlay" onClick={onClose}>
     <div className="profile-modal" onClick={(e) => e.stopPropagation()}>
       <div className="profile-modal__scanlines" />
@@ -208,9 +211,9 @@ export const ProfileModal = ({ onClose }: Props) => {
             </div>
           </div>
         ) : (
-          <a href="/membresia" className="profile-modal__cta" onClick={onClose}>
+          <button className="profile-modal__cta" onClick={() => setShowMembershipModal(true)}>
             Hazte miembro
-          </a>
+          </button>
         )}
       </div>
 
@@ -237,5 +240,10 @@ export const ProfileModal = ({ onClose }: Props) => {
 
     </div>
   </div>
-)
+
+  {showMembershipModal && (
+    <MembershipModal onClose={() => setShowMembershipModal(false)} />
+  )}
+  </>
+  )
 }

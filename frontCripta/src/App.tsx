@@ -10,6 +10,7 @@ import { UbicacionSection } from "./components/ubicacion/Ubicacion";
 import AboutUs from "./components/aboutUs/aboutUs";
 import SectionDivider from "./components/sectionDivider/SectionDivider";
 import { HeroCarousel } from "./components/heroCarousel/HeroCarousel";
+import MembershipSection from "./components/membershipSection/MembershipSection";
 
 function App() {
   const path = window.location.pathname;
@@ -49,7 +50,7 @@ function App() {
       jóvenes. Juegos de mesa, rol, videojuegos y mucho más.
     </p>
     <div className="hero-buttons">
-      <a className="btn-pink">Únete al Club</a>
+      <a href="#membresia" className="btn-pink">Únete al Club</a>
       <a href="#eventos" className="btn-outline">Ver Eventos</a>
     </div>
   </div>
@@ -59,6 +60,10 @@ function App() {
       <SectionDivider />
 
       <AboutUs/>
+
+      <SectionDivider />
+
+      <MembershipSection /> 
 
       <SectionDivider />
 
