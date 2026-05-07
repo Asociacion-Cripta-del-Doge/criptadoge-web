@@ -48,7 +48,7 @@ export const Navbar = () => {
                 <a href="/login" className="btn-outline">Iniciar sesión</a>
               )
             )}
-            <a href="/membresia" className="btn-pink">Membresía</a>
+            <a href="#membresia" className="btn-pink">Membresía</a>
           </div>
         </div>
       </nav>

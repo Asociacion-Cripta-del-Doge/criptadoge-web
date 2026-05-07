@@ -1,0 +1,202 @@
+@use '../../styles/variables' as v;
+
+.membership-section {
+  padding: 80px 0;
+
+  &__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 v.$space-lg;
+  }
+
+  &__header {
+    text-align: center;
+    margin-bottom: v.$space-xl;
+  }
+
+  &__badge {
+    display: inline-block;
+    background: linear-gradient(135deg, v.$neon-pink, v.$color-secondary);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    padding: v.$space-xs v.$space-md;
+    border-radius: 999px;
+    margin-bottom: v.$space-md;
+  }
+
+  &__title {
+    font-family: v.$font-display;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    color: v.$color-text-main;
+    margin-bottom: v.$space-md;
+    text-shadow: 0 0 24px rgba(v.$neon-blue, 0.45);
+  }
+
+  &__subtitle {
+    color: v.$color-text-muted;
+    font-size: 1.05rem;
+    max-width: 580px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: v.$space-lg;
+    margin-bottom: v.$space-xl;
+  }
+
+  &__card {
+    background: v.$color-bg-surface;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-lg;
+    padding: v.$space-xl;
+    transition:
+      border-color v.$transition-normal,
+      transform v.$transition-normal,
+      box-shadow v.$transition-normal;
+
+    &:hover {
+      border-color: v.$neon-blue;
+      transform: translateY(-5px);
+      box-shadow: 0 10px 28px rgba(v.$neon-blue, 0.15);
+    }
+  }
+
+  &__card-icon {
+    display: block;
+    font-size: 2.4rem;
+    margin-bottom: v.$space-md;
+  }
+
+  &__card-title {
+    font-family: v.$font-display;
+    font-size: 0.95rem;
+    color: v.$color-text-main;
+    margin-bottom: v.$space-sm;
+  }
+
+  &__card-desc {
+    color: v.$color-text-muted;
+    font-size: 0.875rem;
+    line-height: 1.65;
+  }
+
+  &__cta {
+    text-align: center;
+  }
+
+  &__cta-text {
+    color: v.$color-text-muted;
+    margin-bottom: v.$space-lg;
+    font-size: 1rem;
+  }
+
+  &__cta-btn {
+    font-size: 1rem;
+    padding: v.$space-md v.$space-xl;
+  }
+}
+
+.membership-modal {
+  background: v.$color-bg-surface;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-lg;
+  padding: v.$space-xl;
+  max-width: 440px;
+  width: 100%;
+  position: relative;
+  text-align: center;
+  box-shadow: 0 0 48px rgba(v.$neon-pink, 0.2);
+
+  &__overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.85); 
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: v.$space-lg;
+  }
+
+  &__close {
+    position: absolute;
+    top: v.$space-md;
+    right: v.$space-md;
+    background: none;
+    border: none;
+    color: v.$color-text-muted;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: color v.$transition-fast;
+    line-height: 1;
+
+    &:hover {
+      color: v.$color-text-main;
+    }
+  }
+
+  &__hero-icon {
+    display: block;
+    font-size: 3rem;
+    margin-bottom: v.$space-md;
+  }
+
+  &__title {
+    font-family: v.$font-display;
+    font-size: 1.3rem;
+    color: v.$color-text-main;
+    margin-bottom: v.$space-sm;
+  }
+
+  &__text {
+    color: v.$color-text-muted;
+    font-size: 0.9rem;
+    line-height: 1.65;
+    margin-bottom: v.$space-lg;
+  }
+
+  &__input {
+    width: 100%;
+    box-sizing: border-box;
+    background: v.$color-bg-surface;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    padding: v.$space-md;
+    color: v.$color-text-main;
+    font-family: v.$font-primary;
+    font-size: 1rem;
+    margin-bottom: v.$space-md;
+    transition: border-color v.$transition-fast, box-shadow v.$transition-fast;
+
+    &:focus {
+      outline: none;
+      border-color: v.$neon-pink;
+      box-shadow: 0 0 0 3px rgba(255, 46, 154, 0.15);
+    }
+
+    &::placeholder {
+      color: v.$color-text-muted;
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  &__submit {
+    width: 100%;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
