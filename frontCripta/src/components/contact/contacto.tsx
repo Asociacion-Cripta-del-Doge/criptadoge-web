@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import type { CSSProperties, FormEvent } from "react"
 import "./contacto.scss"
 
-const API_BASE = "http://localhost:8080/api"
+const API_BASE = "/api"
 
 interface RedSocial {
   _id: string
