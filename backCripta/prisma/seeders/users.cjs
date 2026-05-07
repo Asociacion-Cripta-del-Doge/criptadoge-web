@@ -10,7 +10,6 @@ async function main() {
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
   const adapter = new PrismaPg(pool);
   const prisma = new PrismaClient({ adapter });
-
   const hashedUserPass = await bcrypt.hash('1234', 10);
 
   const mockMembers = [
@@ -49,15 +48,16 @@ async function main() {
   for (const member of mockMembers) {
     await prisma.user.upsert({
       where: { email: member.email },
-      update: {},
+      update: member,
       create: member,
     });
-    console.log(`Socio creado: ${member.name} (${member.status})`);
+    console.log(`Socio creado o actualizado: ${member.name} (${member.status})`);
   }
 
-  console.log('Todos los socios de prueba han sido plantados con éxito!');
+  console.log('Todos los socios de prueba han sido plantados con exito');
 
   await prisma.$disconnect();
+  await pool.end();
 }
 
 main().catch((e) => {
