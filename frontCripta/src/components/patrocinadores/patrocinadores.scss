@@ -1,0 +1,207 @@
+@use "../../styles/variables" as v;
+
+.sp-section {
+  padding: 80px v.$space-xl;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.sp-header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.sp-tag {
+  display: inline-block;
+  border: 1px solid v.$color-accent;
+  color: v.$color-accent;
+  font-family: v.$font-mono;
+  font-size: 0.75rem;
+  padding: 4px 14px;
+  border-radius: 20px;
+  margin-bottom: 16px;
+  letter-spacing: 0.5px;
+}
+
+.sp-title {
+  font-family: v.$font-display;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  color: v.$color-text-main;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+}
+
+.sp-title-highlight {
+  color: v.$color-accent;
+  text-shadow: 0 0 20px rgba(234, 179, 8, 0.4);
+}
+
+.sp-subtitle {
+  color: v.$color-text-muted;
+  font-family: v.$font-primary;
+  font-size: 0.95rem;
+}
+
+/* --- Grupos por tier --- */
+
+.sp-tier-group {
+  margin-bottom: v.$space-xl;
+}
+
+.sp-tier-label {
+  font-family: v.$font-mono;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: v.$space-md;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  &--oro    { color: #f59e0b; }
+  &--plata  { color: #94a3b8; }
+  &--bronce { color: #b45309; }
+}
+
+/* --- Grid --- */
+
+.sp-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: v.$space-md;
+
+  .sp-card-link {
+    flex: 1 1 240px;
+    max-width: 340px;
+  }
+
+  &--oro .sp-card-link {
+    flex-basis: 280px;
+    max-width: 420px;
+  }
+
+  @media (max-width: 600px) {
+    .sp-card-link {
+      flex: 1 1 100%;
+      max-width: 100%;
+    }
+  }
+}
+
+/* --- Card link wrapper --- */
+
+.sp-card-link {
+  display: block;
+  text-decoration: none;
+  border-radius: v.$radius-md;
+  transition: transform v.$transition-fast;
+
+  &:hover {
+    transform: translateY(-2px);
+
+    .sp-card {
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+  }
+}
+
+/* --- Card --- */
+
+.sp-card {
+  background: v.$color-bg-surface;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-md;
+  padding: v.$space-md;
+  display: flex;
+  align-items: center;
+  gap: v.$space-md;
+  transition: border-color v.$transition-fast;
+
+  &--oro    { border-left: 3px solid #f59e0b; }
+  &--plata  { border-left: 3px solid #94a3b8; }
+  &--bronce { border-left: 3px solid #b45309; }
+}
+
+/* --- Avatar con iniciales --- */
+
+.sp-card-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: v.$radius-sm;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid v.$color-border;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: v.$font-display;
+  font-size: 0.85rem;
+  color: v.$color-text-main;
+  flex-shrink: 0;
+  letter-spacing: 1px;
+
+  .sp-card--oro &    { color: #f59e0b; border-color: rgba(245, 158, 11, 0.3); }
+  .sp-card--plata &  { color: #94a3b8; border-color: rgba(148, 163, 184, 0.3); }
+  .sp-card--bronce & { color: #b45309; border-color: rgba(180, 83, 9, 0.3); }
+}
+
+.sp-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+}
+
+.sp-card-nombre {
+  font-family: v.$font-primary;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: v.$color-text-main;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sp-card-descripcion {
+  font-size: 0.75rem;
+  color: v.$color-text-muted;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* --- Tier badge --- */
+
+.sp-tier-badge {
+  font-family: v.$font-mono;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+
+  &--oro    { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+  &--plata  { background: rgba(148, 163, 184, 0.15); color: #94a3b8; }
+  &--bronce { background: rgba(180, 83, 9, 0.15); color: #b45309; }
+}
+
+/* --- CTA --- */
+
+.sp-cta {
+  text-align: center;
+  margin-top: v.$space-xl;
+  font-size: 0.9rem;
+  color: v.$color-text-muted;
+
+  a {
+    color: v.$neon-blue;
+    font-weight: 600;
+
+    &:hover {
+      color: v.$neon-pink;
+    }
+  }
+}
