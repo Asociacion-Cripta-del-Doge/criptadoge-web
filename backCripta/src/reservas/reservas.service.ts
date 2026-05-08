@@ -16,6 +16,10 @@ const ACTIVE_RESERVATION_STATES = [
   EstadoReservaMesa.CONFIRMADA,
 ];
 
+/**
+ * Horario provisional visible en la web. Se usa como ventana por defecto para
+ * calcular huecos libres cuando el cliente no envia un rango personalizado.
+ */
 const SERVER_BOOKING_SCHEDULE = {
   duracionFranjaMinutos: 60,
   porDiaSemana: [
@@ -33,6 +37,11 @@ const SERVER_BOOKING_SCHEDULE = {
 export class ReservasService {
   constructor(private prisma: PrismaService) {}
 
+  /**
+   * Crea una reserva para el usuario autenticado si la mesa tiene asientos
+   * suficientes en el rango solicitado. Las reservas parciales no bloquean la
+   * mesa completa: solo consumen el numero de asientos reservados.
+   */
   async create(data: CreateReservaDto, userId: string) {
     const range = this.parseRange(data.fechaHoraInicio, data.fechaHoraFin);
 
@@ -61,6 +70,10 @@ export class ReservasService {
     });
   }
 
+  /**
+   * Consulta disponibilidad para una mesa concreta y un rango concreto.
+   * Devuelve ocupacion y asientos libres considerando reservas solapadas.
+   */
   async checkAvailability(query: ConsultaDisponibilidadDto) {
     const range = this.parseRange(query.fechaHoraInicio, query.fechaHoraFin);
 
@@ -72,6 +85,10 @@ export class ReservasService {
     );
   }
 
+  /**
+   * Genera huecos libres por franjas horarias usando el horario del servidor.
+   * Si `soloGratis` es true, calcula las franjas solo sobre mesas gratuitas.
+   */
   async findAvailableSlots(query: ConsultaHuecosDto, soloGratis = false) {
     const asientosSolicitados = query.asientosReservados ?? 1;
     const duracionMinutos =
@@ -152,6 +169,10 @@ export class ReservasService {
     };
   }
 
+  /**
+   * Lista las reservas del usuario autenticado con la informacion basica de la
+   * mesa, sin exponer datos de otros usuarios.
+   */
   async findOwn(userId: string) {
     return this.prisma.reservaMesa.findMany({
       where: { userId },
@@ -160,6 +181,10 @@ export class ReservasService {
     });
   }
 
+  /**
+   * Lista todas las reservas para administracion, incluyendo datos basicos del
+   * usuario propietario.
+   */
   async findAll() {
     return this.prisma.reservaMesa.findMany({
       orderBy: { fechaHoraInicio: 'desc' },
@@ -167,6 +192,10 @@ export class ReservasService {
     });
   }
 
+  /**
+   * Cancela una reserva conservando el historico. Puede hacerlo el propietario
+   * de la reserva o un ADMIN; no permite cancelar reservas completadas.
+   */
   async cancel(id: string, userId: string, role: string) {
     const reserva = await this.prisma.reservaMesa.findUnique({
       where: { id },
@@ -206,6 +235,11 @@ export class ReservasService {
     fechaHoraFin: Date,
     asientosSolicitados: number,
   ) {
+    /**
+     * Hay solape cuando una reserva empieza antes de que termine el rango
+     * consultado y termina despues de que empiece. En ese caso suma asientos,
+     * no bloquea la mesa entera.
+     */
     const mesa = await this.prisma.mesa.findUnique({
       where: { id: mesaId },
       select: { id: true, asientos: true, orden: true, esDePago: true },
@@ -296,6 +330,11 @@ export class ReservasService {
     query: ConsultaHuecosDto,
     duracionMinutos: number,
   ) {
+    /**
+     * Permite acotar el calculo dentro del horario oficial del dia, pero evita
+     * pedir huecos fuera de apertura. Los cierres a 00:00 se tratan como el
+     * inicio del dia siguiente.
+     */
     const schedule = this.getScheduleForDate(query.fecha);
     const inicio =
       query.desde ??
