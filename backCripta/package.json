@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "seed": "node prisma/seeders/admin.cjs && node prisma/seeders/users.cjs && node prisma/seeders/events.cjs",
+    "seed": "node prisma/seeders/admin.cjs && node prisma/seeders/users.cjs && node prisma/seeders/events.cjs && node prisma/seeders/social-links.cjs",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
