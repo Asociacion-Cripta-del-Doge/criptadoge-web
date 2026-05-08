@@ -203,6 +203,61 @@ Base URL via Nginx: `http://localhost:8080/api`
 
 ---
 
+## Reservas `/reservas`
+
+| Metodo | Ruta | Auth | Roles | Body / uso |
+| ------ | ---- | ---- | ----- | ---------- |
+| POST | `/reservas` | JWT | Usuario autenticado | `CreateReservaDto` |
+| GET | `/reservas/disponibilidad` | JWT | Usuario autenticado | Query de disponibilidad |
+| GET | `/reservas/mis-reservas` | JWT | Usuario autenticado | Lista las reservas propias |
+| GET | `/reservas` | JWT | ADMIN | Lista todas las reservas |
+| PATCH | `/reservas/:id/cancelar` | JWT | Propietario o ADMIN | Cancela una reserva |
+
+**CreateReservaDto:**
+
+```json
+{
+  "mesaId": "uuid (requerido)",
+  "fechaHoraInicio": "ISO 8601 (requerido)",
+  "fechaHoraFin": "ISO 8601 (requerido)",
+  "asientosReservados": "number (requerido, min. 1)"
+}
+```
+
+**Query GET `/reservas/disponibilidad`:**
+
+```http
+/reservas/disponibilidad?mesaId=uuid&fechaHoraInicio=2026-05-10T18:00:00.000Z&fechaHoraFin=2026-05-10T20:00:00.000Z&asientosReservados=2
+```
+
+**Response de disponibilidad:**
+
+```json
+{
+  "mesa": {
+    "id": "uuid",
+    "orden": 1,
+    "asientos": 4,
+    "esDePago": false
+  },
+  "fechaHoraInicio": "ISO 8601",
+  "fechaHoraFin": "ISO 8601",
+  "asientosTotales": 4,
+  "asientosOcupados": 1,
+  "asientosDisponibles": 3,
+  "asientosSolicitados": 2,
+  "disponible": true
+}
+```
+
+**Notas de negocio:**
+
+- Las reservas activas que ocupan disponibilidad son `PENDIENTE` y `CONFIRMADA`.
+- Cancelar una reserva cambia su estado a `CANCELADA`; no elimina el historico.
+- Solo el propietario de la reserva o un usuario `ADMIN` puede cancelarla.
+
+---
+
 ## Autenticacion
 
 Incluir el token en el header de todas las rutas protegidas:

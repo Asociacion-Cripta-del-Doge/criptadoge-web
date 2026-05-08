@@ -13,6 +13,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { TasksModule } from './tasks/tasks.module';
 import { ContactModule } from './contact/contact.module';
 import { MesasModule } from './mesas/mesas.module';
+import { ReservasModule } from './reservas/reservas.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { MesasModule } from './mesas/mesas.module';
     TasksModule,
     ContactModule,
     MesasModule,
+    ReservasModule,
   ],
   controllers: [AppController],
   providers: [AppService],
