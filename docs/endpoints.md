@@ -222,7 +222,7 @@ Base URL via Nginx: `http://localhost:8080/api`
   "mesaId": "uuid (requerido)",
   "fechaHoraInicio": "ISO 8601 (requerido)",
   "fechaHoraFin": "ISO 8601 (requerido)",
-  "asientosReservados": "number (requerido, min. 1)"
+  "asientosReservados": "number (requerido, min. 2)"
 }
 ```
 

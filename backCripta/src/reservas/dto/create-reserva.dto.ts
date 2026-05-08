@@ -13,6 +13,6 @@ export class CreateReservaDto {
 
   @Type(() => Number)
   @IsInt()
-  @Min(1)
+  @Min(2)
   asientosReservados: number;
 }

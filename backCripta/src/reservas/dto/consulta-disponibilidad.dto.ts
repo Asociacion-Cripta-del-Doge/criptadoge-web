@@ -14,6 +14,6 @@ export class ConsultaDisponibilidadDto {
   @IsOptional()
   @Type(() => Number)
   @IsInt()
-  @Min(1)
+  @Min(2)
   asientosReservados?: number;
 }

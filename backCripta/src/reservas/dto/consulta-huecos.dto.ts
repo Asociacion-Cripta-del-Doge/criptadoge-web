@@ -8,7 +8,7 @@ export class ConsultaHuecosDto {
   @IsOptional()
   @Type(() => Number)
   @IsInt()
-  @Min(1)
+  @Min(2)
   asientosReservados?: number;
 
   @IsOptional()

@@ -15,6 +15,7 @@ const ACTIVE_RESERVATION_STATES = [
   EstadoReservaMesa.PENDIENTE,
   EstadoReservaMesa.CONFIRMADA,
 ];
+const MIN_RESERVED_SEATS = 2;
 
 /**
  * Horario provisional visible en la web. Se usa como ventana por defecto para
@@ -81,7 +82,7 @@ export class ReservasService {
       query.mesaId,
       range.fechaHoraInicio,
       range.fechaHoraFin,
-      query.asientosReservados ?? 1,
+      query.asientosReservados ?? MIN_RESERVED_SEATS,
     );
   }
 
@@ -90,7 +91,8 @@ export class ReservasService {
    * Si `soloGratis` es true, calcula las franjas solo sobre mesas gratuitas.
    */
   async findAvailableSlots(query: ConsultaHuecosDto, soloGratis = false) {
-    const asientosSolicitados = query.asientosReservados ?? 1;
+    const asientosSolicitados =
+      query.asientosReservados ?? MIN_RESERVED_SEATS;
     const duracionMinutos =
       query.duracionMinutos ?? SERVER_BOOKING_SCHEDULE.duracionFranjaMinutos;
     const scheduleRange = this.parseScheduleRange(query, duracionMinutos);
