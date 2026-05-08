@@ -26,3 +26,13 @@ model User {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }
+
+model Mesa {
+  id        String   @id @default(uuid())
+  asientos  Int
+  orden     Int      @unique
+  esDePago  Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
