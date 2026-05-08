@@ -8,12 +8,26 @@ import {
 import { EstadoReservaMesa } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { ConsultaDisponibilidadDto } from './dto/consulta-disponibilidad.dto';
+import { ConsultaHuecosDto } from './dto/consulta-huecos.dto';
 import { CreateReservaDto } from './dto/create-reserva.dto';
 
 const ACTIVE_RESERVATION_STATES = [
   EstadoReservaMesa.PENDIENTE,
   EstadoReservaMesa.CONFIRMADA,
 ];
+
+const SERVER_BOOKING_SCHEDULE = {
+  duracionFranjaMinutos: 60,
+  porDiaSemana: [
+    { dia: 'domingo', horaApertura: '11:00', horaCierre: '20:00' },
+    { dia: 'lunes', horaApertura: '17:00', horaCierre: '22:00' },
+    { dia: 'martes', horaApertura: '17:00', horaCierre: '22:00' },
+    { dia: 'miercoles', horaApertura: '17:00', horaCierre: '22:00' },
+    { dia: 'jueves', horaApertura: '17:00', horaCierre: '22:00' },
+    { dia: 'viernes', horaApertura: '17:00', horaCierre: '00:00' },
+    { dia: 'sabado', horaApertura: '11:00', horaCierre: '00:00' },
+  ],
+};
 
 @Injectable()
 export class ReservasService {
@@ -56,6 +70,86 @@ export class ReservasService {
       range.fechaHoraFin,
       query.asientosReservados ?? 1,
     );
+  }
+
+  async findAvailableSlots(query: ConsultaHuecosDto, soloGratis = false) {
+    const asientosSolicitados = query.asientosReservados ?? 1;
+    const duracionMinutos =
+      query.duracionMinutos ?? SERVER_BOOKING_SCHEDULE.duracionFranjaMinutos;
+    const scheduleRange = this.parseScheduleRange(query, duracionMinutos);
+
+    const mesas = await this.prisma.mesa.findMany({
+      where: soloGratis ? { esDePago: false } : undefined,
+      orderBy: { orden: 'asc' },
+      select: { id: true, orden: true, asientos: true, esDePago: true },
+    });
+
+    const reservas = await this.prisma.reservaMesa.findMany({
+      where: {
+        estado: { in: ACTIVE_RESERVATION_STATES },
+        fechaHoraInicio: { lt: scheduleRange.fin },
+        fechaHoraFin: { gt: scheduleRange.inicio },
+        mesa: soloGratis ? { esDePago: false } : undefined,
+      },
+      select: {
+        mesaId: true,
+        fechaHoraInicio: true,
+        fechaHoraFin: true,
+        asientosReservados: true,
+      },
+    });
+
+    const slots = this.buildSlots(
+      scheduleRange.inicio,
+      scheduleRange.fin,
+      duracionMinutos,
+    ).map((slot) => {
+      const mesasDisponibles = mesas
+        .map((mesa) => {
+          const asientosOcupados = reservas
+            .filter(
+              (reserva) =>
+                reserva.mesaId === mesa.id &&
+                reserva.fechaHoraInicio < slot.fechaHoraFin &&
+                reserva.fechaHoraFin > slot.fechaHoraInicio,
+            )
+            .reduce((total, reserva) => total + reserva.asientosReservados, 0);
+          const asientosDisponibles = mesa.asientos - asientosOcupados;
+
+          return {
+            ...mesa,
+            asientosOcupados,
+            asientosDisponibles,
+            disponible: asientosDisponibles >= asientosSolicitados,
+          };
+        })
+        .filter((mesa) => mesa.disponible);
+
+      return {
+        fechaHoraInicio: slot.fechaHoraInicio,
+        fechaHoraFin: slot.fechaHoraFin,
+        horaInicio: this.formatTime(slot.fechaHoraInicio),
+        horaFin: this.formatTime(slot.fechaHoraFin),
+        asientosSolicitados,
+        asientosDisponiblesTotales: mesasDisponibles.reduce(
+          (total, mesa) => total + mesa.asientosDisponibles,
+          0,
+        ),
+        mesasDisponibles,
+      };
+    });
+
+    return {
+      fecha: query.fecha,
+      soloGratis,
+      horario: {
+        dia: scheduleRange.dia,
+        horaApertura: this.formatTime(scheduleRange.inicio),
+        horaCierre: scheduleRange.horaCierre,
+        duracionFranjaMinutos: duracionMinutos,
+      },
+      slots: slots.filter((slot) => slot.mesasDisponibles.length > 0),
+    };
   }
 
   async findOwn(userId: string) {
@@ -195,6 +289,100 @@ export class ReservasService {
             },
           }
         : false,
+    };
+  }
+
+  private parseScheduleRange(
+    query: ConsultaHuecosDto,
+    duracionMinutos: number,
+  ) {
+    const schedule = this.getScheduleForDate(query.fecha);
+    const inicio =
+      query.desde ??
+      this.buildServerDateTime(query.fecha, schedule.horaApertura);
+    const fin =
+      query.hasta ?? this.buildServerDateTime(query.fecha, schedule.horaCierre);
+    const range = this.parseRange(inicio, fin);
+
+    if (
+      range.fechaHoraInicio < schedule.inicio ||
+      range.fechaHoraFin > schedule.fin
+    ) {
+      throw new BadRequestException(
+        'El rango de huecos debe estar dentro del horario de apertura',
+      );
+    }
+
+    const durationInMs = duracionMinutos * 60 * 1000;
+
+    if (
+      range.fechaHoraInicio.getTime() + durationInMs >
+      range.fechaHoraFin.getTime()
+    ) {
+      throw new BadRequestException(
+        'La duracion de la franja no cabe dentro del horario consultado',
+      );
+    }
+
+    return {
+      inicio: range.fechaHoraInicio,
+      fin: range.fechaHoraFin,
+      dia: schedule.dia,
+      horaCierre: schedule.horaCierre,
+    };
+  }
+
+  private buildSlots(inicio: Date, fin: Date, duracionMinutos: number) {
+    const slots: { fechaHoraInicio: Date; fechaHoraFin: Date }[] = [];
+    const durationInMs = duracionMinutos * 60 * 1000;
+
+    for (
+      let cursor = inicio.getTime();
+      cursor + durationInMs <= fin.getTime();
+      cursor += durationInMs
+    ) {
+      slots.push({
+        fechaHoraInicio: new Date(cursor),
+        fechaHoraFin: new Date(cursor + durationInMs),
+      });
+    }
+
+    return slots;
+  }
+
+  private buildServerDateTime(fecha: string, hora: string) {
+    const date = new Date(`${fecha}T00:00:00.000Z`);
+    const [hours, minutes] = hora.split(':').map(Number);
+
+    if (hora === '00:00') {
+      date.setUTCDate(date.getUTCDate() + 1);
+    }
+
+    date.setUTCHours(hours, minutes, 0, 0);
+    return date.toISOString();
+  }
+
+  private formatTime(date: Date) {
+    return date.toISOString().slice(11, 16);
+  }
+
+  private getScheduleForDate(fecha: string) {
+    const date = new Date(`${fecha}T00:00:00.000Z`);
+
+    if (Number.isNaN(date.getTime())) {
+      throw new BadRequestException('La fecha debe tener formato YYYY-MM-DD');
+    }
+
+    const schedule = SERVER_BOOKING_SCHEDULE.porDiaSemana[date.getUTCDay()];
+    const inicio = new Date(
+      this.buildServerDateTime(fecha, schedule.horaApertura),
+    );
+    const fin = new Date(this.buildServerDateTime(fecha, schedule.horaCierre));
+
+    return {
+      ...schedule,
+      inicio,
+      fin,
     };
   }
 }

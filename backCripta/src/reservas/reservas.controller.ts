@@ -14,6 +14,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
 import { ConsultaDisponibilidadDto } from './dto/consulta-disponibilidad.dto';
+import { ConsultaHuecosDto } from './dto/consulta-huecos.dto';
 import { CreateReservaDto } from './dto/create-reserva.dto';
 import { ReservasService } from './reservas.service';
 
@@ -40,6 +41,18 @@ export class ReservasController {
   @UseGuards(JwtAuthGuard)
   checkAvailability(@Query() query: ConsultaDisponibilidadDto) {
     return this.reservasService.checkAvailability(query);
+  }
+
+  @Get('huecos')
+  @UseGuards(JwtAuthGuard)
+  findAvailableSlots(@Query() query: ConsultaHuecosDto) {
+    return this.reservasService.findAvailableSlots(query);
+  }
+
+  @Get('huecos/gratis')
+  @UseGuards(JwtAuthGuard)
+  findFreeAvailableSlots(@Query() query: ConsultaHuecosDto) {
+    return this.reservasService.findAvailableSlots(query, true);
   }
 
   @Get('mis-reservas')

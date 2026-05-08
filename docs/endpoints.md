@@ -209,6 +209,8 @@ Base URL via Nginx: `http://localhost:8080/api`
 | ------ | ---- | ---- | ----- | ---------- |
 | POST | `/reservas` | JWT | Usuario autenticado | `CreateReservaDto` |
 | GET | `/reservas/disponibilidad` | JWT | Usuario autenticado | Query de disponibilidad |
+| GET | `/reservas/huecos` | JWT | Usuario autenticado | Lista huecos libres por franja horaria |
+| GET | `/reservas/huecos/gratis` | JWT | Usuario autenticado | Lista huecos libres solo en mesas gratuitas |
 | GET | `/reservas/mis-reservas` | JWT | Usuario autenticado | Lista las reservas propias |
 | GET | `/reservas` | JWT | ADMIN | Lista todas las reservas |
 | PATCH | `/reservas/:id/cancelar` | JWT | Propietario o ADMIN | Cancela una reserva |
@@ -250,9 +252,78 @@ Base URL via Nginx: `http://localhost:8080/api`
 }
 ```
 
+**Query GET `/reservas/huecos`:**
+
+```http
+/reservas/huecos?fecha=2026-05-10&asientosReservados=2
+```
+
+El servidor aplica por defecto el horario provisional publicado en la web, en franjas de `60` minutos:
+
+| Dia | Horario |
+| --- | ------- |
+| Lunes | 17:00 - 22:00 |
+| Martes | 17:00 - 22:00 |
+| Miercoles | 17:00 - 22:00 |
+| Jueves | 17:00 - 22:00 |
+| Viernes | 17:00 - 00:00 |
+| Sabado | 11:00 - 00:00 |
+| Domingo | 11:00 - 20:00 |
+
+Opcionalmente se puede ajustar la duracion de franja y acotar el rango dentro del horario de apertura:
+
+```http
+/reservas/huecos?fecha=2026-05-10&asientosReservados=2&duracionMinutos=30&desde=2026-05-10T18:00:00.000Z&hasta=2026-05-10T22:00:00.000Z
+```
+
+**Query GET `/reservas/huecos/gratis`:**
+
+```http
+/reservas/huecos/gratis?fecha=2026-05-10&asientosReservados=2
+```
+
+Filtra las mesas con `esDePago = false` antes de calcular los huecos.
+
+**Response de huecos:**
+
+```json
+{
+  "fecha": "2026-05-10",
+  "soloGratis": false,
+  "horario": {
+    "dia": "domingo",
+    "horaApertura": "11:00",
+    "horaCierre": "20:00",
+    "duracionFranjaMinutos": 60
+  },
+  "slots": [
+    {
+      "fechaHoraInicio": "2026-05-10T11:00:00.000Z",
+      "fechaHoraFin": "2026-05-10T12:00:00.000Z",
+      "horaInicio": "11:00",
+      "horaFin": "12:00",
+      "asientosSolicitados": 2,
+      "asientosDisponiblesTotales": 6,
+      "mesasDisponibles": [
+        {
+          "id": "uuid",
+          "orden": 1,
+          "asientos": 4,
+          "esDePago": false,
+          "asientosOcupados": 1,
+          "asientosDisponibles": 3,
+          "disponible": true
+        }
+      ]
+    }
+  ]
+}
+```
+
 **Notas de negocio:**
 
 - Las reservas activas que ocupan disponibilidad son `PENDIENTE` y `CONFIRMADA`.
+- Los huecos libres se calculan por franja horaria y por asientos disponibles, no bloqueando la mesa completa salvo que los asientos ocupados alcancen su capacidad.
 - Cancelar una reserva cambia su estado a `CANCELADA`; no elimina el historico.
 - Solo el propietario de la reserva o un usuario `ADMIN` puede cancelarla.
 
