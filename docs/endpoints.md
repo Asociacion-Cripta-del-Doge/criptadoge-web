@@ -219,4 +219,5 @@ Authorization: Bearer <access_token>
 - `/api/auth/me` tiene una regla especifica en Nginx y no usa ese rate limit.
 - El backend acepta JSON y URL encoded con limite de **10 MB**.
 - Usuarios se almacenan en **PostgreSQL** con Prisma.
+- Mesas y reservas de mesa se almacenan en **PostgreSQL** con Prisma.
 - Eventos y etiquetas de eventos se almacenan en **MongoDB** con Mongoose.
