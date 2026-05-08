@@ -222,9 +222,11 @@ Base URL via Nginx: `http://localhost:8080/api`
   "mesaId": "uuid (requerido)",
   "fechaHoraInicio": "ISO 8601 (requerido)",
   "fechaHoraFin": "ISO 8601 (requerido)",
-  "asientosReservados": "number (requerido, min. 2)"
+  "asientosReservados": "number (requerido, min. 2, par)"
 }
 ```
+
+Al crear una reserva se guarda el campo informativo `precio`. Solo se pueden reservar asientos en cantidades pares. En mesas gratuitas queda a `0`; en mesas de pago se calcula proporcionalmente a `1.25` euros por asiento reservado, por lo que 2 asientos son `2.50` euros y una mesa completa de 4 asientos son `5.00` euros.
 
 **Query GET `/reservas/disponibilidad`:**
 
@@ -323,7 +325,9 @@ Filtra las mesas con `esDePago = false` antes de calcular los huecos.
 **Notas de negocio:**
 
 - Las reservas activas que ocupan disponibilidad son `PENDIENTE` y `CONFIRMADA`.
+- Las reservas y consultas con `asientosReservados` solo aceptan cantidades pares.
 - Los huecos libres se calculan por franja horaria y por asientos disponibles, no bloqueando la mesa completa salvo que los asientos ocupados alcancen su capacidad.
+- El precio de las reservas de mesas de pago es solo informativo; no activa ningun cobro.
 - Cancelar una reserva cambia su estado a `CANCELADA`; no elimina el historico.
 - Solo el propietario de la reserva o un usuario `ADMIN` puede cancelarla.
 

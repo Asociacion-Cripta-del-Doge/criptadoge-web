@@ -1,5 +1,12 @@
 import { Type } from 'class-transformer';
-import { IsDateString, IsInt, IsOptional, IsUUID, Min } from 'class-validator';
+import {
+  IsDateString,
+  IsDivisibleBy,
+  IsInt,
+  IsOptional,
+  IsUUID,
+  Min,
+} from 'class-validator';
 
 export class ConsultaDisponibilidadDto {
   @IsUUID()
@@ -14,6 +21,7 @@ export class ConsultaDisponibilidadDto {
   @IsOptional()
   @Type(() => Number)
   @IsInt()
+  @IsDivisibleBy(2)
   @Min(2)
   asientosReservados?: number;
 }

@@ -16,6 +16,7 @@ const ACTIVE_RESERVATION_STATES = [
   EstadoReservaMesa.CONFIRMADA,
 ];
 const MIN_RESERVED_SEATS = 2;
+const PAID_SEAT_PRICE_EUROS = 1.25;
 
 /**
  * Horario provisional visible en la web. Se usa como ventana por defecto para
@@ -45,6 +46,7 @@ export class ReservasService {
    */
   async create(data: CreateReservaDto, userId: string) {
     const range = this.parseRange(data.fechaHoraInicio, data.fechaHoraFin);
+    this.validateReservedSeats(data.asientosReservados);
 
     const availability = await this.getAvailability(
       data.mesaId,
@@ -59,6 +61,11 @@ export class ReservasService {
       );
     }
 
+    const precio = this.calculatePrice(
+      availability.mesa.esDePago,
+      data.asientosReservados,
+    );
+
     return this.prisma.reservaMesa.create({
       data: {
         mesaId: data.mesaId,
@@ -66,6 +73,7 @@ export class ReservasService {
         fechaHoraInicio: range.fechaHoraInicio,
         fechaHoraFin: range.fechaHoraFin,
         asientosReservados: data.asientosReservados,
+        precio,
       },
       include: this.defaultInclude(),
     });
@@ -77,12 +85,15 @@ export class ReservasService {
    */
   async checkAvailability(query: ConsultaDisponibilidadDto) {
     const range = this.parseRange(query.fechaHoraInicio, query.fechaHoraFin);
+    const asientosSolicitados =
+      query.asientosReservados ?? MIN_RESERVED_SEATS;
+    this.validateReservedSeats(asientosSolicitados);
 
     return this.getAvailability(
       query.mesaId,
       range.fechaHoraInicio,
       range.fechaHoraFin,
-      query.asientosReservados ?? MIN_RESERVED_SEATS,
+      asientosSolicitados,
     );
   }
 
@@ -93,6 +104,7 @@ export class ReservasService {
   async findAvailableSlots(query: ConsultaHuecosDto, soloGratis = false) {
     const asientosSolicitados =
       query.asientosReservados ?? MIN_RESERVED_SEATS;
+    this.validateReservedSeats(asientosSolicitados);
     const duracionMinutos =
       query.duracionMinutos ?? SERVER_BOOKING_SCHEDULE.duracionFranjaMinutos;
     const scheduleRange = this.parseScheduleRange(query, duracionMinutos);
@@ -405,6 +417,20 @@ export class ReservasService {
 
   private formatTime(date: Date) {
     return date.toISOString().slice(11, 16);
+  }
+
+  private calculatePrice(esDePago: boolean, asientosReservados: number) {
+    if (!esDePago) {
+      return 0;
+    }
+
+    return Math.round(asientosReservados * PAID_SEAT_PRICE_EUROS * 100) / 100;
+  }
+
+  private validateReservedSeats(asientosReservados: number) {
+    if (asientosReservados % 2 !== 0) {
+      throw new BadRequestException('Solo se pueden reservar asientos pares');
+    }
   }
 
   private getScheduleForDate(fecha: string) {
