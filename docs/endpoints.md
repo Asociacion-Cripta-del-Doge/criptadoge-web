@@ -205,6 +205,8 @@ Base URL via Nginx: `http://localhost:8080/api`
 
 ## Textos web `/web-texts`
 
+> Documentacion funcional completa: [`docs/textos-web.md`](./textos-web.md)
+
 | Metodo | Ruta | Auth | Roles | Body / uso |
 | ------ | ---- | ---- | ----- | ---------- |
 | GET | `/web-texts` | No | Publico | Lista textos configurables. Acepta `locale` y `section` como query params |
