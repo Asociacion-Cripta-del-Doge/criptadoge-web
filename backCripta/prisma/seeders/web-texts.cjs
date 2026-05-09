@@ -309,7 +309,7 @@ async function main() {
     await WebText.findOneAndUpdate(
       { key: texto.key, locale: 'es' },
       { $setOnInsert: { ...texto, locale: 'es' } },
-      { upsert: true, new: true },
+      { upsert: true, returnDocument: 'after' },
     );
     console.log(`  OK ${texto.key}`);
   }

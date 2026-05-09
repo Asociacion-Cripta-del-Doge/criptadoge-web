@@ -43,7 +43,7 @@ export class WebTextsService {
     }
 
     const updated = await this.webTextModel
-      .findByIdAndUpdate(id, dto, { new: true, runValidators: true })
+      .findByIdAndUpdate(id, dto, { returnDocument: 'after', runValidators: true })
       .exec();
 
     if (!updated) {
