@@ -1,4 +1,4 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException } from '@nestjs/common';
 import { ReservasService } from './reservas.service';
 
 describe('ReservasService', () => {
@@ -10,8 +10,17 @@ describe('ReservasService', () => {
   };
   const userId = 'a77236db-4a92-441b-a4ab-26d59f0bc5a7';
 
-  const buildService = (mesa: { asientos: number; esDePago: boolean }) => {
+  const buildService = (
+    mesa: { asientos: number; esDePago: boolean },
+    userStatus = 'Activo',
+  ) => {
     const prisma = {
+      user: {
+        findUnique: jest.fn().mockResolvedValue({
+          id: userId,
+          status: userStatus,
+        }),
+      },
       mesa: {
         findUnique: jest.fn().mockResolvedValue({
           id: reservaDto.mesaId,
@@ -56,6 +65,64 @@ describe('ReservasService', () => {
       asientos: 4,
       esDePago: false,
     });
+
+    await service.create(reservaDto, userId);
+
+    expect(prisma.reservaMesa.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          precio: 0,
+        }),
+      }),
+    );
+  });
+
+  it('aplica una hora gratis a socios activos en mesas de pago', async () => {
+    const { prisma, service } = buildService({
+      asientos: 4,
+      esDePago: true,
+    });
+
+    await service.create(
+      {
+        ...reservaDto,
+        fechaHoraFin: '2026-05-10T19:00:00.000Z',
+      },
+      userId,
+    );
+
+    expect(prisma.reservaMesa.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          precio: 0,
+        }),
+      }),
+    );
+  });
+
+  it('rechaza mesas de pago para usuarios sin membresia activa', async () => {
+    const { prisma, service } = buildService(
+      {
+        asientos: 4,
+        esDePago: true,
+      },
+      'Inactivo',
+    );
+
+    await expect(service.create(reservaDto, userId)).rejects.toThrow(
+      ForbiddenException,
+    );
+    expect(prisma.reservaMesa.create).not.toHaveBeenCalled();
+  });
+
+  it('permite mesas gratuitas para usuarios sin membresia activa', async () => {
+    const { prisma, service } = buildService(
+      {
+        asientos: 4,
+        esDePago: false,
+      },
+      'Inactivo',
+    );
 
     await service.create(reservaDto, userId);
 

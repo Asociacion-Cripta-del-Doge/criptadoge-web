@@ -17,6 +17,9 @@ const ACTIVE_RESERVATION_STATES = [
 ];
 const MIN_RESERVED_SEATS = 2;
 const PAID_SEAT_PRICE_EUROS = 1.25;
+const ACTIVE_USER_STATUS = 'Activo';
+const DEACTIVATED_USER_STATUS = 'Desactivado';
+const ACTIVE_MEMBER_FREE_PAID_MINUTES = 60;
 
 /**
  * Horario provisional visible en la web. Se usa como ventana por defecto para
@@ -47,6 +50,7 @@ export class ReservasService {
   async create(data: CreateReservaDto, userId: string) {
     const range = this.parseRange(data.fechaHoraInicio, data.fechaHoraFin);
     this.validateReservedSeats(data.asientosReservados);
+    const user = await this.getBookingUser(userId);
 
     const availability = await this.getAvailability(
       data.mesaId,
@@ -61,9 +65,18 @@ export class ReservasService {
       );
     }
 
+    if (availability.mesa.esDePago && user.status !== ACTIVE_USER_STATUS) {
+      throw new ForbiddenException(
+        'Solo los socios con membresia activa pueden reservar mesas de pago',
+      );
+    }
+
     const precio = this.calculatePrice(
       availability.mesa.esDePago,
       data.asientosReservados,
+      range.fechaHoraInicio,
+      range.fechaHoraFin,
+      user.status,
     );
 
     return this.prisma.reservaMesa.create({
@@ -101,16 +114,23 @@ export class ReservasService {
    * Genera huecos libres por franjas horarias usando el horario del servidor.
    * Si `soloGratis` es true, calcula las franjas solo sobre mesas gratuitas.
    */
-  async findAvailableSlots(query: ConsultaHuecosDto, soloGratis = false) {
+  async findAvailableSlots(
+    query: ConsultaHuecosDto,
+    soloGratis = false,
+    userId?: string,
+  ) {
     const asientosSolicitados =
       query.asientosReservados ?? MIN_RESERVED_SEATS;
     this.validateReservedSeats(asientosSolicitados);
     const duracionMinutos =
       query.duracionMinutos ?? SERVER_BOOKING_SCHEDULE.duracionFranjaMinutos;
     const scheduleRange = this.parseScheduleRange(query, duracionMinutos);
+    const user = userId ? await this.getBookingUser(userId) : null;
+    const onlyFreeTables =
+      soloGratis || Boolean(user && user.status !== ACTIVE_USER_STATUS);
 
     const mesas = await this.prisma.mesa.findMany({
-      where: soloGratis ? { esDePago: false } : undefined,
+      where: onlyFreeTables ? { esDePago: false } : undefined,
       orderBy: { orden: 'asc' },
       select: { id: true, orden: true, asientos: true, esDePago: true },
     });
@@ -120,7 +140,7 @@ export class ReservasService {
         estado: { in: ACTIVE_RESERVATION_STATES },
         fechaHoraInicio: { lt: scheduleRange.fin },
         fechaHoraFin: { gt: scheduleRange.inicio },
-        mesa: soloGratis ? { esDePago: false } : undefined,
+        mesa: onlyFreeTables ? { esDePago: false } : undefined,
       },
       select: {
         mesaId: true,
@@ -172,7 +192,7 @@ export class ReservasService {
 
     return {
       fecha: query.fecha,
-      soloGratis,
+      soloGratis: onlyFreeTables,
       horario: {
         dia: scheduleRange.dia,
         horaApertura: this.formatTime(scheduleRange.inicio),
@@ -340,6 +360,19 @@ export class ReservasService {
     };
   }
 
+  private async getBookingUser(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, status: true },
+    });
+
+    if (!user || user.status === DEACTIVATED_USER_STATUS) {
+      throw new ForbiddenException('Usuario no autorizado para reservar mesas');
+    }
+
+    return user;
+  }
+
   private parseScheduleRange(
     query: ConsultaHuecosDto,
     duracionMinutos: number,
@@ -419,12 +452,28 @@ export class ReservasService {
     return date.toISOString().slice(11, 16);
   }
 
-  private calculatePrice(esDePago: boolean, asientosReservados: number) {
+  private calculatePrice(
+    esDePago: boolean,
+    asientosReservados: number,
+    fechaHoraInicio: Date,
+    fechaHoraFin: Date,
+    userStatus: string,
+  ) {
     if (!esDePago) {
       return 0;
     }
 
-    return Math.round(asientosReservados * PAID_SEAT_PRICE_EUROS * 100) / 100;
+    const durationInMinutes =
+      (fechaHoraFin.getTime() - fechaHoraInicio.getTime()) / (60 * 1000);
+    const freeMinutes =
+      userStatus === ACTIVE_USER_STATUS ? ACTIVE_MEMBER_FREE_PAID_MINUTES : 0;
+    const billableHours = Math.max(0, durationInMinutes - freeMinutes) / 60;
+
+    return (
+      Math.round(
+        asientosReservados * PAID_SEAT_PRICE_EUROS * billableHours * 100,
+      ) / 100
+    );
   }
 
   private validateReservedSeats(asientosReservados: number) {

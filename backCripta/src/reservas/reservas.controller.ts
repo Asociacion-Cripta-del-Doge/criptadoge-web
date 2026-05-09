@@ -45,14 +45,19 @@ export class ReservasController {
 
   @Get('huecos')
   @UseGuards(JwtAuthGuard)
-  findAvailableSlots(@Query() query: ConsultaHuecosDto) {
-    return this.reservasService.findAvailableSlots(query);
+  findAvailableSlots(@Query() query: ConsultaHuecosDto, @Req() req: Request) {
+    const user = (req as AuthenticatedRequest).user;
+    return this.reservasService.findAvailableSlots(query, false, user.id);
   }
 
   @Get('huecos/gratis')
   @UseGuards(JwtAuthGuard)
-  findFreeAvailableSlots(@Query() query: ConsultaHuecosDto) {
-    return this.reservasService.findAvailableSlots(query, true);
+  findFreeAvailableSlots(
+    @Query() query: ConsultaHuecosDto,
+    @Req() req: Request,
+  ) {
+    const user = (req as AuthenticatedRequest).user;
+    return this.reservasService.findAvailableSlots(query, true, user.id);
   }
 
   @Get('mis-reservas')
