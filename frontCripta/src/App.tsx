@@ -16,11 +16,16 @@ const demoMesas: Mesa[] = [
   { id: "demo-6", orden: 6, asientos: 6, esDePago: true },
 ];
 
-const today = new Date().toISOString().slice(0, 10);
+const getToday = () => {
+  const date = new Date();
+  const offset = date.getTimezoneOffset() * 60000;
+  return new Date(date.getTime() - offset).toISOString().slice(0, 10);
+};
 
 const buildDemoSlot = (
   mesas: Mesa[],
   asientosReservados: number,
+  fecha: string,
 ): HuecoReserva => {
   const demoAvailability = mesas.map((mesa, index) => {
     const occupiedPattern = [0, 2, 0, 2, 4, 2][index] ?? 0;
@@ -36,8 +41,8 @@ const buildDemoSlot = (
   });
 
   return {
-    fechaHoraInicio: `${today}T18:00:00.000Z`,
-    fechaHoraFin: `${today}T19:00:00.000Z`,
+    fechaHoraInicio: `${fecha}T18:00:00.000Z`,
+    fechaHoraFin: `${fecha}T19:00:00.000Z`,
     horaInicio: "18:00",
     horaFin: "19:00",
     asientosSolicitados: asientosReservados,
@@ -52,7 +57,7 @@ const buildDemoSlot = (
 function App() {
   const path = window.location.pathname;
   const { user, loading, logout } = useAuth();
-  const [fecha, setFecha] = useState(today);
+  const [fecha, setFecha] = useState(getToday);
   const [duracionMinutos, setDuracionMinutos] = useState(60);
   const [asientosReservados, setAsientosReservados] = useState(2);
   const [mesas, setMesas] = useState<Mesa[]>([]);
@@ -90,7 +95,11 @@ function App() {
 
   useEffect(() => {
     if (!user) {
-      const fallbackSlot = buildDemoSlot(demoMesas, asientosReservados);
+      const fallbackSlot = buildDemoSlot(
+        demoMesas,
+        asientosReservados,
+        fecha,
+      );
 
       setMesas(demoMesas);
       setSlots([fallbackSlot]);
@@ -119,7 +128,11 @@ function App() {
         setSlotIndex(0);
         setDemoMode(false);
       } catch {
-        const fallbackSlot = buildDemoSlot(demoMesas, asientosReservados);
+        const fallbackSlot = buildDemoSlot(
+          demoMesas,
+          asientosReservados,
+          fecha,
+        );
 
         setMesas(demoMesas);
         setSlots([fallbackSlot]);
@@ -216,7 +229,9 @@ function App() {
 
         <div className="booking-user">
           <span>{user?.name ?? "Invitado"}</span>
-          <small>{user ? (user.role === "ADMIN" ? "Admin" : user.status) : "Vista previa"}</small>
+          <small>
+            {user ? (user.role === "ADMIN" ? "Admin" : user.status) : "Vista previa"}
+          </small>
           {user ? (
             <button type="button" onClick={logout}>
               Salir
@@ -278,7 +293,10 @@ function App() {
               <option value={0}>Sin huecos</option>
             ) : (
               slots.map((slot, index) => (
-                <option key={`${slot.fechaHoraInicio}-${slot.fechaHoraFin}`} value={index}>
+                <option
+                  key={`${slot.fechaHoraInicio}-${slot.fechaHoraFin}`}
+                  value={index}
+                >
                   {slot.horaInicio} - {slot.horaFin}
                 </option>
               ))
@@ -397,7 +415,11 @@ function App() {
                 onClick={handleReserve}
                 disabled={booking}
               >
-                {!user ? "Inicia sesion para reservar" : booking ? "Reservando..." : "Reservar huecos"}
+                {!user
+                  ? "Inicia sesion para reservar"
+                  : booking
+                    ? "Reservando..."
+                    : "Reservar huecos"}
               </button>
 
               {user?.role === "ADMIN" && (

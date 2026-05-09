@@ -14,6 +14,7 @@ import { TasksModule } from './tasks/tasks.module';
 import { ContactModule } from './contact/contact.module';
 import { MesasModule } from './mesas/mesas.module';
 import { ReservasModule } from './reservas/reservas.module';
+import { WebTextsModule } from './web-texts/web-texts.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { ReservasModule } from './reservas/reservas.module';
     ContactModule,
     MesasModule,
     ReservasModule,
+    WebTextsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

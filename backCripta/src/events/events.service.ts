@@ -61,7 +61,7 @@ export class EventsService {
     }
 
     const event = await this.eventModel
-      .findByIdAndUpdate(id, updateEventDto, { new: true })
+      .findByIdAndUpdate(id, updateEventDto, { returnDocument: 'after' })
       .exec();
 
     if (!event) {
