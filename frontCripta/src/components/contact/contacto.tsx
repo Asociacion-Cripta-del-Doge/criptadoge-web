@@ -105,35 +105,33 @@ export const ContactoSection = () => {
       <div className="ct-header">
         <span className="ct-tag">{text("home.contact.badge")}</span>
         <h2 className="ct-title">
-          ¿Tienes <span className="ct-title-highlight">Preguntas</span>?
+          {text("home.contact.titlePrefix")} <span className="ct-title-highlight">{text("home.contact.titleHighlight")}</span>?
         </h2>
-        <p className="ct-subtitle">
-          Contáctanos a través de cualquiera de nuestros canales o envíanos un mensaje directo.
-        </p>
+        <p className="ct-subtitle">{text("home.contact.subtitle")}</p>
       </div>
 
       <div className="ct-layout">
         <div className="ct-card ct-form-card">
-          <h3 className="ct-card-title">Envíanos un mensaje</h3>
+          <h3 className="ct-card-title">{text("home.contact.formTitle")}</h3>
           <p className="ct-card-sub">{text("home.contact.formSubtitle")}</p>
 
           <form className="ct-form" onSubmit={handleSubmit}>
             <div className="ct-form-row">
               <div className="ct-field">
-                <label>Nombre</label>
+                <label>{text("home.contact.fields.name")}</label>
                 <input
                   type="text"
-                  placeholder="Tu nombre"
+                  placeholder={text("home.contact.fields.namePlaceholder")}
                   value={nombre}
                   onChange={e => setNombre(e.target.value)}
                   required
                 />
               </div>
               <div className="ct-field">
-                <label>Email</label>
+                <label>{text("home.contact.fields.email")}</label>
                 <input
                   type="email"
-                  placeholder="tu@email.com"
+                  placeholder={text("home.contact.fields.emailPlaceholder")}
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   required
@@ -142,10 +140,10 @@ export const ContactoSection = () => {
             </div>
 
             <div className="ct-field">
-              <label>Asunto</label>
+              <label>{text("home.contact.fields.subject")}</label>
               <input
                 type="text"
-                placeholder="¿Sobre qué nos escribes?"
+                placeholder={text("home.contact.fields.subjectPlaceholder")}
                 value={asunto}
                 onChange={e => setAsunto(e.target.value)}
                 required
@@ -153,9 +151,9 @@ export const ContactoSection = () => {
             </div>
 
             <div className="ct-field">
-              <label>Mensaje</label>
+              <label>{text("home.contact.fields.message")}</label>
               <textarea
-                placeholder="Escribe tu mensaje aquí..."
+                placeholder={text("home.contact.fields.messagePlaceholder")}
                 rows={5}
                 value={mensaje}
                 onChange={e => setMensaje(e.target.value)}
@@ -169,10 +167,10 @@ export const ContactoSection = () => {
               disabled={formState === "sending"}
             >
               {formState === "sending" && <span className="ct-spinner" />}
-              {formState === "ok"      && "✓ Mensaje enviado"}
-              {formState === "error"   && "✗ Error al enviar"}
-              {formState === "idle"    && (
-                <><span className="ct-submit-icon">✈</span> Enviar Mensaje</>
+              {formState === "ok" && text("home.contact.submit.ok")}
+              {formState === "error" && text("home.contact.submit.error")}
+              {formState === "idle" && (
+                <><span className="ct-submit-icon">✈</span> {text("home.contact.submit.idle")}</>
               )}
             </button>
           </form>
@@ -180,8 +178,8 @@ export const ContactoSection = () => {
 
         <div className="ct-right">
           <div className="ct-card">
-            <h3 className="ct-card-title">Síguenos en Redes</h3>
-            <p className="ct-card-sub">Mantente al día con todas las novedades</p>
+            <h3 className="ct-card-title">{text("home.contact.socialTitle")}</h3>
+            <p className="ct-card-sub">{text("home.contact.socialSubtitle")}</p>
 
             <ul className="ct-redes">
               {redes.map((red: RedSocial) => (
@@ -212,8 +210,8 @@ export const ContactoSection = () => {
                   <IconTwitch /> Twitch
                 </span>
                 {twitch.live
-                  ? <span className="ct-live-badge"><span className="ct-live-dot" /> EN VIVO</span>
-                  : <span className="ct-live-badge ct-live-badge--offline">⚫ OFFLINE</span>
+                  ? <span className="ct-live-badge"><span className="ct-live-dot" /> {text("home.contact.twitch.live")}</span>
+                  : <span className="ct-live-badge ct-live-badge--offline">{text("home.contact.twitch.offline")}</span>
                 }
               </div>
 
@@ -230,8 +228,8 @@ export const ContactoSection = () => {
                   }
                   <div className="ct-twitch-overlay">
                     {twitch.live
-                      ? <><span className="ct-twitch-live-pill">🔴 LIVE</span><span className="ct-twitch-viewers">👁 {twitch.viewers.toLocaleString()}</span></>
-                      : <span className="ct-twitch-live-pill ct-twitch-live-pill--offline">⚫ Offline</span>
+                      ? <><span className="ct-twitch-live-pill">{text("home.contact.twitch.liveShort")}</span><span className="ct-twitch-viewers">👁 {twitch.viewers.toLocaleString()}</span></>
+                      : <span className="ct-twitch-live-pill ct-twitch-live-pill--offline">{text("home.contact.twitch.offlineShort")}</span>
                     }
                   </div>
                 </div>
@@ -245,7 +243,7 @@ export const ContactoSection = () => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <IconTwitch /> {twitch.live ? "Ver Directo" : "Ver Canal"}
+                <IconTwitch /> {twitch.live ? text("home.contact.twitch.watchLive") : text("home.contact.twitch.watchChannel")}
               </a>
             </div>
           )}
@@ -256,7 +254,7 @@ export const ContactoSection = () => {
             return (
               <div className="ct-card">
                 <h3 className="ct-card-title">
-                  <span style={{ opacity: 0.7 }}><IconInstagram /></span> Instagram
+                  <span style={{ opacity: 0.7 }}><IconInstagram /></span> {text("home.contact.instagramTitle")}
                 </h3>
                 <p className="ct-card-sub">{instagram.handle}</p>
                 <a
@@ -266,7 +264,7 @@ export const ContactoSection = () => {
                   rel="noopener noreferrer"
                   style={{ background: instagram.color }}
                 >
-                  <IconInstagram /> Ver Perfil
+                  <IconInstagram /> {text("home.contact.instagramCta")}
                 </a>
               </div>
             )

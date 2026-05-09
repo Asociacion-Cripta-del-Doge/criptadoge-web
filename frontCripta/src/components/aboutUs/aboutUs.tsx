@@ -1,34 +1,40 @@
 import './aboutUs.scss';
 import { useWebTexts } from '../../hooks/useWebTexts';
+import type { WebTextKey } from '../../data/webTextDefaults';
 
-const activities = [
-    { icon: '🎲', label: 'Juegos de mesa' },
-    { icon: '🃏', label: 'TCG' },
-    { icon: '🐉', label: 'Rol de mesa' },
-    { icon: '🕹️', label: 'Arcade & Retro' },
-    { icon: '⚔️', label: 'Softcombat' },
-    { icon: '💻', label: 'Informática' },
-    { icon: '🖨️', label: 'Impresión 3D' },
-    { icon: '🎨', label: 'Pintado figuras' },
+const activities: { icon: string; labelKey: WebTextKey }[] = [
+    { icon: '🎲', labelKey: 'home.about.activities.boardGames' },
+    { icon: '🃏', labelKey: 'home.about.activities.tcg' },
+    { icon: '🐉', labelKey: 'home.about.activities.roleplay' },
+    { icon: '🕹️', labelKey: 'home.about.activities.arcade' },
+    { icon: '⚔️', labelKey: 'home.about.activities.softcombat' },
+    { icon: '💻', labelKey: 'home.about.activities.it' },
+    { icon: '🖨️', labelKey: 'home.about.activities.print3d' },
+    { icon: '🎨', labelKey: 'home.about.activities.painting' },
 ];
 
-const pillars = [
+const pillars: {
+    icon: string;
+    titleKey: WebTextKey;
+    descriptionKey: WebTextKey;
+    modifier: string;
+}[] = [
     {
-    icon: '👥',
-    title: 'Comunidad',
-    description: 'Un punto de encuentro real para la juventud de Puertollano.',
-    modifier: 'blue',
+        icon: '👥',
+        titleKey: 'home.about.pillars.community.title',
+        descriptionKey: 'home.about.pillars.community.description',
+        modifier: 'blue',
     },
     {
         icon: '💡',
-        title: 'Creatividad',
-        description: 'Fomentamos habilidades, pensamiento estratégico e imaginación.',
+        titleKey: 'home.about.pillars.creativity.title',
+        descriptionKey: 'home.about.pillars.creativity.description',
         modifier: 'pink',
     },
     {
         icon: '📖',
-        title: 'Cultura',
-        description: 'Ocio alternativo y enriquecedor al alcance de todos.',
+        titleKey: 'home.about.pillars.culture.title',
+        descriptionKey: 'home.about.pillars.culture.description',
         modifier: 'yellow',
     },
 ];
@@ -46,11 +52,11 @@ const AboutUs = () => {
                     <p className="about-us__description">{text('home.about.body')}</p>
                     <div className="about-us__pillars">
                         {pillars.map((pillar) => (
-                            <div key={pillar.title} className={`about-us__pillar about-us__pillar--${pillar.modifier}`}>
+                            <div key={pillar.titleKey} className={`about-us__pillar about-us__pillar--${pillar.modifier}`}>
                                 <span className="about-us__pillar-icon">{pillar.icon}</span>
                                 <div>
-                                    <p className="about-us__pillar-title">{pillar.title}</p>
-                                    <p className="about-us__pillar-desc">{pillar.description}</p>
+                                    <p className="about-us__pillar-title">{text(pillar.titleKey)}</p>
+                                    <p className="about-us__pillar-desc">{text(pillar.descriptionKey)}</p>
                                 </div>
                             </div>
                         ))}
@@ -61,23 +67,23 @@ const AboutUs = () => {
                     <div className="about-us__stats">
                         <div className="about-us__stat">
                             <span className="about-us__stat-number">8+</span>
-                            <span className="about-us__stat-label">Actividades</span>
+                            <span className="about-us__stat-label">{text('home.about.stats.activities')}</span>
                         </div>
                         <div className="about-us__stat">
                             <span className="about-us__stat-number">100%</span>
-                            <span className="about-us__stat-label">Sin ánimo de lucro</span>
+                            <span className="about-us__stat-label">{text('home.about.stats.nonProfit')}</span>
                         </div>
                         <div className="about-us__stat">
                             <span className="about-us__stat-number">Puer.</span>
-                            <span className="about-us__stat-label">Puertollano</span>
+                            <span className="about-us__stat-label">{text('home.about.stats.location')}</span>
                         </div>
                     </div>
-                    <p className="about-us__activities-title">Nuestras actividades</p>
+                    <p className="about-us__activities-title">{text('home.about.activitiesTitle')}</p>
                     <div className="about-us__activities">
                         {activities.map((activity) => (
-                            <div key={activity.label} className="about-us__activity">
+                            <div key={activity.labelKey} className="about-us__activity">
                                 <span className="about-us__activity-icon">{activity.icon}</span>
-                                <span className="about-us__activity-label">{activity.label}</span>
+                                <span className="about-us__activity-label">{text(activity.labelKey)}</span>
                             </div>
                         ))}
                     </div>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useWebTexts } from '../../hooks/useWebTexts';
 import './membershipSection.scss';
 
 interface MembershipModalProps {
@@ -10,6 +11,7 @@ export default function MembershipModal({ onClose }: MembershipModalProps) {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const text = useWebTexts('home.membership');
 
   const handleSubmit = async () => {
     if (!email.trim()) return;
@@ -23,21 +25,25 @@ export default function MembershipModal({ onClose }: MembershipModalProps) {
   return createPortal(
     <div className="membership-modal__overlay" onClick={onClose}>
       <div className="membership-modal" onClick={(e) => e.stopPropagation()}>
-        <button className="membership-modal__close" onClick={onClose} aria-label="Cerrar">
+        <button
+          className="membership-modal__close"
+          onClick={onClose}
+          aria-label={text('home.membership.modal.close')}
+        >
           ✕
         </button>
 
         {!submitted ? (
           <>
             <span className="membership-modal__hero-icon">🎮</span>
-            <h3 className="membership-modal__title">¡Únete a la Cripta!</h3>
+            <h3 className="membership-modal__title">{text('home.membership.modal.title')}</h3>
             <p className="membership-modal__text">
-              Déjanos tu correo y te enviamos toda la información para hacerte socio de la asociación.
+              {text('home.membership.modal.body')}
             </p>
             <input
               type="email"
               className="membership-modal__input"
-              placeholder="tu@email.com"
+              placeholder={text('home.membership.modal.emailPlaceholder')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
@@ -48,18 +54,20 @@ export default function MembershipModal({ onClose }: MembershipModalProps) {
               onClick={handleSubmit}
               disabled={loading || !email.trim()}
             >
-              {loading ? 'Enviando...' : 'Enviar información'}
+              {loading
+                ? text('home.membership.modal.loading')
+                : text('home.membership.modal.submit')}
             </button>
           </>
         ) : (
           <>
             <span className="membership-modal__hero-icon">✉️</span>
-            <h3 className="membership-modal__title">¡Correo en camino!</h3>
+            <h3 className="membership-modal__title">{text('home.membership.modal.successTitle')}</h3>
             <p className="membership-modal__text">
-              En breve recibirás toda la información en tu bandeja de entrada. ¡Nos vemos en la Cripta!
+              {text('home.membership.modal.successBody')}
             </p>
             <button className="btn-outline membership-modal__submit" onClick={onClose}>
-              Cerrar
+              {text('home.membership.modal.close')}
             </button>
           </>
         )}
