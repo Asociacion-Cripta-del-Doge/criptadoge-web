@@ -1,5 +1,6 @@
 import "./patrocinadores.scss"
 import { PATROCINADORES_MOCK, type Patrocinador, type TierPatrocinador } from "../../data/patrocinadores.mock"
+import { useWebTexts } from "../../hooks/useWebTexts"
 
 const TIER_LABEL: Record<TierPatrocinador, string> = {
   oro: "Oro",
@@ -40,6 +41,7 @@ const PatrocinadorCard = ({ patrocinador }: { patrocinador: Patrocinador }) => {
 }
 
 export const PatrocinadoresSection = () => {
+  const text = useWebTexts("home.sponsors")
   const oro = PATROCINADORES_MOCK.filter(p => p.tier === "oro")
   const plata = PATROCINADORES_MOCK.filter(p => p.tier === "plata")
   const bronce = PATROCINADORES_MOCK.filter(p => p.tier === "bronce")
@@ -47,13 +49,9 @@ export const PatrocinadoresSection = () => {
   return (
     <section id="patrocinadores" className="sp-section">
       <div className="sp-header">
-        <span className="sp-tag">Patrocinadores</span>
-        <h2 className="sp-title">
-          Quienes nos <span className="sp-title-highlight">Apoyan</span>
-        </h2>
-        <p className="sp-subtitle">
-          Gracias a estas empresas y negocios locales por hacer posible nuestra asociación.
-        </p>
+        <span className="sp-tag">{text("home.sponsors.badge")}</span>
+        <h2 className="sp-title">{text("home.sponsors.title")}</h2>
+        <p className="sp-subtitle">{text("home.sponsors.subtitle")}</p>
       </div>
 
       <div className="sp-tier-group">
@@ -78,7 +76,7 @@ export const PatrocinadoresSection = () => {
       </div>
 
       <p className="sp-cta">
-        ¿Quieres patrocinar la asociación?{" "}
+        {text("home.sponsors.cta")}{" "}
         <a href="#contacto">Contáctanos</a>
       </p>
     </section>

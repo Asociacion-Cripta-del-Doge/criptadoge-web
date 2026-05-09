@@ -1,8 +1,10 @@
 import "./footer.scss"
 import logo from "../../assets/logo.png"
-
+import { useWebTexts } from "../../hooks/useWebTexts"
 
 export const Footer = () => {
+    const text = useWebTexts("footer")
+
     return(
         <footer className="footer">
             <div className="footer-top-line"/>
@@ -13,17 +15,15 @@ export const Footer = () => {
                         <span>LA CRIPTA DE DOGE</span>
                     </div>
 
-                    <p>
-                        Asociación sin ánimo de lucro dedicada al ocio alternativo para jóvenes en Puertollano.
-                    </p>
+                    <p>{text("footer.description")}</p>
                 </div>
 
                 <div className="footer-column">
                     <h4>Enlaces</h4>
                     <a href="#inicio">Inicio</a>
-                    <a href="#">Eventos</a>
-                    <a href="#">Nosotros</a>
-                    <a href="#">Únete al club</a>
+                    <a href="#eventos">Eventos</a>
+                    <a href="#about">Nosotros</a>
+                    <a href="#membresia">Únete al club</a>
                 </div>
 
                 <div className="footer-column">
@@ -35,13 +35,13 @@ export const Footer = () => {
 
                 <div className="footer-column">
                     <h4>Contacto</h4>
-                    <p>📍 Puertollano </p>
-                    <p>✉️ info@criptadeldoge.es</p>
-                    <p>🕒 Lun - Vie 17:00 - 22:00</p>
+                    <p>📍 {text("footer.contact.location")}</p>
+                    <p>✉️ {text("footer.contact.email")}</p>
+                    <p>🕒 {text("footer.contact.hours")}</p>
                 </div>
 
                 <div className="footer-bottom">
-                    <p>&copy; 2026 La Cripta de Doge Club. Todos los derechos reservados.</p>
+                    <p>{text("footer.copyright")}</p>
                     <a href="#inicio">Volver arriba</a>
                 </div>
             </div>

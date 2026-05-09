@@ -1,4 +1,5 @@
 import './aboutUs.scss';
+import { useWebTexts } from '../../hooks/useWebTexts';
 
 const activities = [
     { icon: '🎲', label: 'Juegos de mesa' },
@@ -33,19 +34,16 @@ const pillars = [
 ];
 
 const AboutUs = () => {
+    const text = useWebTexts('home.about');
+
     return (
         <section className="about-us" id="about">
             <div className="about-us__container">
 
                 <div className="about-us__left">
-                    <span className="about-us__badge">Asociación sin ánimo de lucro</span>
-                    <h2 className="about-us__title">
-                    ¿Quiénes <span className="about-us__title--accent">somos?</span>
-                    </h2>
-                    <p className="about-us__description">
-                        Llenamos el vacío de ocio alternativo en Puertollano. Un espacio donde
-                        los jóvenes conectan, crean y juegan — sin necesidad de salir de su ciudad.
-                    </p>
+                    <span className="about-us__badge">{text('home.about.badge')}</span>
+                    <h2 className="about-us__title">{text('home.about.title')}</h2>
+                    <p className="about-us__description">{text('home.about.body')}</p>
                     <div className="about-us__pillars">
                         {pillars.map((pillar) => (
                             <div key={pillar.title} className={`about-us__pillar about-us__pillar--${pillar.modifier}`}>

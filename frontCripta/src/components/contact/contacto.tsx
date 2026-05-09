@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import type { CSSProperties, FormEvent } from "react"
 import "./contacto.scss"
+import { useWebTexts } from "../../hooks/useWebTexts"
 
 const API_BASE = "http://localhost:8080/api"
 
@@ -47,6 +48,7 @@ const ICON_MAP = {
 type FormState = "idle" | "sending" | "ok" | "error"
 
 export const ContactoSection = () => {
+  const text = useWebTexts("home.contact")
   const [nombre, setNombre] = useState("")
   const [email, setEmail] = useState("")
   const [asunto, setAsunto] = useState("")
@@ -101,7 +103,7 @@ export const ContactoSection = () => {
   return (
     <section id="contacto" className="ct-section">
       <div className="ct-header">
-        <span className="ct-tag">Contacto</span>
+        <span className="ct-tag">{text("home.contact.badge")}</span>
         <h2 className="ct-title">
           ¿Tienes <span className="ct-title-highlight">Preguntas</span>?
         </h2>
@@ -113,7 +115,7 @@ export const ContactoSection = () => {
       <div className="ct-layout">
         <div className="ct-card ct-form-card">
           <h3 className="ct-card-title">Envíanos un mensaje</h3>
-          <p className="ct-card-sub">Te responderemos lo antes posible</p>
+          <p className="ct-card-sub">{text("home.contact.formSubtitle")}</p>
 
           <form className="ct-form" onSubmit={handleSubmit}>
             <div className="ct-form-row">

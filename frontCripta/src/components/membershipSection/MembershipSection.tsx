@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import MembershipModal from './MembershipModal';
 import './membershipSection.scss';
+import { useWebTexts } from '../../hooks/useWebTexts';
 
 const BENEFITS = [
   {
@@ -37,18 +38,16 @@ const BENEFITS = [
 
 export default function MembershipSection() {
   const [modalOpen, setModalOpen] = useState(false);
+  const text = useWebTexts('home.membership');
 
   return (
     <section className="membership-section" id="membresia">
       <div className="membership-section__container">
 
         <div className="membership-section__header">
-          <span className="membership-section__badge">Membresía</span>
-          <h2 className="membership-section__title">Hazte Socio</h2>
-          <p className="membership-section__subtitle">
-            Únete a la comunidad y accede a todo lo que La Cripta de Doge tiene para ofrecerte.
-            Una cuota, infinitas posibilidades.
-          </p>
+          <span className="membership-section__badge">{text('home.membership.badge')}</span>
+          <h2 className="membership-section__title">{text('home.membership.title')}</h2>
+          <p className="membership-section__subtitle">{text('home.membership.subtitle')}</p>
         </div>
 
         <div className="membership-section__grid">
@@ -62,14 +61,12 @@ export default function MembershipSection() {
         </div>
 
         <div className="membership-section__cta">
-          <p className="membership-section__cta-text">
-            ¿Te interesa? Te enviamos toda la información directamente a tu correo.
-          </p>
+          <p className="membership-section__cta-text">{text('home.membership.ctaText')}</p>
           <button
             className="btn-pink membership-section__cta-btn"
             onClick={() => setModalOpen(true)}
           >
-            Quiero ser socio
+            {text('home.membership.ctaButton')}
           </button>
         </div>
 
