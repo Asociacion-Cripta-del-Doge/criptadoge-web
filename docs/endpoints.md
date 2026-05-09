@@ -203,6 +203,38 @@ Base URL via Nginx: `http://localhost:8080/api`
 
 ---
 
+## Mesas `/mesas`
+
+| Metodo | Ruta | Auth | Roles | Body / uso |
+| ------ | ---- | ---- | ----- | ---------- |
+| GET | `/mesas` | No | Publico | Lista mesas ordenadas por `orden` |
+| GET | `/mesas/:id` | No | Publico | Detalle de mesa |
+| POST | `/mesas` | JWT | ADMIN | `CreateMesaDto` |
+| PUT | `/mesas/:id` | JWT | ADMIN | `UpdateMesaDto` |
+| DELETE | `/mesas/:id` | JWT | ADMIN | Elimina una mesa |
+
+**CreateMesaDto:**
+
+```json
+{
+  "asientos": "number (requerido, min. 1)",
+  "orden": "number (requerido, min. 1, unico)",
+  "esDePago": "boolean (opcional)"
+}
+```
+
+**UpdateMesaDto:** todos los campos son opcionales.
+
+```json
+{
+  "asientos": "number",
+  "orden": "number",
+  "esDePago": "boolean"
+}
+```
+
+---
+
 ## Reservas `/reservas`
 
 | Metodo | Ruta | Auth | Roles | Body / uso |

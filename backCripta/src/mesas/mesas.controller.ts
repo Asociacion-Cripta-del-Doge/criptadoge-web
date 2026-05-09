@@ -16,12 +16,12 @@ import { UpdateMesaDto } from './dto/update-mesa.dto';
 import { MesasService } from './mesas.service';
 
 @Controller('mesas')
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('ADMIN')
 export class MesasController {
   constructor(private readonly mesasService: MesasService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
   create(@Body() createMesaDto: CreateMesaDto) {
     return this.mesasService.create(createMesaDto);
   }
@@ -37,11 +37,15 @@ export class MesasController {
   }
 
   @Put(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
   update(@Param('id') id: string, @Body() updateMesaDto: UpdateMesaDto) {
     return this.mesasService.update(id, updateMesaDto);
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
   remove(@Param('id') id: string) {
     return this.mesasService.remove(id);
   }

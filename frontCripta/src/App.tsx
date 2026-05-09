@@ -2,20 +2,21 @@ import { useEffect, useMemo, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import "./App.scss";
 import Login from "./components/login/login";
+import { Navbar } from "./components/navbar/navbar";
+import { Footer } from "./components/footer/footer";
+import { EventCalendar } from "./components/EventCalendar/EventCalendar";
+import { ContactoSection } from "./components/contact/contacto";
+import { UbicacionSection } from "./components/ubicacion/Ubicacion";
+import AboutUs from "./components/aboutUs/aboutUs";
+import SectionDivider from "./components/sectionDivider/SectionDivider";
+import { HeroCarousel } from "./components/heroCarousel/HeroCarousel";
+import MembershipSection from "./components/membershipSection/MembershipSection";
+import { PatrocinadoresSection } from "./components/patrocinadores/patrocinadores";
 import { useAuth } from "./context/AuthContext";
 import { useWebTexts } from "./hooks/useWebTexts";
 import { reservasService } from "./services/reservasService";
 import type { HuecoReserva, Mesa } from "./services/reservasService";
 import logo from "./assets/logo.png";
-
-const demoMesas: Mesa[] = [
-  { id: "demo-1", orden: 1, asientos: 4, esDePago: false },
-  { id: "demo-2", orden: 2, asientos: 4, esDePago: false },
-  { id: "demo-3", orden: 3, asientos: 4, esDePago: false },
-  { id: "demo-4", orden: 4, asientos: 4, esDePago: true },
-  { id: "demo-5", orden: 5, asientos: 4, esDePago: true },
-  { id: "demo-6", orden: 6, asientos: 6, esDePago: true },
-];
 
 const getToday = () => {
   const date = new Date();
@@ -23,42 +24,11 @@ const getToday = () => {
   return new Date(date.getTime() - offset).toISOString().slice(0, 10);
 };
 
-const buildDemoSlot = (
-  mesas: Mesa[],
-  asientosReservados: number,
-  fecha: string,
-): HuecoReserva => {
-  const demoAvailability = mesas.map((mesa, index) => {
-    const occupiedPattern = [0, 2, 0, 2, 4, 2][index] ?? 0;
-    const asientosOcupados = Math.min(occupiedPattern, mesa.asientos);
-    const asientosDisponibles = mesa.asientos - asientosOcupados;
-
-    return {
-      ...mesa,
-      asientosOcupados,
-      asientosDisponibles,
-      disponible: asientosDisponibles >= asientosReservados,
-    };
-  });
-
-  return {
-    fechaHoraInicio: `${fecha}T18:00:00.000Z`,
-    fechaHoraFin: `${fecha}T19:00:00.000Z`,
-    horaInicio: "18:00",
-    horaFin: "19:00",
-    asientosSolicitados: asientosReservados,
-    asientosDisponiblesTotales: demoAvailability.reduce(
-      (total, mesa) => total + (mesa.asientosDisponibles ?? 0),
-      0,
-    ),
-    mesasDisponibles: demoAvailability.filter((mesa) => mesa.disponible),
-  };
-};
-
 function App() {
   const path = window.location.pathname;
-  const { user, loading, logout } = useAuth();
+  const { user, loading } = useAuth();
   const text = useWebTexts("booking");
+  const heroText = useWebTexts("home.hero");
   const [fecha, setFecha] = useState(getToday);
   const [duracionMinutos, setDuracionMinutos] = useState(60);
   const [asientosReservados, setAsientosReservados] = useState(2);
@@ -67,7 +37,7 @@ function App() {
   const [slotIndex, setSlotIndex] = useState(0);
   const [selectedMesaId, setSelectedMesaId] = useState<string | null>(null);
   const [fetching, setFetching] = useState(false);
-  const [demoMode, setDemoMode] = useState(false);
+  const [bookingError, setBookingError] = useState<string | null>(null);
   const [booking, setBooking] = useState(false);
 
   const selectedSlot = slots[slotIndex];
@@ -96,57 +66,42 @@ function App() {
   );
 
   useEffect(() => {
-    if (!user) {
-      const fallbackSlot = buildDemoSlot(
-        demoMesas,
-        asientosReservados,
-        fecha,
-      );
-
-      setMesas(demoMesas);
-      setSlots([fallbackSlot]);
-      setSlotIndex(0);
-      setSelectedMesaId(null);
-      setDemoMode(true);
-      return;
-    }
-
     const load = async () => {
       setFetching(true);
       setSelectedMesaId(null);
+      setBookingError(null);
 
       try {
-        const [mesasData, huecosData] = await Promise.all([
-          reservasService.getMesas(),
-          reservasService.getHuecos({
+        const mesasData = await reservasService.getMesas();
+        setMesas(mesasData);
+
+        if (!user) {
+          setSlots([]);
+          setSlotIndex(0);
+          return;
+        }
+
+        const huecosData = await reservasService.getHuecos({
             fecha,
             asientosReservados,
             duracionMinutos,
-          }),
-        ]);
+        });
 
-        setMesas(mesasData);
         setSlots(huecosData.slots);
         setSlotIndex(0);
-        setDemoMode(false);
-      } catch {
-        const fallbackSlot = buildDemoSlot(
-          demoMesas,
-          asientosReservados,
-          fecha,
-        );
-
-        setMesas(demoMesas);
-        setSlots([fallbackSlot]);
+      } catch (error) {
+        setSlots([]);
         setSlotIndex(0);
-        setDemoMode(true);
+        setBookingError(
+          error instanceof Error ? error.message : text("booking.toast.error"),
+        );
       } finally {
         setFetching(false);
       }
     };
 
     load();
-  }, [asientosReservados, duracionMinutos, fecha, user]);
+  }, [asientosReservados, duracionMinutos, fecha, text, user]);
 
   const handleReserve = async () => {
     if (!selectedMesa || !selectedSlot) {
@@ -155,11 +110,6 @@ function App() {
 
     if (!user) {
       window.location.href = "/login";
-      return;
-    }
-
-    if (demoMode) {
-      toast(text("booking.toast.demo"));
       return;
     }
 
@@ -216,7 +166,7 @@ function App() {
     return <div className="app-loading">{text("booking.loading")}</div>;
   }
 
-  return (
+  const bookingPage = (
     <main className="booking-app">
       <Toaster position="top-right" />
 
@@ -227,26 +177,6 @@ function App() {
             <span>{text("booking.brand")}</span>
             <strong>{text("booking.title")}</strong>
           </div>
-        </div>
-
-        <div className="booking-user">
-          <span>{user?.name ?? text("booking.user.guest")}</span>
-          <small>
-            {user
-              ? user.role === "ADMIN"
-                ? text("booking.user.admin")
-                : user.status
-              : text("booking.user.preview")}
-          </small>
-          {user ? (
-            <button type="button" onClick={logout}>
-              {text("booking.user.logout")}
-            </button>
-          ) : (
-            <button type="button" onClick={() => (window.location.href = "/login")}>
-              {text("booking.user.login")}
-            </button>
-          )}
         </div>
       </header>
 
@@ -311,8 +241,8 @@ function App() {
         </label>
       </section>
 
-      {demoMode && (
-        <p className="booking-notice">{text("booking.demoNotice")}</p>
+      {bookingError && (
+        <p className="booking-notice">{bookingError}</p>
       )}
 
       <section className="booking-layout">
@@ -458,6 +388,72 @@ function App() {
         </aside>
       </section>
     </main>
+  );
+
+  if (path === "/reservas") {
+    return (
+      <>
+        <Navbar />
+        {bookingPage}
+        <Footer />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <Toaster position="top-right" />
+      <Navbar />
+
+      <section id="inicio" className="hero">
+        <div className="hero-left">
+          <h1 className="hero-title">
+            <span className="hero-highlight">
+              {heroText("home.hero.titlePrefix")}
+            </span>{" "}
+            <br /> {heroText("home.hero.titleSuffix")}
+          </h1>
+          <p className="hero-subtitle">{heroText("home.hero.subtitle")}</p>
+          <div className="hero-buttons">
+            <a href="#membresia" className="btn-pink">
+              {heroText("home.hero.primaryCta")}
+            </a>
+            <a href="/reservas" className="btn-outline">
+              {text("booking.title")}
+            </a>
+          </div>
+        </div>
+        <HeroCarousel />
+      </section>
+
+      <SectionDivider />
+
+      <AboutUs />
+
+      <SectionDivider />
+
+      <MembershipSection />
+
+      <SectionDivider />
+
+      <section id="eventos">
+        <EventCalendar />
+      </section>
+
+      <SectionDivider />
+
+      <UbicacionSection />
+
+      <SectionDivider />
+
+      <PatrocinadoresSection />
+
+      <SectionDivider />
+
+      <ContactoSection />
+
+      <Footer />
+    </>
   );
 }
 

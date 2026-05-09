@@ -18,6 +18,7 @@ const WEB_TEXT_DEFAULTS = {
   'nav.brand': 'LA CRIPTA DE DOGE',
   'nav.links.home': 'Inicio',
   'nav.links.events': 'Eventos',
+  'nav.links.booking': 'Reservas',
   'nav.links.gallery': 'Galería',
   'nav.links.location': 'Ubicación',
   'nav.links.sponsors': 'Patrocinadores',
@@ -214,8 +215,6 @@ const WEB_TEXT_DEFAULTS = {
   'booking.controls.seatsUnit': 'asientos',
   'booking.controls.slot': 'Franja',
   'booking.controls.noSlots': 'Sin huecos',
-  'booking.demoNotice':
-    'Vista demo activa. Cuando el backend de mesas responda, el plano usara disponibilidad real.',
   'booking.stage': 'Mostrador',
   'booking.table.prefix': 'Mesa',
   'booking.table.shortPrefix': 'M',
@@ -244,7 +243,6 @@ const WEB_TEXT_DEFAULTS = {
   'booking.actions.reserve': 'Reservar huecos',
   'booking.admin.hint':
     'Modo admin: la edicion de mesas puede abrirse desde este panel usando los endpoints `/api/mesas`.',
-  'booking.toast.demo': 'Modo demo: conecta el backend de reservas para guardar.',
   'booking.toast.created': 'Reserva creada',
   'booking.toast.error': 'No se ha podido reservar',
 

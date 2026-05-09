@@ -20,10 +20,10 @@ export const Footer = () => {
 
                 <div className="footer-column">
                     <h4>{text("footer.linksTitle")}</h4>
-                    <a href="#inicio">{text("footer.links.home")}</a>
-                    <a href="#eventos">{text("footer.links.events")}</a>
-                    <a href="#about">{text("footer.links.about")}</a>
-                    <a href="#membresia">{text("footer.links.membership")}</a>
+                    <a href="/#inicio">{text("footer.links.home")}</a>
+                    <a href="/#eventos">{text("footer.links.events")}</a>
+                    <a href="/#about">{text("footer.links.about")}</a>
+                    <a href="/#membresia">{text("footer.links.membership")}</a>
                 </div>
 
                 <div className="footer-column">
@@ -42,7 +42,7 @@ export const Footer = () => {
 
                 <div className="footer-bottom">
                     <p>{text("footer.copyright")}</p>
-                    <a href="#inicio">{text("footer.backToTop")}</a>
+                    <a href="/#inicio">{text("footer.backToTop")}</a>
                 </div>
             </div>
         </footer>
