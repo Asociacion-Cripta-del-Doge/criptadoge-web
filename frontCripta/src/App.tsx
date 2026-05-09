@@ -3,6 +3,7 @@ import toast, { Toaster } from "react-hot-toast";
 import "./App.scss";
 import Login from "./components/login/login";
 import { useAuth } from "./context/AuthContext";
+import { useWebTexts } from "./hooks/useWebTexts";
 import { reservasService } from "./services/reservasService";
 import type { HuecoReserva, Mesa } from "./services/reservasService";
 import logo from "./assets/logo.png";
@@ -57,6 +58,7 @@ const buildDemoSlot = (
 function App() {
   const path = window.location.pathname;
   const { user, loading, logout } = useAuth();
+  const text = useWebTexts("booking");
   const [fecha, setFecha] = useState(getToday);
   const [duracionMinutos, setDuracionMinutos] = useState(60);
   const [asientosReservados, setAsientosReservados] = useState(2);
@@ -157,7 +159,7 @@ function App() {
     }
 
     if (demoMode) {
-      toast("Modo demo: conecta el backend de reservas para guardar.");
+      toast(text("booking.toast.demo"));
       return;
     }
 
@@ -171,7 +173,7 @@ function App() {
         asientosReservados,
       });
 
-      toast.success("Reserva creada");
+      toast.success(text("booking.toast.created"));
       setSelectedMesaId(null);
       const huecosData = await reservasService.getHuecos({
         fecha,
@@ -182,7 +184,7 @@ function App() {
       setSlotIndex(0);
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "No se ha podido reservar",
+        error instanceof Error ? error.message : text("booking.toast.error"),
       );
     } finally {
       setBooking(false);
@@ -211,7 +213,7 @@ function App() {
   }
 
   if (loading) {
-    return <div className="app-loading">Preparando la sala...</div>;
+    return <div className="app-loading">{text("booking.loading")}</div>;
   }
 
   return (
@@ -220,25 +222,29 @@ function App() {
 
       <header className="booking-header">
         <div className="booking-brand">
-          <img src={logo} alt="La Cripta de Doge" />
+          <img src={logo} alt={text("booking.brand")} />
           <div>
-            <span>La Cripta de Doge</span>
-            <strong>Reservas de mesas</strong>
+            <span>{text("booking.brand")}</span>
+            <strong>{text("booking.title")}</strong>
           </div>
         </div>
 
         <div className="booking-user">
-          <span>{user?.name ?? "Invitado"}</span>
+          <span>{user?.name ?? text("booking.user.guest")}</span>
           <small>
-            {user ? (user.role === "ADMIN" ? "Admin" : user.status) : "Vista previa"}
+            {user
+              ? user.role === "ADMIN"
+                ? text("booking.user.admin")
+                : user.status
+              : text("booking.user.preview")}
           </small>
           {user ? (
             <button type="button" onClick={logout}>
-              Salir
+              {text("booking.user.logout")}
             </button>
           ) : (
             <button type="button" onClick={() => (window.location.href = "/login")}>
-              Entrar
+              {text("booking.user.login")}
             </button>
           )}
         </div>
@@ -246,7 +252,7 @@ function App() {
 
       <section className="booking-toolbar" aria-label="Filtros de reserva">
         <label>
-          Fecha
+          {text("booking.controls.date")}
           <input
             type="date"
             value={fecha}
@@ -255,33 +261,33 @@ function App() {
         </label>
 
         <label>
-          Duracion
+          {text("booking.controls.duration")}
           <select
             value={duracionMinutos}
             onChange={(event) => setDuracionMinutos(Number(event.target.value))}
           >
-            <option value={60}>1 hora</option>
-            <option value={120}>2 horas</option>
-            <option value={180}>3 horas</option>
+            <option value={60}>{text("booking.controls.duration.oneHour")}</option>
+            <option value={120}>{text("booking.controls.duration.twoHours")}</option>
+            <option value={180}>{text("booking.controls.duration.threeHours")}</option>
           </select>
         </label>
 
         <label>
-          Huecos
+          {text("booking.controls.seats")}
           <select
             value={asientosReservados}
             onChange={(event) =>
               setAsientosReservados(Number(event.target.value))
             }
           >
-            <option value={2}>2 asientos</option>
-            <option value={4}>4 asientos</option>
-            <option value={6}>6 asientos</option>
+            <option value={2}>2 {text("booking.controls.seatsUnit")}</option>
+            <option value={4}>4 {text("booking.controls.seatsUnit")}</option>
+            <option value={6}>6 {text("booking.controls.seatsUnit")}</option>
           </select>
         </label>
 
         <label>
-          Franja
+          {text("booking.controls.slot")}
           <select
             value={slotIndex}
             onChange={(event) => {
@@ -290,7 +296,7 @@ function App() {
             }}
           >
             {slots.length === 0 ? (
-              <option value={0}>Sin huecos</option>
+              <option value={0}>{text("booking.controls.noSlots")}</option>
             ) : (
               slots.map((slot, index) => (
                 <option
@@ -306,15 +312,12 @@ function App() {
       </section>
 
       {demoMode && (
-        <p className="booking-notice">
-          Vista demo activa. Cuando el backend de mesas responda, el plano usara
-          disponibilidad real.
-        </p>
+        <p className="booking-notice">{text("booking.demoNotice")}</p>
       )}
 
       <section className="booking-layout">
         <div className="table-map-shell">
-          <div className="room-stage">Mostrador</div>
+          <div className="room-stage">{text("booking.stage")}</div>
 
           <div className={`table-map ${fetching ? "is-loading" : ""}`}>
             {mesasConDisponibilidad.map((mesa) => (
@@ -329,11 +332,18 @@ function App() {
                 ].join(" ")}
                 onClick={() => setSelectedMesaId(mesa.id)}
                 disabled={!mesa.disponible}
-                aria-label={`Mesa ${mesa.orden}`}
+                aria-label={`${text("booking.table.prefix")} ${mesa.orden}`}
               >
                 <span className="table-top">
-                  <strong>M{mesa.orden}</strong>
-                  <small>{mesa.esDePago ? "Pago" : "Gratis"}</small>
+                  <strong>
+                    {text("booking.table.shortPrefix")}
+                    {mesa.orden}
+                  </strong>
+                  <small>
+                    {mesa.esDePago
+                      ? text("booking.table.paid")
+                      : text("booking.table.free")}
+                  </small>
                 </span>
 
                 <span className="table-seats">
@@ -362,41 +372,54 @@ function App() {
 
           <div className="booking-legend" aria-label="Leyenda">
             <span>
-              <i className="legend-free" /> Gratuita
+              <i className="legend-free" /> {text("booking.legend.free")}
             </span>
             <span>
-              <i className="legend-paid" /> De pago
+              <i className="legend-paid" /> {text("booking.legend.paid")}
             </span>
             <span>
-              <i className="legend-busy" /> Ocupado
+              <i className="legend-busy" /> {text("booking.legend.busy")}
             </span>
             <span>
-              <i className="legend-picked" /> Seleccionado
+              <i className="legend-picked" /> {text("booking.legend.selected")}
             </span>
           </div>
         </div>
 
         <aside className="booking-panel">
-          <span className="panel-kicker">Seleccion actual</span>
-          <h1>{selectedMesa ? `Mesa ${selectedMesa.orden}` : "Elige una mesa"}</h1>
+          <span className="panel-kicker">{text("booking.panel.kicker")}</span>
+          <h1>
+            {selectedMesa
+              ? `${text("booking.table.prefix")} ${selectedMesa.orden}`
+              : text("booking.panel.emptyTitle")}
+          </h1>
 
           {selectedMesa && selectedSlot ? (
             <>
               <dl className="panel-facts">
                 <div>
-                  <dt>Tipo</dt>
-                  <dd>{selectedMesa.esDePago ? "De pago" : "Gratuita"}</dd>
+                  <dt>{text("booking.panel.type")}</dt>
+                  <dd>
+                    {selectedMesa.esDePago
+                      ? text("booking.table.paidLong")
+                      : text("booking.legend.free")}
+                  </dd>
                 </div>
                 <div>
-                  <dt>Capacidad</dt>
-                  <dd>{selectedMesa.asientos} asientos</dd>
+                  <dt>{text("booking.panel.capacity")}</dt>
+                  <dd>
+                    {selectedMesa.asientos} {text("booking.panel.seatsWord")}
+                  </dd>
                 </div>
                 <div>
-                  <dt>Libres</dt>
-                  <dd>{selectedMesa.asientosDisponibles} huecos</dd>
+                  <dt>{text("booking.panel.available")}</dt>
+                  <dd>
+                    {selectedMesa.asientosDisponibles}{" "}
+                    {text("booking.panel.spacesWord")}
+                  </dd>
                 </div>
                 <div>
-                  <dt>Franja</dt>
+                  <dt>{text("booking.panel.slot")}</dt>
                   <dd>
                     {selectedSlot.horaInicio} - {selectedSlot.horaFin}
                   </dd>
@@ -404,9 +427,8 @@ function App() {
               </dl>
 
               <p className="panel-copy">
-                Reservaras {asientosReservados} huecos. Si la mesa es de pago,
-                el backend aplicara la primera hora gratis a socios activos y
-                calculara el precio proporcional.
+                {text("booking.panel.copyPrefix")} {asientosReservados}{" "}
+                {text("booking.panel.copySuffix")}
               </p>
 
               <button
@@ -416,23 +438,21 @@ function App() {
                 disabled={booking}
               >
                 {!user
-                  ? "Inicia sesion para reservar"
+                  ? text("booking.actions.loginToReserve")
                   : booking
-                    ? "Reservando..."
-                    : "Reservar huecos"}
+                    ? text("booking.actions.reserving")
+                    : text("booking.actions.reserve")}
               </button>
 
               {user?.role === "ADMIN" && (
                 <p className="admin-hint">
-                  Modo admin: la edicion de mesas puede abrirse desde este panel
-                  usando los endpoints `/api/mesas`.
+                  {text("booking.admin.hint")}
                 </p>
               )}
             </>
           ) : (
             <p className="panel-empty">
-              Selecciona fecha, franja y una mesa disponible para ver el detalle
-              de la reserva.
+              {text("booking.panel.empty")}
             </p>
           )}
         </aside>
