@@ -31,10 +31,12 @@ Hay un indice unico por `{ key, locale }`, asi que una misma key puede existir e
 Usar keys estables, legibles y agrupadas por seccion:
 
 ```text
+nav.links.home
 home.hero.titlePrefix
 home.hero.subtitle
 home.about.body
 home.membership.ctaButton
+auth.submit.login
 footer.copyright
 ```
 
@@ -127,17 +129,23 @@ Flujo:
 
 Esto evita pantallas vacias si MongoDB no tiene datos, si el seeder no se ha ejecutado o si una key se borra por error.
 
-## Secciones conectadas
+## Secciones disponibles en el seeder
 
-Actualmente consumen textos configurables:
+El seeder inicial cubre el inventario completo de textos visibles actuales de la web:
 
+- `nav`: marca, enlaces principales y botones de sesion/membresia.
 - `home.hero`: titular, subtitulo y CTAs del hero.
-- `home.about`: badge, titulo y descripcion.
-- `home.membership`: badge, titulo, subtitulo y CTA.
-- `home.location`: badge, titulo, subtitulo y direccion.
-- `home.sponsors`: badge, titulo, subtitulo y CTA.
-- `home.contact`: cabecera y subtitulo del formulario.
-- `footer`: descripcion, contacto y copyright.
+- `home.about`: bloque informativo, actividades, pilares y estadisticas.
+- `home.membership`: cabecera, beneficios, CTA y modal de interes.
+- `home.events`: cabecera del calendario, estados, vacios, modal y acciones.
+- `home.location`: cabecera, direccion, horario y contacto rapido.
+- `home.sponsors`: cabecera, tiers, CTA y textos de patrocinadores mock.
+- `home.contact`: cabecera, formulario, estados, redes sociales, Twitch e Instagram.
+- `footer`: marca, columnas, legales, contacto, copyright y vuelta arriba.
+- `auth`: pantalla de login/registro, placeholders, CTAs, errores y mensajes.
+- `profile`: modal de perfil, estados, membresia, errores y logout.
+
+Actualmente los componentes ya consumen una parte de estas keys mediante `useWebTexts`; el resto queda sembrado como inventario editable y fallback preparado para migrar los textos hardcodeados progresivamente.
 
 ## Seguridad y contenido
 
