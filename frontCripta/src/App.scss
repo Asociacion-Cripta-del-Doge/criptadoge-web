@@ -830,6 +830,10 @@ a {
 }
 
 @media (max-width: 980px) {
+  .booking-app {
+    width: min(760px, 100%);
+  }
+
   .booking-layout {
     grid-template-columns: 1fr;
   }
@@ -841,12 +845,32 @@ a {
 
 @media (max-width: 760px) {
   .booking-app {
-    padding: 110px 16px 32px;
+    padding: 96px 14px 30px;
   }
 
   .booking-header {
     align-items: flex-start;
     flex-direction: column;
+    gap: 12px;
+    padding-bottom: 14px;
+  }
+
+  .booking-brand {
+    gap: 10px;
+
+    img {
+      width: 44px;
+      height: 44px;
+    }
+
+    strong {
+      font-size: 1.08rem;
+      line-height: 1.2;
+    }
+
+    span {
+      font-size: 0.78rem;
+    }
   }
 
   .booking-user {
@@ -856,6 +880,25 @@ a {
 
   .booking-toolbar {
     grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .booking-date-control {
+    grid-column: 1 / -1;
+  }
+
+  .booking-toolbar label:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .booking-calendar {
+    width: min(100%, 340px);
+  }
+
+  .booking-layout {
+    gap: 14px;
+    margin-top: 14px;
   }
 
   .own-reservations ul {
@@ -865,26 +908,173 @@ a {
   .table-map-shell {
     min-height: auto;
     padding: 12px;
+    gap: 12px;
   }
 
   .table-map {
-    grid-template-columns: 1fr;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(152px, 58vw);
+    grid-template-columns: none;
+    align-content: stretch;
+    min-height: auto;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
     padding: 14px;
+    gap: 12px;
+    scroll-snap-type: x proximity;
+    scrollbar-color: rgba(v.$color-accent, 0.55) rgba(15, 23, 42, 0.72);
+    scrollbar-width: thin;
+  }
+
+  .table-map::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .table-map::-webkit-scrollbar-track {
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.72);
+  }
+
+  .table-map::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: rgba(v.$color-accent, 0.55);
+  }
+
+  .room-table-tooltip {
+    scroll-snap-align: start;
+  }
+
+  .room-table-tooltip::before,
+  .room-table-tooltip::after {
+    display: none;
+  }
+
+  .room-table {
+    min-height: 138px;
+  }
+
+  .table-top {
+    width: 78px;
+    height: 58px;
+    border-radius: 14px;
+  }
+
+  .table-seats {
+    inset: 12px;
+  }
+
+  .seat-dot {
+    width: 15px;
+    height: 15px;
+  }
+
+  .booking-legend {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
+    font-size: 0.8rem;
+  }
+
+  .booking-panel {
+    padding: 16px;
+    min-height: auto;
+
+    h1 {
+      font-size: 1.35rem;
+    }
+  }
+
+  .panel-facts {
+    gap: 8px;
+    margin: 16px 0;
+  }
+
+  .panel-facts div {
+    padding: 10px;
+  }
+
+  .reserve-button {
+    margin-top: 16px;
   }
 }
 
 @media (max-width: 520px) {
-  .booking-toolbar,
-  .panel-facts {
+  .booking-app {
+    padding-inline: 10px;
+  }
+
+  .booking-toolbar {
     grid-template-columns: 1fr;
+  }
+
+  .booking-calendar {
+    position: static;
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .booking-calendar__day {
+    font-size: 0.8rem;
   }
 
   .booking-brand strong {
     font-size: 1.1rem;
   }
 
+  .table-map {
+    grid-auto-columns: minmax(148px, 74vw);
+  }
+
+  .booking-legend {
+    grid-template-columns: 1fr;
+  }
+
+  .panel-facts {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .own-reservations li {
+    grid-template-columns: 1fr;
+  }
+
+  .own-reservations button {
+    width: 100%;
+  }
+
   .hero {
     grid-template-columns: 1fr;
     padding: 140px v.$space-md 80px;
+  }
+}
+
+@media (max-width: 380px) {
+  .booking-app {
+    padding-inline: 8px;
+  }
+
+  .panel-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .booking-calendar {
+    padding: 10px;
+  }
+
+  .booking-calendar__header {
+    grid-template-columns: 30px 1fr 30px;
+
+    strong {
+      font-size: 0.82rem;
+    }
+
+    button {
+      min-width: 30px;
+      min-height: 30px;
+    }
+  }
+
+  .booking-calendar__weekdays,
+  .booking-calendar__grid {
+    gap: 4px;
   }
 }
