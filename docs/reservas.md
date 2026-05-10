@@ -58,11 +58,15 @@ La membresia determina que mesas puede reservar cada usuario:
 | Estado del usuario | Mesas gratuitas | Mesas de pago |
 | --- | --- | --- |
 | `Activo` | Permitidas | Permitidas |
-| No activo | Permitidas | Bloqueadas |
+| No activo | Permitidas, maximo 1 reserva activa al dia | Bloqueadas |
 | `Desactivado` | Bloqueadas | Bloqueadas |
 
 Si un usuario no activo intenta reservar una mesa de pago, la API responde con
 `403 Forbidden`.
+
+Los usuarios sin membresia activa solo pueden tener una reserva activa
+(`PENDIENTE` o `CONFIRMADA`) por dia natural, tomando como referencia el dia UTC
+de `fechaHoraInicio`.
 
 ## Huecos disponibles
 
@@ -87,6 +91,11 @@ Reglas:
 - Minimo: `2` asientos.
 - El numero debe ser divisible entre `2`.
 - No se puede solicitar mas que la capacidad total de la mesa.
+
+## Duracion maxima
+
+Las reservas no pueden superar las `3` horas. Si `fechaHoraFin` excede ese
+limite respecto a `fechaHoraInicio`, la API responde con `400 Bad Request`.
 
 ## Calculo de precio
 
@@ -180,6 +189,13 @@ del horario oficial del dia.
 1. El usuario se autentica con JWT.
 2. La API encuentra que la mesa tiene `esDePago = true`.
 3. Como `User.status` no es `Activo`, se rechaza con `403 Forbidden`.
+
+### Usuario caducado intenta crear una segunda reserva el mismo dia
+
+1. El usuario se autentica con JWT.
+2. La API consulta sus reservas activas del dia de `fechaHoraInicio`.
+3. Si ya tiene una reserva `PENDIENTE` o `CONFIRMADA`, se rechaza con
+   `409 Conflict`.
 
 ## Implementacion actual
 

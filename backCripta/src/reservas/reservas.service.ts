@@ -20,6 +20,8 @@ const PAID_SEAT_PRICE_EUROS = 1.25;
 const ACTIVE_USER_STATUS = 'Activo';
 const DEACTIVATED_USER_STATUS = 'Desactivado';
 const ACTIVE_MEMBER_FREE_PAID_MINUTES = 60;
+const MAX_RESERVATION_DURATION_MINUTES = 180;
+const NON_MEMBER_DAILY_RESERVATION_LIMIT = 1;
 
 /**
  * Horario provisional visible en la web. Se usa como ventana por defecto para
@@ -49,6 +51,7 @@ export class ReservasService {
    */
   async create(data: CreateReservaDto, userId: string) {
     const range = this.parseRange(data.fechaHoraInicio, data.fechaHoraFin);
+    this.validateReservationDuration(range.fechaHoraInicio, range.fechaHoraFin);
     this.validateReservedSeats(data.asientosReservados);
     const user = await this.getBookingUser(userId);
 
@@ -69,6 +72,10 @@ export class ReservasService {
       throw new ForbiddenException(
         'Solo los socios con membresia activa pueden reservar mesas de pago',
       );
+    }
+
+    if (user.status !== ACTIVE_USER_STATUS) {
+      await this.validateNonMemberDailyLimit(userId, range.fechaHoraInicio);
     }
 
     const precio = this.calculatePrice(
@@ -479,6 +486,45 @@ export class ReservasService {
   private validateReservedSeats(asientosReservados: number) {
     if (asientosReservados % 2 !== 0) {
       throw new BadRequestException('Solo se pueden reservar asientos pares');
+    }
+  }
+
+  private validateReservationDuration(
+    fechaHoraInicio: Date,
+    fechaHoraFin: Date,
+  ) {
+    const durationInMinutes =
+      (fechaHoraFin.getTime() - fechaHoraInicio.getTime()) / (60 * 1000);
+
+    if (durationInMinutes > MAX_RESERVATION_DURATION_MINUTES) {
+      throw new BadRequestException(
+        'La reserva no puede superar las 3 horas',
+      );
+    }
+  }
+
+  private async validateNonMemberDailyLimit(userId: string, date: Date) {
+    const dayStart = new Date(date);
+    dayStart.setUTCHours(0, 0, 0, 0);
+
+    const nextDayStart = new Date(dayStart);
+    nextDayStart.setUTCDate(nextDayStart.getUTCDate() + 1);
+
+    const reservasDelDia = await this.prisma.reservaMesa.count({
+      where: {
+        userId,
+        estado: { in: ACTIVE_RESERVATION_STATES },
+        fechaHoraInicio: {
+          gte: dayStart,
+          lt: nextDayStart,
+        },
+      },
+    });
+
+    if (reservasDelDia >= NON_MEMBER_DAILY_RESERVATION_LIMIT) {
+      throw new ConflictException(
+        'Los usuarios sin membresia activa solo pueden tener una reserva por dia',
+      );
     }
   }
 

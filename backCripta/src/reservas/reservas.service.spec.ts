@@ -13,6 +13,7 @@ describe('ReservasService', () => {
   const buildService = (
     mesa: { asientos: number; esDePago: boolean },
     userStatus = 'Activo',
+    reservasDelDia = 0,
   ) => {
     const prisma = {
       user: {
@@ -32,6 +33,7 @@ describe('ReservasService', () => {
         aggregate: jest.fn().mockResolvedValue({
           _sum: { asientosReservados: 0 },
         }),
+        count: jest.fn().mockResolvedValue(reservasDelDia),
         create: jest.fn().mockResolvedValue({ id: 'reserva-id' }),
       },
     };
@@ -145,5 +147,65 @@ describe('ReservasService', () => {
       service.create({ ...reservaDto, asientosReservados: 3 }, userId),
     ).rejects.toThrow(BadRequestException);
     expect(prisma.mesa.findUnique).not.toHaveBeenCalled();
+  });
+
+  it('rechaza reservas de mas de 3 horas', async () => {
+    const { prisma, service } = buildService({
+      asientos: 4,
+      esDePago: false,
+    });
+
+    await expect(
+      service.create(
+        {
+          ...reservaDto,
+          fechaHoraFin: '2026-05-10T22:00:01.000Z',
+        },
+        userId,
+      ),
+    ).rejects.toThrow(BadRequestException);
+    expect(prisma.mesa.findUnique).not.toHaveBeenCalled();
+  });
+
+  it('rechaza una segunda reserva diaria para usuarios sin membresia activa', async () => {
+    const { prisma, service } = buildService(
+      {
+        asientos: 4,
+        esDePago: false,
+      },
+      'Inactivo',
+      1,
+    );
+
+    await expect(service.create(reservaDto, userId)).rejects.toThrow(
+      'Los usuarios sin membresia activa solo pueden tener una reserva por dia',
+    );
+    expect(prisma.reservaMesa.count).toHaveBeenCalledWith({
+      where: {
+        userId,
+        estado: { in: ['PENDIENTE', 'CONFIRMADA'] },
+        fechaHoraInicio: {
+          gte: new Date('2026-05-10T00:00:00.000Z'),
+          lt: new Date('2026-05-11T00:00:00.000Z'),
+        },
+      },
+    });
+    expect(prisma.reservaMesa.create).not.toHaveBeenCalled();
+  });
+
+  it('no aplica el limite diario de no socios a usuarios con membresia activa', async () => {
+    const { prisma, service } = buildService(
+      {
+        asientos: 4,
+        esDePago: true,
+      },
+      'Activo',
+      1,
+    );
+
+    await service.create(reservaDto, userId);
+
+    expect(prisma.reservaMesa.count).not.toHaveBeenCalled();
+    expect(prisma.reservaMesa.create).toHaveBeenCalled();
   });
 });

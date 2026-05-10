@@ -258,7 +258,7 @@ Base URL via Nginx: `http://localhost:8080/api`
 }
 ```
 
-Al crear una reserva se guarda el campo informativo `precio`. Solo se pueden reservar asientos en cantidades pares. En mesas gratuitas queda a `0`. En mesas de pago solo pueden reservar socios con `status = "Activo"`; tienen la primera hora gratis y despues se calcula proporcionalmente a `1.25` euros por asiento reservado y hora facturable.
+Al crear una reserva se guarda el campo informativo `precio`. Solo se pueden reservar asientos en cantidades pares y la duracion maxima es de `3` horas. En mesas gratuitas queda a `0`. En mesas de pago solo pueden reservar socios con `status = "Activo"`; tienen la primera hora gratis y despues se calcula proporcionalmente a `1.25` euros por asiento reservado y hora facturable. Los usuarios sin membresia activa solo pueden tener una reserva activa (`PENDIENTE` o `CONFIRMADA`) por dia.
 
 **Query GET `/reservas/disponibilidad`:**
 
@@ -358,8 +358,10 @@ Filtra las mesas con `esDePago = false` antes de calcular los huecos. Los usuari
 
 - Las reservas activas que ocupan disponibilidad son `PENDIENTE` y `CONFIRMADA`.
 - Las reservas y consultas con `asientosReservados` solo aceptan cantidades pares.
+- Las reservas no pueden superar las `3` horas.
 - Los huecos libres se calculan por franja horaria y por asientos disponibles, no bloqueando la mesa completa salvo que los asientos ocupados alcancen su capacidad.
 - Los socios con membresia no activa solo pueden consultar y reservar huecos en mesas gratuitas.
+- Los usuarios sin membresia activa solo pueden tener una reserva activa por dia natural, segun el dia UTC de `fechaHoraInicio`.
 - Los socios activos tienen 1 hora gratis en mesas de pago; el precio de las horas restantes es solo informativo y no activa ningun cobro.
 - Cancelar una reserva cambia su estado a `CANCELADA`; no elimina el historico.
 - Solo el propietario de la reserva o un usuario `ADMIN` puede cancelarla.
