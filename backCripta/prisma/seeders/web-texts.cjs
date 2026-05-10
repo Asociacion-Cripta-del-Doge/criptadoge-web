@@ -238,9 +238,17 @@ const WEB_TEXT_DEFAULTS = {
   'booking.actions.loginToReserve': 'Inicia sesion para reservar',
   'booking.actions.reserving': 'Reservando...',
   'booking.actions.reserve': 'Reservar huecos',
+  'booking.own.title': 'Mis reservas',
+  'booking.own.loading': 'Cargando reservas...',
+  'booking.own.empty': 'Todavia no tienes reservas.',
+  'booking.own.cancel': 'Cancelar',
+  'booking.own.canceling': 'Cancelando...',
+  'booking.own.seats': 'huecos',
+  'booking.own.free': 'Gratis',
   'booking.admin.hint':
     'Modo admin: la edicion de mesas puede abrirse desde este panel usando los endpoints `/api/mesas`.',
   'booking.toast.created': 'Reserva creada',
+  'booking.toast.cancelled': 'Reserva cancelada',
   'booking.toast.error': 'No se ha podido reservar',
 
   'footer.brand': 'LA CRIPTA DE DOGE',

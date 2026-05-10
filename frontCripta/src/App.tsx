@@ -15,17 +15,68 @@ import { PatrocinadoresSection } from "./components/patrocinadores/patrocinadore
 import { useAuth } from "./context/AuthContext";
 import { useWebTexts } from "./hooks/useWebTexts";
 import { reservasService } from "./services/reservasService";
-import type { HuecoReserva, Mesa } from "./services/reservasService";
+import type { HuecoReserva, Mesa, ReservaMesa } from "./services/reservasService";
 import logo from "./assets/logo.png";
 
 const BOOKING_PAID_NOTE =
   "En mesas de pago, la primera hora es gratis para socios activos y el resto se calcula automaticamente.";
 const ACTIVE_USER_STATUS = "Activo";
+const CANCELLABLE_RESERVATION_STATES = ["PENDIENTE", "CONFIRMADA"];
 
 const getToday = () => {
   const date = new Date();
   const offset = date.getTimezoneOffset() * 60000;
   return new Date(date.getTime() - offset).toISOString().slice(0, 10);
+};
+
+const parseLocalDate = (value: string) => {
+  const [year, month, day] = value.split("-").map(Number);
+  return new Date(year, month - 1, day);
+};
+
+const toLocalDateValue = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const formatCalendarTitle = (date: Date) =>
+  new Intl.DateTimeFormat("es-ES", {
+    month: "long",
+    year: "numeric",
+  }).format(date);
+
+const formatSelectedDate = (value: string) =>
+  new Intl.DateTimeFormat("es-ES", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+  }).format(parseLocalDate(value));
+
+const formatReservationDateTime = (value: string) =>
+  new Intl.DateTimeFormat("es-ES", {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(value));
+
+const buildCalendarDays = (visibleMonth: Date) => {
+  const firstDay = new Date(
+    visibleMonth.getFullYear(),
+    visibleMonth.getMonth(),
+    1,
+  );
+  const calendarStart = new Date(firstDay);
+  const mondayOffset = (firstDay.getDay() + 6) % 7;
+  calendarStart.setDate(firstDay.getDate() - mondayOffset);
+
+  return Array.from({ length: 42 }, (_, index) => {
+    const day = new Date(calendarStart);
+    day.setDate(calendarStart.getDate() + index);
+    return day;
+  });
 };
 
 function App() {
@@ -34,17 +85,29 @@ function App() {
   const text = useWebTexts("booking");
   const heroText = useWebTexts("home.hero");
   const [fecha, setFecha] = useState(getToday);
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [visibleMonth, setVisibleMonth] = useState(() => parseLocalDate(getToday()));
   const [duracionMinutos, setDuracionMinutos] = useState(60);
   const [asientosReservados, setAsientosReservados] = useState(2);
   const [mesas, setMesas] = useState<Mesa[]>([]);
   const [slots, setSlots] = useState<HuecoReserva[]>([]);
   const [slotIndex, setSlotIndex] = useState(0);
   const [selectedMesaId, setSelectedMesaId] = useState<string | null>(null);
+  const [ownReservations, setOwnReservations] = useState<ReservaMesa[]>([]);
+  const [ownReservationsLoading, setOwnReservationsLoading] = useState(false);
+  const [cancelingReservationId, setCancelingReservationId] = useState<
+    string | null
+  >(null);
   const [fetching, setFetching] = useState(false);
   const [bookingError, setBookingError] = useState<string | null>(null);
   const [booking, setBooking] = useState(false);
 
   const selectedSlot = slots[slotIndex];
+  const today = getToday();
+  const calendarDays = buildCalendarDays(visibleMonth);
+  const currentMonth = parseLocalDate(today);
+  currentMonth.setDate(1);
+  const canGoToPreviousMonth = visibleMonth > currentMonth;
 
   const mesasConDisponibilidad = useMemo(() => {
     const disponibilidad = new Map(
@@ -67,6 +130,11 @@ function App() {
 
   const selectedMesa = mesasConDisponibilidad.find(
     (mesa) => mesa.id === selectedMesaId,
+  );
+  const sortedOwnReservations = [...ownReservations].sort(
+    (left, right) =>
+      new Date(right.fechaHoraInicio).getTime() -
+      new Date(left.fechaHoraInicio).getTime(),
   );
 
   const getUnavailableMesaReason = (mesa: Mesa) => {
@@ -95,6 +163,74 @@ function App() {
     return "Esta mesa no tiene huecos libres en la franja seleccionada.";
   };
 
+  const handleSelectDate = (dateValue: string) => {
+    if (dateValue < today) {
+      return;
+    }
+
+    setFecha(dateValue);
+    setCalendarOpen(false);
+    setSelectedMesaId(null);
+  };
+
+  const moveVisibleMonth = (direction: number) => {
+    setVisibleMonth((current) => {
+      const next = new Date(current);
+      next.setMonth(current.getMonth() + direction, 1);
+      return next < currentMonth ? currentMonth : next;
+    });
+  };
+
+  const refreshOwnReservations = async () => {
+    if (!user) {
+      setOwnReservations([]);
+      return;
+    }
+
+    setOwnReservationsLoading(true);
+
+    try {
+      const reservas = await reservasService.getMisReservas();
+      setOwnReservations(reservas);
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : text("booking.toast.error"),
+      );
+    } finally {
+      setOwnReservationsLoading(false);
+    }
+  };
+
+  const refreshSlots = async () => {
+    const huecosData = await reservasService.getHuecos({
+      fecha,
+      asientosReservados,
+      duracionMinutos,
+    });
+    setSlots(huecosData.slots);
+    setSlotIndex(0);
+  };
+
+  const handleCancelReservation = async (reservaId: string) => {
+    setCancelingReservationId(reservaId);
+
+    try {
+      await reservasService.cancelReserva(reservaId);
+      toast.success(text("booking.toast.cancelled"));
+      await refreshOwnReservations();
+
+      if (user) {
+        await refreshSlots();
+      }
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : text("booking.toast.error"),
+      );
+    } finally {
+      setCancelingReservationId(null);
+    }
+  };
+
   useEffect(() => {
     const load = async () => {
       setFetching(true);
@@ -108,16 +244,21 @@ function App() {
         if (!user) {
           setSlots([]);
           setSlotIndex(0);
+          setOwnReservations([]);
           return;
         }
 
-        const huecosData = await reservasService.getHuecos({
+        const [huecosData, reservasData] = await Promise.all([
+          reservasService.getHuecos({
             fecha,
             asientosReservados,
             duracionMinutos,
-        });
+          }),
+          reservasService.getMisReservas(),
+        ]);
 
         setSlots(huecosData.slots);
+        setOwnReservations(reservasData);
         setSlotIndex(0);
       } catch (error) {
         setSlots([]);
@@ -155,13 +296,8 @@ function App() {
 
       toast.success(text("booking.toast.created"));
       setSelectedMesaId(null);
-      const huecosData = await reservasService.getHuecos({
-        fecha,
-        asientosReservados,
-        duracionMinutos,
-      });
-      setSlots(huecosData.slots);
-      setSlotIndex(0);
+      await refreshSlots();
+      await refreshOwnReservations();
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : text("booking.toast.error"),
@@ -211,13 +347,82 @@ function App() {
       </header>
 
       <section className="booking-toolbar" aria-label="Filtros de reserva">
-        <label>
+        <label className="booking-date-control">
           {text("booking.controls.date")}
-          <input
-            type="date"
-            value={fecha}
-            onChange={(event) => setFecha(event.target.value)}
-          />
+          <button
+            type="button"
+            className="booking-date-trigger"
+            onClick={() => setCalendarOpen((isOpen) => !isOpen)}
+            aria-expanded={calendarOpen}
+          >
+            {formatSelectedDate(fecha)}
+          </button>
+
+          {calendarOpen && (
+            <div
+              className="booking-calendar"
+              role="dialog"
+              aria-label="Calendario de reservas"
+            >
+              <div className="booking-calendar__header">
+                <button
+                  type="button"
+                  onClick={() => moveVisibleMonth(-1)}
+                  disabled={!canGoToPreviousMonth}
+                  aria-label="Mes anterior"
+                >
+                  ‹
+                </button>
+                <strong>{formatCalendarTitle(visibleMonth)}</strong>
+                <button
+                  type="button"
+                  onClick={() => moveVisibleMonth(1)}
+                  aria-label="Mes siguiente"
+                >
+                  ›
+                </button>
+              </div>
+
+              <div className="booking-calendar__weekdays" aria-hidden="true">
+                {["L", "M", "X", "J", "V", "S", "D"].map((day) => (
+                  <span key={day}>{day}</span>
+                ))}
+              </div>
+
+              <div className="booking-calendar__grid">
+                {calendarDays.map((day) => {
+                  const dateValue = toLocalDateValue(day);
+                  const isPast = dateValue < today;
+                  const isOutsideMonth =
+                    day.getMonth() !== visibleMonth.getMonth();
+                  const isSelected = dateValue === fecha;
+
+                  return (
+                    <button
+                      type="button"
+                      key={dateValue}
+                      className={[
+                        "booking-calendar__day",
+                        isPast ? "is-past" : "",
+                        isOutsideMonth ? "is-outside-month" : "",
+                        isSelected ? "is-selected" : "",
+                      ].join(" ")}
+                      onClick={() => handleSelectDate(dateValue)}
+                      disabled={isPast}
+                      aria-label={new Intl.DateTimeFormat("es-ES", {
+                        weekday: "long",
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      }).format(day)}
+                    >
+                      {day.getDate()}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </label>
 
         <label>
@@ -427,6 +632,60 @@ function App() {
             <p className="panel-empty">
               {text("booking.panel.empty")}
             </p>
+          )}
+
+          {user && (
+            <section className="own-reservations" aria-label={text("booking.own.title")}>
+              <h2>{text("booking.own.title")}</h2>
+
+              {ownReservationsLoading ? (
+                <p>{text("booking.own.loading")}</p>
+              ) : sortedOwnReservations.length === 0 ? (
+                <p>{text("booking.own.empty")}</p>
+              ) : (
+                <ul>
+                  {sortedOwnReservations.map((reserva) => {
+                    const canCancel = CANCELLABLE_RESERVATION_STATES.includes(
+                      reserva.estado,
+                    );
+                    const isCanceling = cancelingReservationId === reserva.id;
+
+                    return (
+                      <li key={reserva.id}>
+                        <div>
+                          <strong>
+                            {text("booking.table.prefix")} {reserva.mesa.orden}
+                          </strong>
+                          <span>
+                            {formatReservationDateTime(reserva.fechaHoraInicio)} -{" "}
+                            {formatReservationDateTime(reserva.fechaHoraFin)}
+                          </span>
+                          <small>
+                            {reserva.asientosReservados}{" "}
+                            {text("booking.own.seats")} · {reserva.estado} ·{" "}
+                            {reserva.precio > 0
+                              ? `${reserva.precio.toFixed(2)} €`
+                              : text("booking.own.free")}
+                          </small>
+                        </div>
+
+                        {canCancel && (
+                          <button
+                            type="button"
+                            onClick={() => handleCancelReservation(reserva.id)}
+                            disabled={Boolean(cancelingReservationId)}
+                          >
+                            {isCanceling
+                              ? text("booking.own.canceling")
+                              : text("booking.own.cancel")}
+                          </button>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </section>
           )}
         </aside>
       </section>

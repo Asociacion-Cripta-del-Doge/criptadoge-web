@@ -37,6 +37,18 @@ export interface CreateReservaPayload {
   asientosReservados: number;
 }
 
+export interface ReservaMesa {
+  id: string;
+  mesaId: string;
+  userId: string;
+  fechaHoraInicio: string;
+  fechaHoraFin: string;
+  asientosReservados: number;
+  precio: number;
+  estado: "PENDIENTE" | "CONFIRMADA" | "CANCELADA" | "COMPLETADA";
+  mesa: Mesa;
+}
+
 const getToken = () => localStorage.getItem("access_token");
 
 const authHeaders = (): Record<string, string> => {
@@ -99,5 +111,22 @@ export const reservasService = {
     });
 
     return parseResponse(res);
+  },
+
+  async getMisReservas() {
+    const res = await fetch("/api/reservas/mis-reservas", {
+      headers: authHeaders(),
+    });
+
+    return parseResponse<ReservaMesa[]>(res);
+  },
+
+  async cancelReserva(id: string) {
+    const res = await fetch(`/api/reservas/${id}/cancelar`, {
+      method: "PATCH",
+      headers: authHeaders(),
+    });
+
+    return parseResponse<ReservaMesa>(res);
   },
 };
