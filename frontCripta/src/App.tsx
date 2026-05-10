@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import type { CSSProperties } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import "./App.scss";
 import Login from "./components/login/login";
@@ -487,11 +488,16 @@ function App() {
           <div className={`table-map ${fetching ? "is-loading" : ""}`}>
             {mesasConDisponibilidad.map((mesa) => {
               const unavailableReason = getUnavailableMesaReason(mesa);
+              const isLargeTable = mesa.asientos > 8;
+              const seatColumns = Math.max(4, Math.ceil(mesa.asientos / 2));
 
               return (
                 <div
                   key={mesa.id}
-                  className="room-table-tooltip"
+                  className={[
+                    "room-table-tooltip",
+                    isLargeTable ? "is-large-table" : "",
+                  ].join(" ")}
                   data-tooltip={unavailableReason}
                   title={unavailableReason}
                 >
@@ -502,7 +508,13 @@ function App() {
                       mesa.esDePago ? "is-paid" : "is-free",
                       mesa.disponible ? "is-available" : "is-unavailable",
                       selectedMesaId === mesa.id ? "is-selected" : "",
+                      isLargeTable ? "is-large-table" : "",
                     ].join(" ")}
+                    style={
+                      {
+                        "--seat-columns": seatColumns,
+                      } as CSSProperties
+                    }
                     onClick={() => setSelectedMesaId(mesa.id)}
                     disabled={!mesa.disponible}
                     aria-label={`${text("booking.table.prefix")} ${mesa.orden}`}
@@ -533,6 +545,9 @@ function App() {
                             key={`${mesa.id}-seat-${index}`}
                             className={[
                               "seat-dot",
+                              index < seatColumns
+                                ? "is-top-seat"
+                                : "is-bottom-seat",
                               occupied ? "is-occupied" : "",
                               selected ? "is-picked" : "",
                             ].join(" ")}

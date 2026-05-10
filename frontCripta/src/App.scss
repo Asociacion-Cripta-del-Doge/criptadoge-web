@@ -432,6 +432,10 @@ a {
 .room-table-tooltip {
   position: relative;
 
+  &.is-large-table {
+    grid-column: span 2;
+  }
+
   &[data-tooltip=""] {
     &::before,
     &::after {
@@ -517,6 +521,14 @@ a {
   }
 }
 
+.room-table.is-large-table {
+  min-height: 160px;
+
+  .table-top {
+    width: min(260px, 42%);
+  }
+}
+
 .room-table.is-free .table-top {
   border-color: rgba(34, 197, 94, 0.55);
 }
@@ -529,7 +541,7 @@ a {
   position: absolute;
   inset: 16px;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(var(--seat-columns, 4), 1fr);
   grid-template-rows: repeat(2, 1fr);
   pointer-events: none;
 }
@@ -543,14 +555,11 @@ a {
   border: 2px solid rgba(255, 255, 255, 0.82);
   box-shadow: 0 0 15px rgba(34, 197, 94, 0.32);
 
-  &:nth-child(1),
-  &:nth-child(2),
-  &:nth-child(3),
-  &:nth-child(4) {
+  &.is-top-seat {
     align-self: start;
   }
 
-  &:nth-child(n + 5) {
+  &.is-bottom-seat {
     align-self: end;
   }
 
@@ -944,6 +953,10 @@ a {
     scroll-snap-align: start;
   }
 
+  .room-table-tooltip.is-large-table {
+    grid-column: auto;
+  }
+
   .room-table-tooltip::before,
   .room-table-tooltip::after {
     display: none;
@@ -951,6 +964,14 @@ a {
 
   .room-table {
     min-height: 138px;
+  }
+
+  .room-table.is-large-table {
+    min-width: min(540px, 86vw);
+
+    .table-top {
+      width: min(210px, 48%);
+    }
   }
 
   .table-top {
