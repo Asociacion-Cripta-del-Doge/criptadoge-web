@@ -20,6 +20,7 @@ import logo from "./assets/logo.png";
 
 const BOOKING_PAID_NOTE =
   "En mesas de pago, la primera hora es gratis para socios activos y el resto se calcula automaticamente.";
+const ACTIVE_USER_STATUS = "Activo";
 
 const getToday = () => {
   const date = new Date();
@@ -67,6 +68,32 @@ function App() {
   const selectedMesa = mesasConDisponibilidad.find(
     (mesa) => mesa.id === selectedMesaId,
   );
+
+  const getUnavailableMesaReason = (mesa: Mesa) => {
+    if (mesa.disponible) {
+      return "";
+    }
+
+    if (!user) {
+      return "Inicia sesion para ver huecos disponibles y reservar.";
+    }
+
+    if (mesa.esDePago && user.status !== ACTIVE_USER_STATUS) {
+      return "Las mesas de pago solo estan disponibles para socios activos.";
+    }
+
+    if (!selectedSlot) {
+      return "No hay franjas disponibles para la fecha, duracion y huecos seleccionados.";
+    }
+
+    const asientosDisponibles = mesa.asientosDisponibles ?? 0;
+
+    if (asientosDisponibles > 0) {
+      return `Solo quedan ${asientosDisponibles} huecos libres en esta franja.`;
+    }
+
+    return "Esta mesa no tiene huecos libres en la franja seleccionada.";
+  };
 
   useEffect(() => {
     const load = async () => {
@@ -253,54 +280,65 @@ function App() {
           <div className="room-stage">{text("booking.stage")}</div>
 
           <div className={`table-map ${fetching ? "is-loading" : ""}`}>
-            {mesasConDisponibilidad.map((mesa) => (
-              <button
-                type="button"
-                key={mesa.id}
-                className={[
-                  "room-table",
-                  mesa.esDePago ? "is-paid" : "is-free",
-                  mesa.disponible ? "is-available" : "is-unavailable",
-                  selectedMesaId === mesa.id ? "is-selected" : "",
-                ].join(" ")}
-                onClick={() => setSelectedMesaId(mesa.id)}
-                disabled={!mesa.disponible}
-                aria-label={`${text("booking.table.prefix")} ${mesa.orden}`}
-              >
-                <span className="table-top">
-                  <strong>
-                    {text("booking.table.shortPrefix")}
-                    {mesa.orden}
-                  </strong>
-                  <small>
-                    {mesa.esDePago
-                      ? text("booking.table.paid")
-                      : text("booking.table.free")}
-                  </small>
-                </span>
+            {mesasConDisponibilidad.map((mesa) => {
+              const unavailableReason = getUnavailableMesaReason(mesa);
 
-                <span className="table-seats">
-                  {Array.from({ length: mesa.asientos }).map((_, index) => {
-                    const occupied = index < (mesa.asientosOcupados ?? 0);
-                    const selected =
-                      selectedMesaId === mesa.id &&
-                      !occupied &&
-                      index < (mesa.asientosOcupados ?? 0) + asientosReservados;
+              return (
+                <div
+                  key={mesa.id}
+                  className="room-table-tooltip"
+                  data-tooltip={unavailableReason}
+                  title={unavailableReason}
+                >
+                  <button
+                    type="button"
+                    className={[
+                      "room-table",
+                      mesa.esDePago ? "is-paid" : "is-free",
+                      mesa.disponible ? "is-available" : "is-unavailable",
+                      selectedMesaId === mesa.id ? "is-selected" : "",
+                    ].join(" ")}
+                    onClick={() => setSelectedMesaId(mesa.id)}
+                    disabled={!mesa.disponible}
+                    aria-label={`${text("booking.table.prefix")} ${mesa.orden}`}
+                  >
+                    <span className="table-top">
+                      <strong>
+                        {text("booking.table.shortPrefix")}
+                        {mesa.orden}
+                      </strong>
+                      <small>
+                        {mesa.esDePago
+                          ? text("booking.table.paid")
+                          : text("booking.table.free")}
+                      </small>
+                    </span>
 
-                    return (
-                      <span
-                        key={`${mesa.id}-seat-${index}`}
-                        className={[
-                          "seat-dot",
-                          occupied ? "is-occupied" : "",
-                          selected ? "is-picked" : "",
-                        ].join(" ")}
-                      />
-                    );
-                  })}
-                </span>
-              </button>
-            ))}
+                    <span className="table-seats">
+                      {Array.from({ length: mesa.asientos }).map((_, index) => {
+                        const occupied = index < (mesa.asientosOcupados ?? 0);
+                        const selected =
+                          selectedMesaId === mesa.id &&
+                          !occupied &&
+                          index <
+                            (mesa.asientosOcupados ?? 0) + asientosReservados;
+
+                        return (
+                          <span
+                            key={`${mesa.id}-seat-${index}`}
+                            className={[
+                              "seat-dot",
+                              occupied ? "is-occupied" : "",
+                              selected ? "is-picked" : "",
+                            ].join(" ")}
+                          />
+                        );
+                      })}
+                    </span>
+                  </button>
+                </div>
+              );
+            })}
           </div>
 
           <div className="booking-legend" aria-label="Leyenda">

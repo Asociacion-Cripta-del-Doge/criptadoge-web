@@ -272,6 +272,7 @@ a {
 
 .room-table {
   position: relative;
+  width: 100%;
   min-height: 160px;
   border: 1px solid rgba(v.$color-text-main, 0.12);
   border-radius: v.$radius-md;
@@ -296,6 +297,69 @@ a {
   &.is-selected {
     border-color: rgba(v.$color-accent, 0.9);
     box-shadow: 0 0 0 3px rgba(v.$color-accent, 0.14);
+  }
+}
+
+.room-table-tooltip {
+  position: relative;
+
+  &[data-tooltip=""] {
+    &::before,
+    &::after {
+      display: none;
+    }
+  }
+
+  &::before,
+  &::after {
+    position: absolute;
+    left: 50%;
+    z-index: 20;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, 6px);
+    transition:
+      opacity v.$transition-fast,
+      transform v.$transition-fast;
+  }
+
+  &::before {
+    content: attr(data-tooltip);
+    bottom: calc(100% + 10px);
+    width: min(260px, 92vw);
+    padding: 9px 11px;
+    border: 1px solid rgba(v.$color-accent, 0.38);
+    border-radius: v.$radius-sm;
+    background: rgba(15, 23, 42, 0.96);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+    color: v.$color-text-main;
+    font-size: 0.78rem;
+    line-height: 1.35;
+    text-align: center;
+  }
+
+  &::after {
+    content: "";
+    bottom: calc(100% + 4px);
+    width: 10px;
+    height: 10px;
+    border-right: 1px solid rgba(v.$color-accent, 0.38);
+    border-bottom: 1px solid rgba(v.$color-accent, 0.38);
+    background: rgba(15, 23, 42, 0.96);
+    transform: translate(-50%, 6px) rotate(45deg);
+  }
+
+  &:hover::before,
+  &:hover::after,
+  &:focus-within::before,
+  &:focus-within::after {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  &:hover::after,
+  &:focus-within::after {
+    transform: translate(-50%, 0) rotate(45deg);
   }
 }
 
