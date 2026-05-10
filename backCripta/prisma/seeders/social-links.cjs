@@ -60,7 +60,7 @@ async function main() {
     await SocialLink.findOneAndUpdate(
       { icon: red.icon },
       red,
-      { upsert: true, new: true },
+      { upsert: true, returnDocument: 'after' },
     );
     console.log(`  ✓ ${red.nombre} (${red.handle})`);
   }

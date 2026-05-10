@@ -12,6 +12,7 @@ import { EventLabelsModule } from './event-labels/event-labels.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TasksModule } from './tasks/tasks.module';
 import { ContactModule } from './contact/contact.module';
+import { WebTextsModule } from './web-texts/web-texts.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { ContactModule } from './contact/contact.module';
     AuthModule,
     TasksModule,
     ContactModule,
+    WebTextsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

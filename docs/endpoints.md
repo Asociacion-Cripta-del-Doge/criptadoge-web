@@ -203,6 +203,48 @@ Base URL via Nginx: `http://localhost:8080/api`
 
 ---
 
+## Textos web `/web-texts`
+
+> Documentacion funcional completa: [`docs/textos-web.md`](./textos-web.md)
+
+| Metodo | Ruta | Auth | Roles | Body / uso |
+| ------ | ---- | ---- | ----- | ---------- |
+| GET | `/web-texts` | No | Publico | Lista textos configurables. Acepta `locale` y `section` como query params |
+| GET | `/web-texts/admin` | JWT | ADMIN | Lista textos para gestion interna. Acepta `locale` y `section` |
+| POST | `/web-texts` | JWT | ADMIN | Crea un texto configurable |
+| PATCH | `/web-texts/:id` | JWT | ADMIN | Actualiza valor, seccion, tipo o locale |
+
+**CreateWebTextDto:**
+
+```json
+{
+  "key": "home.hero.title",
+  "value": "Texto editable",
+  "section": "home.hero",
+  "type": "text | textarea | markdown (opcional)",
+  "locale": "es (opcional)"
+}
+```
+
+**UpdateWebTextDto:** todos los campos son opcionales.
+
+```json
+{
+  "value": "Texto actualizado",
+  "section": "home.hero",
+  "type": "text | textarea | markdown",
+  "locale": "es"
+}
+```
+
+Flujo de edicion:
+
+1. La web consulta `/web-texts` por seccion y mezcla esos valores con defaults locales.
+2. Si MongoDB no devuelve una key, el frontend usa `frontCripta/src/data/webTextDefaults.ts`.
+3. Los admins gestionan textos por endpoints protegidos y el seeder solo crea los valores iniciales.
+
+---
+
 ## Autenticacion
 
 Incluir el token en el header de todas las rutas protegidas:
