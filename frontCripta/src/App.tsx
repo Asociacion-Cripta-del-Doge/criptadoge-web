@@ -635,8 +635,11 @@ function App() {
           )}
 
           {user && (
-            <section className="own-reservations" aria-label={text("booking.own.title")}>
-              <h2>{text("booking.own.title")}</h2>
+            <details className="own-reservations">
+              <summary>
+                <span>{text("booking.own.title")}</span>
+                <small>{sortedOwnReservations.length}</small>
+              </summary>
 
               {ownReservationsLoading ? (
                 <p>{text("booking.own.loading")}</p>
@@ -685,7 +688,7 @@ function App() {
                   })}
                 </ul>
               )}
-            </section>
+            </details>
           )}
         </aside>
       </section>

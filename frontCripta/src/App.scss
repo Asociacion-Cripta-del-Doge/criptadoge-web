@@ -683,11 +683,61 @@ a {
   padding-top: 18px;
   border-top: 1px solid rgba(v.$color-text-main, 0.1);
 
-  h2 {
-    margin: 0 0 12px;
+  summary {
+    min-height: 42px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 9px;
+    border: 1px solid rgba(v.$color-text-main, 0.1);
+    border-radius: v.$radius-sm;
+    background: rgba(2, 6, 23, 0.36);
     color: v.$color-text-main;
-    font-size: 1.05rem;
-    letter-spacing: 0;
+    padding: 0 12px;
+    cursor: pointer;
+    list-style: none;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &::before {
+      content: "›";
+      color: v.$color-accent;
+      font-size: 1.2rem;
+      line-height: 1;
+      transition: transform v.$transition-fast;
+    }
+
+    span {
+      font-family: v.$font-display;
+      font-size: 1rem;
+      letter-spacing: 0;
+    }
+
+    small {
+      min-width: 28px;
+      border: 1px solid rgba(v.$color-accent, 0.28);
+      border-radius: 999px;
+      background: rgba(v.$color-accent, 0.1);
+      color: #fef3c7;
+      padding: 3px 8px;
+      text-align: center;
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+  }
+
+  &[open] summary {
+    margin-bottom: 12px;
+
+    &::before {
+      transform: rotate(90deg);
+    }
+  }
+
+  > p {
+    margin: 0;
   }
 
   ul {
@@ -696,6 +746,26 @@ a {
     margin: 0;
     padding: 0;
     list-style: none;
+    max-height: min(360px, 44vh);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-right: 5px;
+    scrollbar-color: rgba(v.$color-accent, 0.55) rgba(15, 23, 42, 0.72);
+    scrollbar-width: thin;
+
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.72);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: 999px;
+      background: rgba(v.$color-accent, 0.55);
+    }
   }
 
   li {
@@ -786,6 +856,10 @@ a {
 
   .booking-toolbar {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .own-reservations ul {
+    max-height: 280px;
   }
 
   .table-map-shell {
