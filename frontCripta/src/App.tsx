@@ -18,6 +18,9 @@ import { reservasService } from "./services/reservasService";
 import type { HuecoReserva, Mesa } from "./services/reservasService";
 import logo from "./assets/logo.png";
 
+const BOOKING_PAID_NOTE =
+  "En mesas de pago, la primera hora es gratis para socios activos y el resto se calcula automaticamente.";
+
 const getToday = () => {
   const date = new Date();
   const offset = date.getTimezoneOffset() * 60000;
@@ -357,8 +360,10 @@ function App() {
               </dl>
 
               <p className="panel-copy">
-                {text("booking.panel.copyPrefix")} {asientosReservados}{" "}
-                {text("booking.panel.copySuffix")}
+                Vas a reservar {asientosReservados}{" "}
+                {text("booking.panel.spacesWord")}.
+                <br />
+                {BOOKING_PAID_NOTE}
               </p>
 
               <button

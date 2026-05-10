@@ -233,9 +233,6 @@ const WEB_TEXT_DEFAULTS = {
   'booking.panel.slot': 'Franja',
   'booking.panel.seatsWord': 'asientos',
   'booking.panel.spacesWord': 'huecos',
-  'booking.panel.copyPrefix': 'Reservaras',
-  'booking.panel.copySuffix':
-    'huecos. Si la mesa es de pago, el backend aplicara la primera hora gratis a socios activos y calculara el precio proporcional.',
   'booking.panel.empty':
     'Selecciona fecha, franja y una mesa disponible para ver el detalle de la reserva.',
   'booking.actions.loginToReserve': 'Inicia sesion para reservar',
