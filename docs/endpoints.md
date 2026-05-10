@@ -168,8 +168,8 @@ Base URL via Nginx: `http://localhost:8080/api`
 | ------ | ---- | ---- | ----- | ---------- |
 | GET | `/event-labels` | No | Publico | Lista etiquetas |
 | POST | `/event-labels` | JWT | ADMIN | `{ name, color? }` |
-| PATCH | `/event-labels/:id` | JWT | ADMIN | `UpdateEventLabelDto` |
-| DELETE | `/event-labels/:id` | JWT | ADMIN | Elimina etiqueta |
+| PATCH | `/event-labels/:id` | JWT | ADMIN | Actualiza etiqueta y propaga el cambio de nombre a los eventos |
+| DELETE | `/event-labels/:id` | JWT | ADMIN | Elimina etiqueta si no esta en uso por eventos |
 
 **CreateEventLabelDto:**
 

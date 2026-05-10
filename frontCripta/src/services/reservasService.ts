@@ -49,6 +49,16 @@ export interface ReservaMesa {
   mesa: Mesa;
 }
 
+const normalizePrecio = (precio: unknown) => {
+  const value = Number(precio);
+  return Number.isFinite(value) ? value : 0;
+};
+
+const normalizeReserva = (reserva: ReservaMesa): ReservaMesa => ({
+  ...reserva,
+  precio: normalizePrecio(reserva.precio),
+});
+
 const getToken = () => localStorage.getItem("access_token");
 
 const authHeaders = (): Record<string, string> => {
@@ -118,7 +128,8 @@ export const reservasService = {
       headers: authHeaders(),
     });
 
-    return parseResponse<ReservaMesa[]>(res);
+    const reservas = await parseResponse<ReservaMesa[]>(res);
+    return reservas.map(normalizeReserva);
   },
 
   async cancelReserva(id: string) {
@@ -127,6 +138,7 @@ export const reservasService = {
       headers: authHeaders(),
     });
 
-    return parseResponse<ReservaMesa>(res);
+    const reserva = await parseResponse<ReservaMesa>(res);
+    return normalizeReserva(reserva);
   },
 };

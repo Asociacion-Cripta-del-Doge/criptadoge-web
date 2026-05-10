@@ -667,6 +667,7 @@ function App() {
                       reserva.estado,
                     );
                     const isCanceling = cancelingReservationId === reserva.id;
+                    const precio = Number(reserva.precio);
 
                     return (
                       <li key={reserva.id}>
@@ -681,8 +682,8 @@ function App() {
                           <small>
                             {reserva.asientosReservados}{" "}
                             {text("booking.own.seats")} · {reserva.estado} ·{" "}
-                            {reserva.precio > 0
-                              ? `${reserva.precio.toFixed(2)} €`
+                            {precio > 0
+                              ? `${precio.toFixed(2)} €`
                               : text("booking.own.free")}
                           </small>
                         </div>
