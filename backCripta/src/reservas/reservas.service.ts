@@ -428,11 +428,13 @@ export class ReservasService {
   private buildSlots(inicio: Date, fin: Date, duracionMinutos: number) {
     const slots: { fechaHoraInicio: Date; fechaHoraFin: Date }[] = [];
     const durationInMs = duracionMinutos * 60 * 1000;
+    const slotStepInMs =
+      SERVER_BOOKING_SCHEDULE.duracionFranjaMinutos * 60 * 1000;
 
     for (
       let cursor = inicio.getTime();
       cursor + durationInMs <= fin.getTime();
-      cursor += durationInMs
+      cursor += slotStepInMs
     ) {
       slots.push({
         fechaHoraInicio: new Date(cursor),

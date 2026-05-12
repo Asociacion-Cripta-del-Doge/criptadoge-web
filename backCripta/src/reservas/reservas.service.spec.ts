@@ -28,6 +28,13 @@ describe('ReservasService', () => {
           orden: 1,
           ...mesa,
         }),
+        findMany: jest.fn().mockResolvedValue([
+          {
+            id: reservaDto.mesaId,
+            orden: 1,
+            ...mesa,
+          },
+        ]),
       },
       reservaMesa: {
         aggregate: jest.fn().mockResolvedValue({
@@ -35,6 +42,7 @@ describe('ReservasService', () => {
         }),
         count: jest.fn().mockResolvedValue(reservasDelDia),
         create: jest.fn().mockResolvedValue({ id: 'reserva-id' }),
+        findMany: jest.fn().mockResolvedValue([]),
       },
     };
 
@@ -207,5 +215,52 @@ describe('ReservasService', () => {
 
     expect(prisma.reservaMesa.count).not.toHaveBeenCalled();
     expect(prisma.reservaMesa.create).toHaveBeenCalled();
+  });
+
+  it('genera inicios horarios para reservas de varias horas', async () => {
+    const { service } = buildService({
+      asientos: 4,
+      esDePago: false,
+    });
+
+    const response = await service.findAvailableSlots(
+      {
+        fecha: '2026-05-11',
+        asientosReservados: 2,
+        duracionMinutos: 180,
+      },
+      false,
+      userId,
+    );
+
+    expect(
+      response.slots.map((slot) => `${slot.horaInicio}-${slot.horaFin}`),
+    ).toEqual(['17:00-20:00', '18:00-21:00', '19:00-22:00']);
+  });
+
+  it('genera todos los inicios horarios para reservas de dos horas', async () => {
+    const { service } = buildService({
+      asientos: 4,
+      esDePago: false,
+    });
+
+    const response = await service.findAvailableSlots(
+      {
+        fecha: '2026-05-11',
+        asientosReservados: 2,
+        duracionMinutos: 120,
+      },
+      false,
+      userId,
+    );
+
+    expect(
+      response.slots.map((slot) => `${slot.horaInicio}-${slot.horaFin}`),
+    ).toEqual([
+      '17:00-19:00',
+      '18:00-20:00',
+      '19:00-21:00',
+      '20:00-22:00',
+    ]);
   });
 });
