@@ -278,3 +278,32 @@
         }
     }
 }
+
+.forgot-sent {
+  text-align: center;
+  color: v.$color-text-muted;
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-lg;
+
+  p {
+    color: v.$color-text-main;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+}
+
+.back-to-login {
+  background: transparent;
+  border: none;
+  color: v.$color-text-muted;
+  cursor: pointer;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  transition: v.$transition-fast;
+  padding: 0;
+
+  &:hover {
+    color: v.$color-primary;
+  }
+}

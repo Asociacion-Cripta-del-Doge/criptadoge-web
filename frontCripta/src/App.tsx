@@ -1,6 +1,7 @@
 import "./App.scss";
 import { Navbar } from "./components/navbar/navbar";
 import Login from "./components/login/login";
+import ResetPassword from "./components/resetPassword/ResetPassword";
 import { Footer } from "./components/footer/footer";
 //import { CalendarSection } from "./components/calendar/calendar"
 import { Toaster } from "react-hot-toast";
@@ -35,8 +36,19 @@ function App() {
     );
   }
 
+  if (path === "/reset-password")
+  {
+    return(
+      <>
+        <Toaster position="top-right" />
+        <ResetPassword />
+      </>
+    )
+  }
+
   return (
     <>
+      <Toaster position="top-right" />
       <Navbar />
 
       <section id="inicio" className="hero">
