@@ -11,18 +11,60 @@ enum Role {
   ADMIN
 }
 
+enum EstadoReservaMesa {
+  PENDIENTE
+  CONFIRMADA
+  CANCELADA
+  COMPLETADA
+}
+
 model User {
-  id             String   @id @default(uuid())
-  dni            String?   @unique
+  id             String  @id @default(uuid())
+  dni            String? @unique
   name           String
-  email          String   @unique
-  password       String   
-  role           Role     @default(MEMBER)
-  lastRenewal    String?  
+  email          String  @unique
+  password       String
+  role           Role    @default(MEMBER)
+  lastRenewal    String?
   expirationDate String?
-  status         String   @default("Pendiente")
+  status         String  @default("Pendiente")
   avatar         String?
-  
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  reservasMesa ReservaMesa[]
+}
+
+model Mesa {
+  id       String  @id @default(uuid())
+  asientos Int
+  orden    Int     @unique
+  esDePago Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  reservas ReservaMesa[]
+}
+
+model ReservaMesa {
+  id                 String            @id @default(uuid())
+  mesaId             String
+  userId             String
+  fechaHoraInicio    DateTime
+  fechaHoraFin       DateTime
+  asientosReservados Int
+  precio             Decimal           @default(0) @db.Decimal(10, 2)
+  estado             EstadoReservaMesa @default(PENDIENTE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  mesa Mesa @relation(fields: [mesaId], references: [id], onDelete: Restrict)
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@index([mesaId, fechaHoraInicio, fechaHoraFin])
+  @@index([userId, fechaHoraInicio])
+  @@index([estado])
 }

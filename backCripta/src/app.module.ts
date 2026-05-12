@@ -12,6 +12,8 @@ import { EventLabelsModule } from './event-labels/event-labels.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TasksModule } from './tasks/tasks.module';
 import { ContactModule } from './contact/contact.module';
+import { MesasModule } from './mesas/mesas.module';
+import { ReservasModule } from './reservas/reservas.module';
 import { WebTextsModule } from './web-texts/web-texts.module';
 
 @Module({
@@ -34,6 +36,8 @@ import { WebTextsModule } from './web-texts/web-texts.module';
     AuthModule,
     TasksModule,
     ContactModule,
+    MesasModule,
+    ReservasModule,
     WebTextsModule,
   ],
   controllers: [AppController],

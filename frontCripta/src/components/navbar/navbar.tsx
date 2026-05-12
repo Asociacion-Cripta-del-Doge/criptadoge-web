@@ -27,12 +27,13 @@ export const Navbar = () => {
             <span className="brand-text"> {text("nav.brand")} </span>
           </div>
           <ul className="navbar-links">
-            <li><a href="#inicio">{text("nav.links.home")}</a></li>
-            <li><a href="#eventos">{text("nav.links.events")}</a></li>
-            <li><a href="#galeria">{text("nav.links.gallery")}</a></li>
-            <li><a href="#ubicacion">{text("nav.links.location")}</a></li>
-            <li><a href="#patrocinadores">{text("nav.links.sponsors")}</a></li>
-            <li><a href="#contacto">{text("nav.links.contact")}</a></li>
+            <li><a href="/#inicio">{text("nav.links.home")}</a></li>
+            <li><a href="/#eventos">{text("nav.links.events")}</a></li>
+            <li><a href="/reservas">{text("nav.links.booking")}</a></li>
+            <li><a href="/#galeria">{text("nav.links.gallery")}</a></li>
+            <li><a href="/#ubicacion">{text("nav.links.location")}</a></li>
+            <li><a href="/#patrocinadores">{text("nav.links.sponsors")}</a></li>
+            <li><a href="/#contacto">{text("nav.links.contact")}</a></li>
           </ul>
           <div className="navbar-buttons">
             {!loading && (
@@ -51,7 +52,7 @@ export const Navbar = () => {
                 <a href="/login" className="btn-outline">{text("nav.login")}</a>
               )
             )}
-            <a href="#membresia" className="btn-pink">{text("nav.membership")}</a>
+            <a href="/#membresia" className="btn-pink">{text("nav.membership")}</a>
           </div>
         </div>
       </nav>
