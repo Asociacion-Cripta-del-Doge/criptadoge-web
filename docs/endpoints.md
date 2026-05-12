@@ -187,6 +187,7 @@ Base URL via Nginx: `http://localhost:8080/api`
 | ------ | ---- | ---- | ----- | ---------- |
 | POST | `/contacto` | No | Publico | `CreateMessageDto` |
 | GET | `/contacto` | JWT | ADMIN | Lista mensajes de contacto |
+| PATCH | `/contacto/:id` | JWT | ADMIN | Cambia el estado de un mensaje |
 | GET | `/contacto/redes` | No | Publico | Devuelve enlaces sociales |
 | GET | `/contacto/twitch` | No | Publico | Devuelve informacion del stream de Twitch |
 
@@ -200,6 +201,22 @@ Base URL via Nginx: `http://localhost:8080/api`
   "mensaje": "string (requerido)"
 }
 ```
+
+**UpdateMessageStatusDto:**
+
+```json
+{
+  "estado": "pendiente | en_proceso | respondido | resuelto | archivado"
+}
+```
+
+Estados disponibles:
+
+- `pendiente`: Pendiente
+- `en_proceso`: En proceso
+- `respondido`: Respondido
+- `resuelto`: Resuelto
+- `archivado`: Archivado
 
 ---
 

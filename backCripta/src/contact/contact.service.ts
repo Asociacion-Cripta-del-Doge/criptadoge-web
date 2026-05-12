@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { isValidObjectId, Model } from 'mongoose';
 import { ContactMessage, ContactMessageDocument } from './schemas/contact-message.schema';
 import { SocialLink, SocialLinkDocument } from './schemas/social-link.schema';
 import { CreateMessageDto } from './dto/create-message.dto';
+import { UpdateMessageStatusDto } from './dto/update-message-status.dto';
 
 @Injectable()
 export class ContactService {
@@ -25,6 +26,22 @@ export class ContactService {
 
   async getMessages() {
     return this.messageModel.find().sort({ createdAt: -1 });
+  }
+
+  async updateMessageStatus(id: string, dto: UpdateMessageStatusDto) {
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException('ID de mensaje invalido');
+    }
+
+    const message = await this.messageModel
+      .findByIdAndUpdate(id, { estado: dto.estado }, { returnDocument: 'after' })
+      .exec();
+
+    if (!message) {
+      throw new NotFoundException('Mensaje de contacto no encontrado');
+    }
+
+    return message;
   }
 
   async getSocialLinks() {
