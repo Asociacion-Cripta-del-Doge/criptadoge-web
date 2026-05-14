@@ -10,12 +10,14 @@ import { Event, EventDocument } from './schemas/events.schema';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { UsersService } from '../users/users.service';
+import { EventsGateway } from './events.gateway';
 
 @Injectable()
 export class EventsService {
   constructor(
     @InjectModel(Event.name) private eventModel: Model<EventDocument>,
     private usersService: UsersService,
+    private eventsGateway: EventsGateway,
   ) {}
 
   async create(createEventDto: CreateEventDto): Promise<Event> {
@@ -94,6 +96,8 @@ export class EventsService {
     event.attendees.push({ userId, joinedAt: new Date() });
     await event.save();
 
+    this.eventsGateway.emitAttendeeUpdate(eventId, event.attendees.toObject());
+
     return event;
   }
 
@@ -114,6 +118,8 @@ export class EventsService {
 
     event.attendees.splice(index, 1);
     await event.save();
+
+    this.eventsGateway.emitAttendeeUpdate(eventId, event.attendees.toObject());
 
     return event;
   }
