@@ -1,5 +1,7 @@
 import { useMemo, useState, useEffect, type CSSProperties } from "react"
 import { useEvents, type Evento } from "../../hooks/useEvents"
+import { joinEvento, leaveEvento } from "../../services/eventosService"
+import { useAuth } from "../../context/AuthContext"
 import "./EventCalendar.scss"
 
 // ─── helpers ────────────────────────────────────────────────────────────────
@@ -35,12 +37,54 @@ const val = (v?: string | number) =>
 
 // ─── Modal ───────────────────────────────────────────────────────────────────
 
-const EventoModal = ({ ev, onClose }: { ev: Evento; onClose: () => void }) => {
+const EventoModal = ({
+  ev,
+  onClose,
+  onUpdated,
+}: {
+  ev: Evento
+  onClose: () => void
+  onUpdated: (updated: Evento) => void
+}) => {
+  const { user } = useAuth()
+  const [busy, setBusy] = useState(false)
+  const [feedback, setFeedback] = useState<{ msg: string; ok: boolean } | null>(null)
+
+  const isInscrito = !!user && ev.attendeeIds.includes(user.id)
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose()
     document.addEventListener("keydown", onKey)
     return () => document.removeEventListener("keydown", onKey)
   }, [onClose])
+
+  const handleInscripcion = async () => {
+    if (!user) {
+      setFeedback({ msg: "Debes iniciar sesión para inscribirte.", ok: false })
+      return
+    }
+    setBusy(true)
+    setFeedback(null)
+    try {
+      const updated = isInscrito
+        ? await leaveEvento(ev.id)
+        : await joinEvento(ev.id)
+      const newAttendeeIds = updated.attendees.map(a => a.userId)
+      onUpdated({
+        ...ev,
+        asistentes: updated.attendees.length,
+        attendeeIds: newAttendeeIds,
+      })
+      setFeedback({
+        msg: isInscrito ? "Te has dado de baja del evento." : "¡Inscripción confirmada!",
+        ok: true,
+      })
+    } catch (err: unknown) {
+      setFeedback({ msg: err instanceof Error ? err.message : "Error inesperado", ok: false })
+    } finally {
+      setBusy(false)
+    }
+  }
 
   return (
     <div className="ec-modal-backdrop" onClick={onClose}>
@@ -84,7 +128,19 @@ const EventoModal = ({ ev, onClose }: { ev: Evento; onClose: () => void }) => {
           </div>
         </dl>
 
-        <button className="ec-modal-inscribirse">Inscribirse</button>
+        {feedback && (
+          <p className={`ec-modal-feedback ${feedback.ok ? "ec-modal-feedback--ok" : "ec-modal-feedback--err"}`}>
+            {feedback.msg}
+          </p>
+        )}
+
+        <button
+          className={`ec-modal-inscribirse ${isInscrito ? "ec-modal-inscribirse--baja" : ""}`}
+          onClick={handleInscripcion}
+          disabled={busy}
+        >
+          {busy ? "..." : isInscrito ? "Abandonar evento" : "Inscribirse"}
+        </button>
       </div>
     </div>
   )
@@ -100,7 +156,7 @@ export const EventCalendar = () => {
   const [filterLabel, setFilterLabel] = useState<string | null>(null)
   const [modalEvento, setModalEvento] = useState<Evento | null>(null)
 
-  const { eventos, loading, error } = useEvents()
+  const { eventos, loading, error, refresh } = useEvents()
 
   const { cells } = useMemo(() => {
     const firstDay = new Date(year, month, 1)
@@ -286,7 +342,11 @@ export const EventCalendar = () => {
       </div>
 
       {modalEvento && (
-        <EventoModal ev={modalEvento} onClose={() => setModalEvento(null)} />
+        <EventoModal
+          ev={modalEvento}
+          onClose={() => setModalEvento(null)}
+          onUpdated={updated => { setModalEvento(updated); refresh() }}
+        />
       )}
     </section>
   )
