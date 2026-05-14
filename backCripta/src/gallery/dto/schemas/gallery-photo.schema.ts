@@ -18,6 +18,9 @@ export class GalleryPhoto {
   originalName!: string;
 
   @Prop({ required: true })
+  mimeType!: string;
+
+  @Prop({ required: true })
   size!: number;
 
   @Prop({ required: true })
