@@ -1,104 +1,216 @@
 @use '../../styles/variables' as v;
 
 .membership-section {
-  padding: 80px 0;
+  padding: 56px 0;
 
   &__container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 v.$space-lg;
+    padding: 0 60px;
   }
 
-  &__header {
+  &__hero {
     text-align: center;
     margin-bottom: v.$space-xl;
   }
 
   &__badge {
     display: inline-block;
-    background: linear-gradient(135deg, v.$neon-pink, v.$color-secondary);
-    color: #fff;
-    font-size: 0.75rem;
-    font-weight: 700;
+    border: 1px solid rgba(v.$neon-pink, 0.5);
+    color: v.$neon-pink;
+    font-family: v.$font-mono;
+    font-size: 0.65rem;
+    letter-spacing: 3px;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    padding: v.$space-xs v.$space-md;
+    padding: 4px 14px;
     border-radius: 999px;
     margin-bottom: v.$space-md;
   }
 
   &__title {
     font-family: v.$font-display;
-    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
     color: v.$color-text-main;
     margin-bottom: v.$space-md;
-    text-shadow: 0 0 24px rgba(v.$neon-blue, 0.45);
+    text-shadow: 0 0 30px rgba(v.$neon-blue, 0.35);
   }
 
-  &__subtitle {
+  &__price {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: v.$space-sm;
+    margin-bottom: 4px;
+  }
+
+  &__price-number {
+    font-family: v.$font-display;
+    font-size: 3.2rem;
+    line-height: 1;
+    color: v.$neon-pink;
+    text-shadow:
+      0 0 20px rgba(v.$neon-pink, 0.7),
+      0 0 60px rgba(v.$neon-pink, 0.3);
+  }
+
+  &__price-period {
+    font-family: v.$font-mono;
+    font-size: 0.95rem;
     color: v.$color-text-muted;
-    font-size: 1.05rem;
-    max-width: 580px;
-    margin: 0 auto;
-    line-height: 1.7;
+    margin-bottom: 4px;
   }
 
-  &__grid {
+  &__price-note {
+    font-family: v.$font-mono;
+    font-size: 0.62rem;
+    letter-spacing: 2px;
+    color: v.$color-text-muted;
+    opacity: 0.45;
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  &__row {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: 140px 1fr;
     gap: v.$space-lg;
-    margin-bottom: v.$space-xl;
-  }
+    align-items: start;
+    padding: v.$space-lg 0;
+    border-top: 1px solid rgba(v.$neon-blue, 0.1);
 
-  &__card {
-    background: v.$color-bg-surface;
-    border: 1px solid v.$color-border;
-    border-radius: v.$radius-lg;
-    padding: v.$space-xl;
-    transition:
-      border-color v.$transition-normal,
-      transform v.$transition-normal,
-      box-shadow v.$transition-normal;
-
-    &:hover {
-      border-color: v.$neon-blue;
-      transform: translateY(-5px);
-      box-shadow: 0 10px 28px rgba(v.$neon-blue, 0.15);
+    &:last-of-type {
+      border-bottom: 1px solid rgba(v.$neon-blue, 0.1);
+      margin-bottom: v.$space-xl;
     }
   }
 
-  &__card-icon {
-    display: block;
-    font-size: 2.4rem;
-    margin-bottom: v.$space-md;
+  &__label {
+    font-family: v.$font-mono;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: rgba(v.$neon-blue, 0.5);
+    padding-top: 4px;
   }
 
-  &__card-title {
+  &__benefits {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: v.$space-md;
+  }
+
+  &__benefit {
+    display: flex;
+    align-items: flex-start;
+    gap: v.$space-md;
+    padding: v.$space-md;
+    background: v.$color-bg-surface;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    transition: border-color v.$transition-normal, box-shadow v.$transition-normal;
+
+    &:hover {
+      border-color: rgba(v.$neon-blue, 0.4);
+      box-shadow: 0 4px 16px rgba(v.$neon-blue, 0.08);
+    }
+  }
+
+  &__benefit-icon {
+    font-size: 1.6rem;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+
+  &__benefit-title {
     font-family: v.$font-display;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     color: v.$color-text-main;
-    margin-bottom: v.$space-sm;
+    margin-bottom: 4px;
   }
 
-  &__card-desc {
+  &__benefit-desc {
+    font-size: 0.8rem;
     color: v.$color-text-muted;
-    font-size: 0.875rem;
-    line-height: 1.65;
+    line-height: 1.55;
+  }
+
+  &__steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: v.$space-md;
+    position: relative;
+  }
+
+  &__step {
+    position: relative;
+    padding: v.$space-md;
+    background: v.$color-bg-surface;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    transition: border-color v.$transition-normal, box-shadow v.$transition-normal;
+
+    &:hover {
+      border-color: rgba(v.$neon-blue, 0.4);
+      box-shadow: 0 4px 16px rgba(v.$neon-blue, 0.08);
+    }
+  }
+
+  &__step-connector {
+    position: absolute;
+    top: 24px;
+    right: calc(-1 * v.$space-md / 2);
+    width: v.$space-md;
+    height: 1px;
+    background: rgba(v.$neon-blue, 0.2);
+    z-index: 1;
+  }
+
+  &__step-num {
+    display: block;
+    font-family: v.$font-mono;
+    font-size: 0.58rem;
+    color: rgba(v.$neon-blue, 0.4);
+    letter-spacing: 2px;
+    margin-bottom: v.$space-xs;
+  }
+
+  &__step-icon {
+    display: block;
+    font-size: 1.5rem;
+    margin-bottom: v.$space-xs;
+    line-height: 1;
+  }
+
+  &__step-title {
+    font-family: v.$font-display;
+    font-size: 0.82rem;
+    color: v.$color-text-main;
+    margin-bottom: 4px;
+  }
+
+  &__step-desc {
+    font-size: 0.75rem;
+    color: v.$color-text-muted;
+    line-height: 1.55;
   }
 
   &__cta {
     text-align: center;
   }
 
-  &__cta-text {
-    color: v.$color-text-muted;
-    margin-bottom: v.$space-lg;
-    font-size: 1rem;
+  &__cta-btn {
+    font-size: 0.95rem;
+    padding: 12px 40px;
+    margin-bottom: v.$space-sm;
   }
 
-  &__cta-btn {
-    font-size: 1rem;
-    padding: v.$space-md v.$space-xl;
+  &__cta-note {
+    font-family: v.$font-mono;
+    font-size: 0.62rem;
+    color: v.$color-text-muted;
+    opacity: 0.5;
+    letter-spacing: 1px;
+    margin: 0;
   }
 }
 
@@ -116,7 +228,7 @@
   &__overlay {
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, 0.85); 
+    background: rgba(15, 23, 42, 0.85);
     backdrop-filter: blur(5px);
     display: flex;
     align-items: center;
@@ -137,9 +249,7 @@
     transition: color v.$transition-fast;
     line-height: 1;
 
-    &:hover {
-      color: v.$color-text-main;
-    }
+    &:hover { color: v.$color-text-main; }
   }
 
   &__hero-icon {
@@ -165,7 +275,7 @@
   &__input {
     width: 100%;
     box-sizing: border-box;
-    background: v.$color-bg-surface;
+    background: v.$color-bg-main;
     border: 1px solid v.$color-border;
     border-radius: v.$radius-md;
     padding: v.$space-md;
@@ -181,22 +291,12 @@
       box-shadow: 0 0 0 3px rgba(255, 46, 154, 0.15);
     }
 
-    &::placeholder {
-      color: v.$color-text-muted;
-    }
-
-    &:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
+    &::placeholder { color: v.$color-text-muted; }
+    &:disabled { opacity: 0.6; cursor: not-allowed; }
   }
 
   &__submit {
     width: 100%;
-
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
   }
 }

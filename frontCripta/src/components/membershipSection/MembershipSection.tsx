@@ -4,34 +4,35 @@ import './membershipSection.scss';
 
 const BENEFITS = [
   {
-    icon: '🎲',
-    title: 'Juegos de Mesa',
-    description: 'Acceso a cientos de juegos modernos, cooperativos y de estrategia para todos los niveles.',
+    icon: '🪑',
+    title: 'Reserva de Mesa',
+    description: 'Una mesa para hasta 4 personas durante una hora al día, sin coste.',
   },
   {
-    icon: '🃏',
-    title: 'TCG & Cartas',
-    description: 'Torneos y partidas de Pokémon y otros juegos de cartas coleccionables.',
+    icon: '🎉',
+    title: 'Eventos Gratis',
+    description: 'Participa sin coste en todos los eventos organizados por la asociación.',
+  },
+];
+
+const STEPS = [
+  {
+    number: '01',
+    icon: '🌐',
+    title: 'Solicitud Online',
+    description: 'Rellena el formulario y luego acércate presencialmente.',
   },
   {
-    icon: '🐉',
-    title: 'Juegos de Rol',
-    description: 'Sesiones inmersivas de rol de mesa con narrativa colaborativa y dungeon masters experimentados.',
+    number: '02',
+    icon: '🏠',
+    title: 'Visítanos',
+    description: 'Pásate durante cualquier evento y te gestionamos el alta.',
   },
   {
-    icon: '🕹️',
-    title: 'Arcade & Retrogaming',
-    description: 'Máquinas arcade originales y consolas retro para revivir los clásicos del videojuego.',
-  },
-  {
-    icon: '⚔️',
-    title: 'Softcombat',
-    description: 'Talleres de esgrima acolchada y eventos de recreación histórica de forma segura y divertida.',
-  },
-  {
-    icon: '💻',
-    title: 'Talleres Creativos',
-    description: 'Programación, impresión 3D y pintado de figuras guiado por expertos del club.',
+    number: '03',
+    icon: '💬',
+    title: 'WhatsApp',
+    description: 'Escríbenos y organizamos un día contigo.',
   },
 ];
 
@@ -42,35 +43,58 @@ export default function MembershipSection() {
     <section className="membership-section" id="membresia">
       <div className="membership-section__container">
 
-        <div className="membership-section__header">
+        <div className="membership-section__hero">
           <span className="membership-section__badge">Membresía</span>
           <h2 className="membership-section__title">Hazte Socio</h2>
-          <p className="membership-section__subtitle">
-            Únete a la comunidad y accede a todo lo que La Cripta de Doge tiene para ofrecerte.
-            Una cuota, infinitas posibilidades.
-          </p>
+          <div className="membership-section__price">
+            <span className="membership-section__price-number">5€</span>
+            <span className="membership-section__price-period">al mes</span>
+          </div>
+          <p className="membership-section__price-note">Asociación sin ánimo de lucro</p>
         </div>
 
-        <div className="membership-section__grid">
-          {BENEFITS.map((benefit) => (
-            <div key={benefit.title} className="membership-section__card">
-              <span className="membership-section__card-icon">{benefit.icon}</span>
-              <h3 className="membership-section__card-title">{benefit.title}</h3>
-              <p className="membership-section__card-desc">{benefit.description}</p>
-            </div>
-          ))}
+        <div className="membership-section__row">
+          <div className="membership-section__label">Qué incluye</div>
+          <div className="membership-section__benefits">
+            {BENEFITS.map((b) => (
+              <div key={b.title} className="membership-section__benefit">
+                <span className="membership-section__benefit-icon">{b.icon}</span>
+                <div>
+                  <h3 className="membership-section__benefit-title">{b.title}</h3>
+                  <p className="membership-section__benefit-desc">{b.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="membership-section__row">
+          <div className="membership-section__label">Cómo unirte</div>
+          <div className="membership-section__steps">
+            {STEPS.map((s, i) => (
+              <div key={s.number} className="membership-section__step">
+                <span className="membership-section__step-num">{s.number}</span>
+                <span className="membership-section__step-icon">{s.icon}</span>
+                <h3 className="membership-section__step-title">{s.title}</h3>
+                <p className="membership-section__step-desc">{s.description}</p>
+                {i < STEPS.length - 1 && (
+                  <div className="membership-section__step-connector" />
+                )}
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="membership-section__cta">
-          <p className="membership-section__cta-text">
-            ¿Te interesa? Te enviamos toda la información directamente a tu correo.
-          </p>
           <button
             className="btn-pink membership-section__cta-btn"
             onClick={() => setModalOpen(true)}
           >
             Quiero ser socio
           </button>
+          <p className="membership-section__cta-note">
+            ¿Prefieres info por correo? Te escribimos todo.
+          </p>
         </div>
 
       </div>
