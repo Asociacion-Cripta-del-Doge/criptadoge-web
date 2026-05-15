@@ -1,11 +1,12 @@
 import "./login.scss"
 import { useState } from "react"
 import toast from 'react-hot-toast'
+import { useWebTexts } from "../../hooks/useWebTexts"
 
 const API_BASE = "http://localhost:3000"
 
 export default function Login(){
-    const [mode, setMode] = useState<"login" | "register" | "forgot">("login")
+    const [mode, setMode] = useState<"login" | "register">("login")
 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
@@ -14,24 +15,25 @@ export default function Login(){
     const [showPassword, setShowPassword] = useState(false)
     const [loading, setLoading] = useState(false)
     const [forgotSent, setForgotSent] = useState(false)
+    const text = useWebTexts("auth")
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
         if(mode === "register" && password !== confirmPassword)
         {
-            toast.error("Las contraseñas no coinciden")
+            toast.error(text("auth.errors.passwordMismatch"))
             return
         }
-        
+
         if(mode === "register" && password.length < 8)
         {
-            toast.error("La contraseña debe tener al menos 8 caracteres")
+            toast.error(text("auth.errors.passwordLength"))
             return
         }
             setLoading(true)
 
-        try 
+        try
         {
             if(mode === "login")
             {
@@ -45,7 +47,7 @@ export default function Login(){
 
                 if(!res.ok)
                 {
-                    toast.error(data.message || "Credenciales incorrectas")
+                    toast.error(data.message || text("auth.errors.invalidCredentials"))
                     return
                 }
 
@@ -66,15 +68,14 @@ export default function Login(){
 
                 if(!res.ok)
                 {
-                    toast.error(data.message || "Error al crear la cuenta")
+                    toast.error(data.message || text("auth.errors.createAccount"))
                     return
                 }
 
-                
                 setMode("login")
                 setEmail(email)
                 setPassword("")
-                toast.success("¡Cuenta creada! Ya puedes iniciar sesión.")
+                toast.success("auth.success.accountCreated")
             }
             else if (mode === "forgot")
             {
@@ -92,20 +93,20 @@ export default function Login(){
                 setForgotSent(true)
             }
         } catch {
-            toast.error("Error de conexión. Inténtalo de nuevo")
+            toast.error(text("auth.errors.connection"))
         } finally {
             setLoading(false)
         }
     }
 
-    const handleModeChange = (newMode: "login" | "register" | "forgot") => {
+    const handleModeChange = (newMode: "login" | "register" | "forgot") => {
         setMode(newMode)
         setForgotSent(false)
     }
 
     return (
     <div className="login-page">
-      <a href="/" className="back-link">Volver al inicio</a>
+      <a href="/" className="back-link">{text("auth.backHome")}</a>
 
       <div className="login-card">
 
@@ -114,19 +115,19 @@ export default function Login(){
             <button
               className={mode === "login" ? "active blue" : ""}
               onClick={() => handleModeChange("login")}>
-              Iniciar sesión
+              {text("auth.tabs.login")}
             </button>
             <button
               className={mode === "register" ? "active pink" : ""}
               onClick={() => handleModeChange("register")}>
-              Registrarse
+              {text("auth.tabs.register")}
             </button>
           </div>
         )}
 
         <h2 className="login-title">
-          {mode === "login" && "INICIAR SESIÓN"}
-          {mode === "register" && "CREAR CUENTA"}
+          {mode === "login" && text("auth.title.login")}
+          {mode === "register" && text("auth.title.register")}
           {mode === "forgot" && "RECUPERAR CONTRASEÑA"}
         </h2>
 
@@ -142,7 +143,7 @@ export default function Login(){
             {mode === "register" && (
               <input
                 type="text"
-                placeholder="Nombre de usuario"
+                placeholder={text("auth.fields.username")}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required />
@@ -150,7 +151,7 @@ export default function Login(){
 
             <input
               type="email"
-              placeholder="tu@email.com"
+              placeholder={text("auth.fields.email")}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required />
@@ -158,7 +159,7 @@ export default function Login(){
             {mode === "login" && (
               <div className="password-header">
                 <a onClick={() => handleModeChange("forgot")} style={{ cursor: "pointer" }}>
-                  ¿Olvidaste tu contraseña?
+                  {text("auth.fields.forgotPassword")}
                 </a>
               </div>
             )}
@@ -167,7 +168,7 @@ export default function Login(){
               <div className="password-field">
                 <input
                   type={showPassword ? "text" : "password"}
-                  placeholder="Contraseña"
+                  placeholder={text("auth.fields.password")}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required />
@@ -180,7 +181,7 @@ export default function Login(){
             {mode === "register" && (
               <input
                 type="password"
-                placeholder="Confirmar contraseña"
+                placeholder={text("auth.fields.confirmPassword")}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required />
@@ -188,9 +189,9 @@ export default function Login(){
 
             <button className={`submit ${mode === "forgot" ? "login" : mode}`} disabled={loading}>
               {loading
-                ? "Cargando..."
-                : mode === "login" ? "Iniciar sesión"
-                : mode === "register" ? "Crear cuenta"
+                ? text("auth.submit.loading")
+                : mode === "login" ? text("auth.submit.login")
+                : mode === "register" ? text("auth.submit.register")
                 : "Enviar enlace de recuperación"}
             </button>
 
@@ -205,18 +206,22 @@ export default function Login(){
         {mode !== "forgot" && (
           <>
             <div className="divider">
-              <span>o continúa con</span>
+              <span>{text("auth.divider")}</span>
             </div>
 
             <button className="google-btn" onClick={() => window.location.href = '/api/auth/google'}>
-              Continuar con Google
+              {text("auth.google")}
             </button>
 
             <p className="register-text">
               {mode === "login" ? (
-                <>¿No tienes cuenta? <span onClick={() => handleModeChange("register")}>Regístrate</span></>
+                <>
+                  {text("auth.switch.noAccount")} <span onClick={() => handleModeChange("register")}>{text("auth.switch.register")}</span>
+                </>
               ) : (
-                <>¿Ya tienes cuenta? <span onClick={() => handleModeChange("login")}>Inicia sesión</span></>
+                <>
+                  {text("auth.switch.hasAccount")} <span onClick={() => handleModeChange("login")}>{text("auth.switch.login")}</span>
+                </>
               )}
             </p>
           </>

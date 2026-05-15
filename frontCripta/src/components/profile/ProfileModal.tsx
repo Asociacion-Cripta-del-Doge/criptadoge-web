@@ -1,5 +1,8 @@
 import { useAuth } from "../../context/AuthContext"
 import { useState } from "react"
+import MembershipModal from "../membershipSection/MembershipModal";
+import { useWebTexts } from "../../hooks/useWebTexts"
+import type { WebTextKey } from "../../data/webTextDefaults"
 import "./profileModal.scss"
 
 interface Props {
@@ -15,11 +18,11 @@ const getRemainingDays = (expirationDate: string | null): number | null => {
 const getInitials = (name: string) =>
   name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; glow: string }> = {
-  Activo:    { label: "Activo",                  color: "#4ade80", glow: "#4ade8066" },
-  Pendiente: { label: "Pendiente de activación", color: "#eab308", glow: "#eab30866" },
-  Expirado:  { label: "Expirado",                color: "#ef4444", glow: "#ef444466" },
-  Cancelado: { label: "Cancelado",               color: "#94a3b8", glow: "#94a3b833" },
+const STATUS_CONFIG: Record<string, { labelKey: WebTextKey; color: string; glow: string }> = {
+  Activo: { labelKey: "profile.status.active", color: "#4ade80", glow: "#4ade8066" },
+  Pendiente: { labelKey: "profile.status.pending", color: "#eab308", glow: "#eab30866" },
+  Expirado: { labelKey: "profile.status.expired", color: "#ef4444", glow: "#ef444466" },
+  Cancelado: { labelKey: "profile.status.cancelled", color: "#94a3b8", glow: "#94a3b833" },
 }
 
 export const ProfileModal = ({ onClose }: Props) => {
@@ -30,6 +33,8 @@ export const ProfileModal = ({ onClose }: Props) => {
   const [nameError, setNameError] = useState("")
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
   const [confirmLogout, setConfirmLogout] = useState(false)
+  const [showMembershipModal, setShowMembershipModal] = useState(false);
+  const text = useWebTexts("profile")
 
   if (!user) return null
 
@@ -59,14 +64,14 @@ export const ProfileModal = ({ onClose }: Props) => {
       if (!res.ok) throw new Error()
       await refreshUser()
     } catch {
-      console.error("Error subiendo avatar")
+      console.error(text("profile.errors.uploadAvatar"))
     } finally {
       setUploadingAvatar(false)
     }
   }
 
   const handleSaveName = async () => {
-    if (nameValue.trim().length < 2) { setNameError("Mínimo 2 caracteres"); return }
+    if (nameValue.trim().length < 2) { setNameError(text("profile.errors.nameMin")); return }
     setSaving(true)
     setNameError("")
     try {
@@ -80,7 +85,7 @@ export const ProfileModal = ({ onClose }: Props) => {
       await refreshUser()
       setEditingName(false)
     } catch {
-      setNameError("Error al guardar, inténtalo de nuevo")
+      setNameError(text("profile.errors.saveName"))
     } finally {
       setSaving(false)
     }
@@ -92,11 +97,11 @@ export const ProfileModal = ({ onClose }: Props) => {
   }
 
   return (
+    <>
   <div className="profile-overlay" onClick={onClose}>
     <div className="profile-modal" onClick={(e) => e.stopPropagation()}>
       <div className="profile-modal__scanlines" />
 
-      {/* Hero header */}
       <div className="profile-modal__hero">
         <div className="profile-modal__hero-bg" />
         <button className="profile-modal__close" onClick={onClose}>✕</button>
@@ -118,7 +123,7 @@ export const ProfileModal = ({ onClose }: Props) => {
             style={{ "--bubble-color": statusCfg.color, "--bubble-glow": statusCfg.glow } as React.CSSProperties}
           >
             <span className="profile-modal__status-dot" />
-            {statusCfg.label}
+            {text(statusCfg.labelKey)}
           </div>
         </div>
 
@@ -147,38 +152,36 @@ export const ProfileModal = ({ onClose }: Props) => {
                 <button className="profile-modal__edit-btn" onClick={() => { setEditingName(true); setNameValue(user.name) }}>✏️</button>
               </>
             )}
-            {user.role === "ADMIN" && !editingName && <span className="profile-modal__badge">ADMIN</span>}
+            {user.role === "ADMIN" && !editingName && <span className="profile-modal__badge">{text("profile.badge.admin")}</span>}
           </div>
           {nameError && <span className="profile-modal__name-error">{nameError}</span>}
           <span className="profile-modal__email">{user.email}</span>
         </div>
       </div>
 
-      {/* Stats */}
       <div className="profile-modal__stats">
         <div className="profile-modal__stat">
           <span className="profile-modal__stat-value">0</span>
-          <span className="profile-modal__stat-label">Eventos</span>
+          <span className="profile-modal__stat-label">{text("profile.stats.events")}</span>
         </div>
         <div className="profile-modal__stat-divider" />
         <div className="profile-modal__stat">
           <span className="profile-modal__stat-value">{joinYear}</span>
-          <span className="profile-modal__stat-label">Miembro desde</span>
+          <span className="profile-modal__stat-label">{text("profile.stats.memberSince")}</span>
         </div>
         <div className="profile-modal__stat-divider" />
         <div className="profile-modal__stat">
           <span className="profile-modal__stat-value" style={{ color: statusCfg.color }}>
-            {user.status}
+            {text(statusCfg.labelKey)}
           </span>
-          <span className="profile-modal__stat-label">Estado</span>
+          <span className="profile-modal__stat-label">{text("profile.stats.status")}</span>
         </div>
       </div>
 
-      {/* Membresía */}
       <div className="profile-modal__section">
         <div className="profile-modal__section-header">
           <span className="profile-modal__section-icon">⚔️</span>
-          <h3 className="profile-modal__section-title">Membresía</h3>
+          <h3 className="profile-modal__section-title">{text("profile.membership.title")}</h3>
         </div>
 
         {hasMembership ? (
@@ -186,20 +189,20 @@ export const ProfileModal = ({ onClose }: Props) => {
             <div className="profile-modal__membership-rows">
               {user.lastRenewal && (
                 <div className="profile-modal__row">
-                  <span className="profile-modal__label">Último pago</span>
+                  <span className="profile-modal__label">{text("profile.membership.lastPayment")}</span>
                   <span className="profile-modal__value">{new Date(user.lastRenewal).toLocaleDateString("es-ES")}</span>
                 </div>
               )}
               {user.expirationDate && (
                 <div className="profile-modal__row">
-                  <span className="profile-modal__label">Expira el</span>
+                  <span className="profile-modal__label">{text("profile.membership.expiresAt")}</span>
                   <span className="profile-modal__value">{new Date(user.expirationDate).toLocaleDateString("es-ES")}</span>
                 </div>
               )}
             </div>
             <div className="profile-modal__bar-wrap">
               <div className="profile-modal__bar-label">
-                <span>{isExpiringSoon ? "⚠️ Expira pronto" : "Tiempo restante"}</span>
+                <span>{isExpiringSoon ? text("profile.membership.expiringSoon") : text("profile.membership.remainingTime")}</span>
                 <span className={isExpiringSoon ? "profile-modal__bar-days--warn" : ""}>{daysLeft}d</span>
               </div>
               <div className="profile-modal__bar-track">
@@ -208,34 +211,38 @@ export const ProfileModal = ({ onClose }: Props) => {
             </div>
           </div>
         ) : (
-          <a href="/membresia" className="profile-modal__cta" onClick={onClose}>
-            Hazte miembro
-          </a>
+          <button className="profile-modal__cta" onClick={() => setShowMembershipModal(true)}>
+            {text("profile.membership.becomeMember")}
+          </button>
         )}
       </div>
 
-      {/* Footer */}
       <div className="profile-modal__footer">
         {confirmLogout ? (
           <div className="profile-modal__logout-confirm">
-            <span className="profile-modal__logout-text">¿Estás seguro?</span>
+            <span className="profile-modal__logout-text">{text("profile.logout.confirm")}</span>
             <div className="profile-modal__logout-actions">
               <button className="profile-modal__logout-yes" onClick={logout}>
-                Sí, salir
+                {text("profile.logout.yes")}
               </button>
               <button className="profile-modal__logout-no" onClick={() => setConfirmLogout(false)}>
-                Cancelar
+                {text("profile.logout.cancel")}
               </button>
             </div>
           </div>
         ) : (
           <button className="profile-modal__logout" onClick={() => setConfirmLogout(true)}>
-            Cerrar sesión
+            {text("profile.logout.button")}
           </button>
         )}
       </div>
 
     </div>
   </div>
-)
+
+  {showMembershipModal && (
+    <MembershipModal onClose={() => setShowMembershipModal(false)} />
+  )}
+  </>
+  )
 }
