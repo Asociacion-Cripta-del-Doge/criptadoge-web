@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import "./App.scss";
-import Login from "./components/login/login";
 import { Navbar } from "./components/navbar/navbar";
 import Login from "./components/login/login";
 import ResetPassword from "./components/resetPassword/ResetPassword";

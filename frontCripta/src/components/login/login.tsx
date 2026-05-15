@@ -3,11 +3,10 @@ import { useState } from "react"
 import toast from 'react-hot-toast'
 import { useWebTexts } from "../../hooks/useWebTexts"
 
-const API_BASE = "http://localhost:3000"
+const API_BASE = "/api"
 
 export default function Login(){
-    const [mode, setMode] = useState<"login" | "register">("login")
-
+    const [mode, setMode] = useState<"login" | "register" | "forgot">("login")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [name, setName] = useState("")
