@@ -9,6 +9,7 @@ import { EventCalendar } from "./components/EventCalendar/EventCalendar";
 import { ContactoSection } from "./components/contact/contacto";
 import { UbicacionSection } from "./components/ubicacion/Ubicacion";
 import AboutUs from "./components/aboutUs/aboutUs";
+import { Gallery } from "./components/gallery/Gallery";
 import SectionDivider from "./components/sectionDivider/SectionDivider";
 import { HeroCarousel } from "./components/heroCarousel/HeroCarousel";
 import MembershipSection from "./components/membershipSection/MembershipSection";
@@ -716,6 +717,18 @@ function App() {
       <>
         <Navbar />
         {bookingPage}
+        <Footer />
+      </>
+    );
+  }
+
+
+
+  if (path === "/galeria") {
+    return (
+      <>
+        <Navbar />
+        <Gallery />
         <Footer />
       </>
     );

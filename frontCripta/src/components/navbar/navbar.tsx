@@ -30,7 +30,7 @@ export const Navbar = () => {
             <li><a href="/#inicio">{text("nav.links.home")}</a></li>
             <li><a href="/#eventos">{text("nav.links.events")}</a></li>
             <li><a href="/reservas">{text("nav.links.booking")}</a></li>
-            <li><a href="/#galeria">{text("nav.links.gallery")}</a></li>
+            <li><a href="/galeria">{text("nav.links.gallery")}</a></li>
             <li><a href="/#ubicacion">{text("nav.links.location")}</a></li>
             <li><a href="/#patrocinadores">{text("nav.links.sponsors")}</a></li>
             <li><a href="/#contacto">{text("nav.links.contact")}</a></li>

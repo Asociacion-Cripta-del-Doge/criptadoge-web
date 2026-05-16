@@ -1,0 +1,8 @@
+@use "../../styles/variables" as v;
+@use "sass:color";
+
+.gallery-app {
+  margin-top: 80px; /* Altura del navbar */
+  padding: v.$space-lg;
+  min-height: calc(100vh - 80px);
+}
