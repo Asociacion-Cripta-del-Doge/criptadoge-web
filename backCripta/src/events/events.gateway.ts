@@ -10,7 +10,7 @@ export class EventsGateway {
     eventId: string,
     attendees: { userId: string; joinedAt: Date }[],
   ) {
-    this.server.emit(`evento:${eventId}:asistentes`, {
+    this.server.emit('attendee-update', {
       eventId,
       attendees,
     });

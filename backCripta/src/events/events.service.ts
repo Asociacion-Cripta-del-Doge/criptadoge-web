@@ -96,7 +96,7 @@ export class EventsService {
     event.attendees.push({ userId, joinedAt: new Date() });
     await event.save();
 
-    this.eventsGateway.emitAttendeeUpdate(eventId, event.attendees.toObject());
+    this.eventsGateway.emitAttendeeUpdate(eventId, event.attendees as { userId: string; joinedAt: Date }[]);
 
     return event;
   }
@@ -119,7 +119,7 @@ export class EventsService {
     event.attendees.splice(index, 1);
     await event.save();
 
-    this.eventsGateway.emitAttendeeUpdate(eventId, event.attendees.toObject());
+    this.eventsGateway.emitAttendeeUpdate(eventId, event.attendees as { userId: string; joinedAt: Date }[]);
 
     return event;
   }

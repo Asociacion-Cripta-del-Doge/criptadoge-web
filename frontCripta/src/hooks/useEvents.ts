@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { fetchEventos, type EventoAPI } from "../services/eventosService"
+import { useSocket } from "../context/SocketContext"
 
 export interface Evento {
   id: string
@@ -29,6 +30,7 @@ export function useEvents() {
   const [eventos, setEventos] = useState<Evento[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const socket = useSocket()
 
   useEffect(() => {
     fetchEventos()
@@ -36,6 +38,21 @@ export function useEvents() {
       .catch(err => setError(err.message))
       .finally(() => setLoading(false))
   }, [])
+
+  useEffect(() => {
+    if (!socket) return
+
+    const handler = (data: { eventId: string; attendees: { userId: string }[] }) => {
+      setEventos(prev =>
+        prev.map(ev =>
+          ev.id === data.eventId ? { ...ev, asistentes: data.attendees.length } : ev
+        )
+      )
+    }
+
+    socket.on("attendee-update", handler)
+    return () => { socket.off("attendee-update", handler) }
+  }, [socket])
 
   return { eventos, loading, error }
 }
