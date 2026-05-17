@@ -39,6 +39,7 @@ const EventoModal = ({
   ev,
   onClose,
   onUpdated,
+  text,
 }: {
   ev: Evento
   onClose: () => void
