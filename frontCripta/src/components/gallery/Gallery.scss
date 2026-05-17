@@ -2,7 +2,58 @@
 @use "sass:color";
 
 .gallery-app {
-  margin-top: 80px; /* Altura del navbar */
+  margin-top: 100px; /* Altura del navbar */
   padding: v.$space-lg;
-  min-height: calc(100vh - 80px);
+  min-height: calc(100vh - 100px);
+}
+
+.gallery-brand {
+  display: flex;
+  align-items: center;
+  padding-bottom: v.$space-lg;
+  gap: 14px;
+
+  img {
+    width: 54px;
+    height: 54px;
+    object-fit: contain;
+  }
+
+  div {
+    display: grid;
+    gap: 2px;
+  }
+
+  span {
+    color: v.$color-text-muted;
+    font-size: 0.9rem;
+  }
+
+  strong {
+    color: v.$color-text-main;
+    font-family: v.$font-display;
+    font-size: 1.35rem;
+    letter-spacing: 0;
+  }
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: v.$space-md;
+}
+
+.gallery-image {
+  padding: v.$space-xl;
+  border: 2px solid white;
+  border-radius: v.$radius-md;
+}
+
+.gallery-image h1 {
+  text-align: center;
+}
+
+.gallery-image img {
+  width: 100%;
+  height: auto;
 }
