@@ -224,6 +224,52 @@
   position: relative;
   text-align: center;
   box-shadow: 0 0 48px rgba(v.$neon-pink, 0.2);
+  max-width: 500px;
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: v.$space-md;
+    margin-bottom: v.$space-lg;
+    text-align: left;
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: v.$space-md;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__label {
+    font-family: v.$font-mono;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: v.$color-text-muted;
+  }
+
+  &__optional {
+    text-transform: none;
+    opacity: 0.5;
+    font-size: 0.6rem;
+  }
+
+  &__input--error {
+    border-color: v.$color-error !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
+  }
+
+  &__error {
+    font-family: v.$font-mono;
+    font-size: 0.62rem;
+    color: v.$color-error;
+  }
 
   &__overlay {
     position: fixed;
