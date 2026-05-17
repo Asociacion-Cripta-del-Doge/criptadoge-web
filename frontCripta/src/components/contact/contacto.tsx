@@ -3,7 +3,7 @@ import type { CSSProperties, FormEvent } from "react"
 import "./contacto.scss"
 import { useWebTexts } from "../../hooks/useWebTexts"
 
-const API_BASE = "http://localhost:8080/api"
+const API_BASE = "/api"
 
 interface RedSocial {
   _id: string
