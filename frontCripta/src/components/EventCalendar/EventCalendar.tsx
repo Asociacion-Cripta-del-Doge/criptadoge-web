@@ -2,9 +2,9 @@ import { useMemo, useState, useEffect, type CSSProperties } from "react"
 import { useEvents, type Evento } from "../../hooks/useEvents"
 import { joinEvento, leaveEvento } from "../../services/eventosService"
 import { useAuth } from "../../context/AuthContext"
+import { useWebTexts } from "../../hooks/useWebTexts"
+import type { WebTextKey } from "../../data/webTextDefaults"
 import "./EventCalendar.scss"
-
-// ─── helpers ────────────────────────────────────────────────────────────────
 
 const MESES_ES = [
   "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -15,8 +15,8 @@ const DIAS_SEMANA = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"]
 
 const LABEL_COLORS: Record<string, string> = {
   cartas: "#ec4899",
-  rol:    "#3b82f6",
-  mesa:   "#eab308",
+  rol: "#3b82f6",
+  mesa: "#eab308",
 }
 
 function getLabelColor(label: string): string {
@@ -32,10 +32,8 @@ function formatFecha(isoStr: string): string {
   return `${parseInt(d)} de ${MESES_ES[parseInt(m) - 1]} de ${y}`
 }
 
-const val = (v?: string | number) =>
-  v !== undefined && v !== null && v !== "" ? String(v) : "Vacío"
-
-// ─── Modal ───────────────────────────────────────────────────────────────────
+const val = (v: string | number | undefined, emptyText: string) =>
+  v !== undefined && v !== null && v !== "" ? String(v) : emptyText
 
 const EventoModal = ({
   ev,
@@ -45,6 +43,7 @@ const EventoModal = ({
   ev: Evento
   onClose: () => void
   onUpdated: (updated: Evento) => void
+  text: (key: WebTextKey) => string
 }) => {
   const { user } = useAuth()
   const [busy, setBusy] = useState(false)
@@ -89,7 +88,7 @@ const EventoModal = ({
   return (
     <div className="ec-modal-backdrop" onClick={onClose}>
       <div className="ec-modal" onClick={e => e.stopPropagation()}>
-        <button className="ec-modal-close" onClick={onClose} aria-label="Cerrar">✕</button>
+        <button className="ec-modal-close" onClick={onClose} aria-label={text("home.events.modal.close")}>✕</button>
 
         <div className="ec-modal-header">
           <span
@@ -103,27 +102,27 @@ const EventoModal = ({
 
         <dl className="ec-modal-fields">
           <div className="ec-modal-field">
-            <dt>Descripción</dt>
-            <dd>{val(ev.descripcion)}</dd>
+            <dt>{text("home.events.modal.description")}</dt>
+            <dd>{val(ev.descripcion, text("home.events.emptyValue"))}</dd>
           </div>
           <div className="ec-modal-field">
-            <dt>Fecha</dt>
-            <dd>{val(formatFecha(ev.fecha))}</dd>
+            <dt>{text("home.events.modal.date")}</dt>
+            <dd>{val(formatFecha(ev.fecha), text("home.events.emptyValue"))}</dd>
           </div>
           <div className="ec-modal-field">
-            <dt>Hora</dt>
-            <dd>{val(ev.hora)}</dd>
+            <dt>{text("home.events.modal.time")}</dt>
+            <dd>{val(ev.hora, text("home.events.emptyValue"))}</dd>
           </div>
           <div className="ec-modal-field">
-            <dt>Categoría</dt>
-            <dd>{val(ev.label)}</dd>
+            <dt>{text("home.events.modal.category")}</dt>
+            <dd>{val(ev.label, text("home.events.emptyValue"))}</dd>
           </div>
           <div className="ec-modal-field">
-            <dt>Estado</dt>
-            <dd>{val(ev.estado)}</dd>
+            <dt>{text("home.events.modal.status")}</dt>
+            <dd>{val(ev.estado, text("home.events.emptyValue"))}</dd>
           </div>
           <div className="ec-modal-field">
-            <dt>Asistentes</dt>
+            <dt>{text("home.events.modal.attendees")}</dt>
             <dd>{ev.asistentes}</dd>
           </div>
         </dl>
@@ -139,22 +138,21 @@ const EventoModal = ({
           onClick={handleInscripcion}
           disabled={busy}
         >
-          {busy ? "..." : isInscrito ? "Abandonar evento" : "Inscribirse"}
+          {busy ? "..." : isInscrito ? text("home.events.modal.leave") : text("home.events.modal.join")}
         </button>
       </div>
     </div>
   )
 }
 
-// ─── componente ─────────────────────────────────────────────────────────────
-
 export const EventCalendar = () => {
   const today = new Date()
-  const [year, setYear]   = useState(today.getFullYear())
+  const [year, setYear] = useState(today.getFullYear())
   const [month, setMonth] = useState(today.getMonth())
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [filterLabel, setFilterLabel] = useState<string | null>(null)
   const [modalEvento, setModalEvento] = useState<Evento | null>(null)
+  const text = useWebTexts("home.events")
 
   const { eventos, loading, error, refresh } = useEvents()
 
@@ -209,16 +207,15 @@ export const EventCalendar = () => {
     <section id="eventos" className="ec-section">
       <div className="ec-header">
         <h2 className="ec-title">
-          <span className="ec-title-highlight">Calendario</span> de Eventos
+          <span className="ec-title-highlight">{text("home.events.titleHighlight")}</span> {text("home.events.titleSuffix")}
         </h2>
-        <p className="ec-subtitle">Descubre todas las actividades que tenemos preparadas para ti</p>
+        <p className="ec-subtitle">{text("home.events.subtitle")}</p>
       </div>
 
-      {loading && <p className="ec-status">Cargando eventos...</p>}
-      {error && <p className="ec-status ec-status--error">No se pudieron cargar los eventos.</p>}
+      {loading && <p className="ec-status">{text("home.events.loading")}</p>}
+      {error && <p className="ec-status ec-status--error">{text("home.events.error")}</p>}
 
       <div className="ec-layout">
-        {/* ── Calendario ── */}
         <div className="ec-calendar">
           <div className="ec-cal-nav">
             <button className="ec-nav-btn" onClick={prevMonth} aria-label="Mes anterior">‹</button>
@@ -236,18 +233,18 @@ export const EventCalendar = () => {
 
               const iso = isoDate(year, month, day)
               const evs = eventosPorFecha[iso] ?? []
-              const isToday    = iso === todayIso
+              const isToday = iso === todayIso
               const isSelected = iso === selectedDate
-              const isWeekend  = (idx % 7) >= 5
+              const isWeekend = (idx % 7) >= 5
 
               return (
                 <button
                   key={iso}
                   className={[
                     "ec-cal-cell",
-                    isToday    && "ec-cal-cell--today",
+                    isToday && "ec-cal-cell--today",
                     isSelected && "ec-cal-cell--selected",
-                    isWeekend  && "ec-cal-cell--weekend",
+                    isWeekend && "ec-cal-cell--weekend",
                     evs.length && "ec-cal-cell--has-events",
                   ].filter(Boolean).join(" ")}
                   onClick={() => setSelectedDate(prev => prev === iso ? null : iso)}
@@ -288,21 +285,28 @@ export const EventCalendar = () => {
           )}
         </div>
 
-        {/* ── Panel lateral ── */}
         <div className="ec-panel">
           {!selectedDate ? (
             <div className="ec-panel-empty">
               <div className="ec-panel-empty-icon">📅</div>
-              <p>Selecciona un día del calendario<br />para ver los eventos disponibles</p>
+              <p>{text("home.events.emptySelect").split("\n").map((line, index) => (
+                <span key={line}>
+                  {index > 0 && <br />}
+                  {line}
+                </span>
+              ))}</p>
             </div>
           ) : (
             <>
-              <h3 className="ec-panel-title">Eventos del {titleDate}</h3>
+              <h3 className="ec-panel-title">{text("home.events.dayEventsPrefix")} {titleDate}</h3>
 
               {eventosDelDia.length === 0 ? (
                 <div className="ec-panel-empty">
                   <div className="ec-panel-empty-icon">🎲</div>
-                  <p>No hay eventos este día{filterLabel ? ` de la categoría "${filterLabel}"` : ""}</p>
+                  <p>
+                    {text("home.events.emptyDay")}
+                    {filterLabel ? ` ${text("home.events.emptyCategory")} "${filterLabel}"` : ""}
+                  </p>
                 </div>
               ) : (
                 <ul className="ec-events-list">
@@ -323,15 +327,15 @@ export const EventCalendar = () => {
                       </div>
                       {ev.descripcion && <p className="ec-event-desc">{ev.descripcion}</p>}
                       <div className="ec-event-meta">
-                        <span title="Fecha">📅 {formatFecha(ev.fecha)}</span>
-                        {ev.hora && <span title="Hora">🕐 {ev.hora}</span>}
+                        <span title={text("home.events.modal.date")}>📅 {formatFecha(ev.fecha)}</span>
+                        {ev.hora && <span title={text("home.events.modal.time")}>🕐 {ev.hora}</span>}
                         {ev.asistentes > 0 && (
-                          <span className="ec-event-plazas" title="Asistentes">
+                          <span className="ec-event-plazas" title={text("home.events.modal.attendees")}>
                             👥 {ev.asistentes} asistente{ev.asistentes !== 1 ? "s" : ""}
                           </span>
                         )}
                       </div>
-                      <span className="ec-event-ver-mas">Ver más →</span>
+                      <span className="ec-event-ver-mas">{text("home.events.more")}</span>
                     </li>
                   ))}
                 </ul>
@@ -342,11 +346,12 @@ export const EventCalendar = () => {
       </div>
 
       {modalEvento && (
-        <EventoModal
-          ev={modalEvento}
-          onClose={() => setModalEvento(null)}
-          onUpdated={updated => { setModalEvento(updated); refresh() }}
-        />
+        <EventoModal                                                                                                    
+            ev={modalEvento}
+            onClose={() => setModalEvento(null)}                                                                          
+            onUpdated={updated => { setModalEvento(updated); refresh() }}                                                 
+            text={text}
+          />
       )}
     </section>
   )

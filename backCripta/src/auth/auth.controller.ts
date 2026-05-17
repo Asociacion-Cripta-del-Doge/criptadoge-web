@@ -64,4 +64,23 @@ export class AuthController {
       `${this.frontendUrl}/auth/callback?token=${access_token}&user=${encodeURIComponent(JSON.stringify(user))}`
     );
   }
+
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  async forgotPassword(@Body('email') email: string)
+  {
+    await this.authService.forgotPassword(email);
+    return { message: 'Si el email existe, recibirás un enlace en breve.' }
+  }
+
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  async resetPassword(
+    @Body('token') token: string,
+    @Body('password') password: string
+  )
+  {
+    await this.authService.resetPassword(token, password);
+    return { message: 'Contraseña actualizada correctamente' }
+  }
 }
