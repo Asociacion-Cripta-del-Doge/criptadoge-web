@@ -454,6 +454,17 @@
   }
 }
 
+.ec-modal-feedback {
+  font-size: 0.82rem;
+  padding: 8px 12px;
+  border-radius: v.$radius-sm;
+  margin-bottom: v.$space-sm;
+  text-align: center;
+
+  &--ok  { background: rgba(22, 163, 74, 0.15); color: #4ade80; }
+  &--err { background: rgba(239, 68, 68, 0.15);  color: #f87171; }
+}
+
 .ec-modal-inscribirse {
   width: 100%;
   padding: 12px;
@@ -465,9 +476,26 @@
   font-weight: 700;
   cursor: pointer;
   letter-spacing: 0.5px;
-  transition: background v.$transition-fast;
+  transition: background v.$transition-fast, opacity v.$transition-fast;
 
-  &:hover {
+  &:hover:not(:disabled) {
     background: darken(#ec4899, 8%);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &--baja {
+    background: v.$color-bg-surface;
+    border: 1px solid v.$color-border;
+    color: v.$color-text-muted;
+
+    &:hover:not(:disabled) {
+      border-color: #f87171;
+      color: #f87171;
+      background: rgba(239, 68, 68, 0.08);
+    }
   }
 }
