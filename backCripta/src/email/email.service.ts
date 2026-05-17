@@ -34,7 +34,7 @@ export class EmailService
                             🔐 Restablecer contraseña
                         </a>
                     </div>
-                    <p style="color #94a3b8; font-size: 0.8rem; text-align: center; margin-top: 24px; border-top: 1px solid #1e293b; padding-top: 16px;">
+                    <p style="color: #94a3b8; font-size: 0.8rem; text-align: center; margin-top: 24px; border-top: 1px solid #1e293b; padding-top: 16px;">
                         Este enlace caduca en <strong>1 hora</strong>
                         Si no solicitaste esto, ignora este email.
                     </p>
@@ -45,4 +45,35 @@ export class EmailService
             `
         })
     }
+
+     async sendMembershipConfirmation(email: string, name: string): Promise<void> {
+    await this.transporter.sendMail({
+      from: process.env.EMAIL_FROM,
+      to: email,
+      subject: '✅ Solicitud recibida - La Cripta de Doge',
+      html: `
+        <div style="font-family: 'Roboto', Arial, sans-serif; background-color: #0f172a; padding: 40px; max-width: 520px; margin: auto; border-radius: 12px; border: 1px solid #334155;">
+          <h1 style="font-family: 'Courier New', monospace; color: #00bfff; font-size: 1.4rem; margin-bottom: 4px; letter-spacing: 2px;">
+            LA CRIPTA DE <span style="color: #eab308;">DOGE</span>
+          </h1>
+          <div style="height: 2px; background: linear-gradient(to right, #00bfff, #ec4899); margin-bottom: 28px; border-radius: 2px;"></div>
+          <p style="color: #f8fafc; font-size: 1rem; margin-bottom: 8px;">
+            Hola, <strong style="color: #ec4899;">${name}</strong> 👋
+          </p>
+          <p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.6;">
+            Hemos recibido tu solicitud para unirte a <strong style="color: #f8fafc;">La Cripta de Doge</strong>.
+            En breve nos pondremos en contacto contigo para completar el alta de forma presencial.
+          </p>
+          <div style="background: #1e293b; border-left: 3px solid #ff2e9a; padding: 16px; border-radius: 8px; margin: 24px 0;">
+            <p style="margin: 0; color: #f8fafc; font-size: 0.9rem;">
+              Mientras tanto, puedes pasarte por la asociación durante cualquier evento o escribirnos por WhatsApp.
+            </p>
+          </div>
+          <p style="color: #334155; font-size: 0.75rem; text-align: center; margin-top: 24px; border-top: 1px solid #1e293b; padding-top: 16px;">
+            © La Cripta de Doge · Asociación sin ánimo de lucro · Puertollano
+          </p>
+        </div>
+      `,
+    });
+  }
 }
