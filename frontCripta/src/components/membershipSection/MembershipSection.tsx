@@ -6,12 +6,12 @@ const BENEFITS = [
   {
     icon: '🪑',
     title: 'Reserva de Mesa',
-    description: 'Una mesa para hasta 4 personas durante una hora al día, sin coste.',
+    description: 'Una mesa para hasta 4 personas durante una hora al día, completamente gratis.',
   },
   {
     icon: '🎉',
     title: 'Eventos Gratis',
-    description: 'Participa sin coste en todos los eventos organizados por la asociación.',
+    description: 'Accede y participa sin coste en todos los eventos organizados por la asociación.',
   },
 ];
 
@@ -20,13 +20,13 @@ const STEPS = [
     number: '01',
     icon: '🌐',
     title: 'Solicitud Online',
-    description: 'Rellena el formulario y luego acércate presencialmente.',
+    description: 'Rellena el formulario web para agilizar los tiempos y luego acércate presencialmente.',
   },
   {
     number: '02',
     icon: '🏠',
     title: 'Visítanos',
-    description: 'Pásate durante cualquier evento y te gestionamos el alta.',
+    description: 'Pásate durante cualquier evento y te gestionamos el alta al momento.',
   },
   {
     number: '03',

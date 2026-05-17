@@ -5,6 +5,7 @@ services:
     restart: always
     volumes:
       - ./frontCripta:/app
+      - front_node_modules:/app/node_modules
     expose:
       - "5173"
     env_file:
@@ -19,6 +20,10 @@ services:
       - ./backCripta:/app
     environment:
       MONGO_URL: mongodb://mongo:27017/cripta-db
+      EMAIL_USER: "lacriptadedoge@gmail.com"
+      EMAIL_PASS: "cvwfjipzwiuhcjhg"
+      EMAIL_FROM: "La Cripta de Doge <lacriptadedoge@gmail.com>"
+      FRONTEND_URL: "http://localhost:8080"
     depends_on:
       db:
         condition: service_healthy
@@ -72,5 +77,6 @@ services:
       - back
 
 volumes:
+  front_node_modules:
   db_data:
   mongo_data:

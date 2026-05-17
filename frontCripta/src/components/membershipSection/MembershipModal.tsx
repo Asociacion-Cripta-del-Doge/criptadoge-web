@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
+import toast from 'react-hot-toast';
 import './membershipSection.scss';
 
 interface MembershipModalProps {
   onClose: () => void;
 }
 
-interface FormData 
-{
+interface FormData {
   name: string;
   email: string;
   phone: string;
@@ -31,8 +31,8 @@ export default function MembershipModal({ onClose }: MembershipModalProps) {
 
   const handleChange = (field: keyof FormData, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
-    if(errors[field]) setErrors((prev) => ({ ...prev, [field]: ''}));
-  }
+    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: '' }));
+  };
 
   const validate = (): boolean => {
     const newErrors: Partial<FormData> = {};
@@ -46,17 +46,27 @@ export default function MembershipModal({ onClose }: MembershipModalProps) {
       newErrors.birthdate = 'Introduce tu fecha de nacimiento';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }
+  };
 
-  const handleSubmit = async() => {
-    if(!validate()) return;
+  const handleSubmit = async () => {
+    if (!validate()) return;
     setLoading(true);
+    try {
+      const res = await fetch('/api/membership/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error();
+      setSubmitted(true);
+    } catch {
+      toast.error('Error al enviar la solicitud. Inténtalo de nuevo.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    await new Promise((res) => setTimeout(res, 900));
-    setLoading(false);
-    setSubmitted(true);
-  }
-return createPortal(
+  return createPortal(
     <div className="membership-modal__overlay" onClick={onClose}>
       <div className="membership-modal" onClick={(e) => e.stopPropagation()}>
         <button className="membership-modal__close" onClick={onClose} aria-label="Cerrar">
@@ -129,7 +139,10 @@ return createPortal(
               </div>
 
               <div className="membership-modal__field">
-                <label className="membership-modal__label">¿Cómo nos conociste? <span className="membership-modal__optional">(opcional)</span></label>
+                <label className="membership-modal__label">
+                  ¿Cómo nos conociste?{' '}
+                  <span className="membership-modal__optional">(opcional)</span>
+                </label>
                 <input
                   type="text"
                   className="membership-modal__input"

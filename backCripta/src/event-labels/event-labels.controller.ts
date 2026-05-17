@@ -4,11 +4,13 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
 import { EventLabelsService } from './event-labels.service';
 import { CreateEventLabelDto } from './dto/create-event-label.dto';
+import { UpdateEventLabelDto } from './dto/update-event-label.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -27,6 +29,16 @@ export class EventLabelsController {
   @Roles('ADMIN')
   create(@Body() createEventLabelDto: CreateEventLabelDto) {
     return this.eventLabelsService.create(createEventLabelDto);
+  }
+
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  update(
+    @Param('id') id: string,
+    @Body() updateEventLabelDto: UpdateEventLabelDto,
+  ) {
+    return this.eventLabelsService.update(id, updateEventLabelDto);
   }
 
   @Delete(':id')

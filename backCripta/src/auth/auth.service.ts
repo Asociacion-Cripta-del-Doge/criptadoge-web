@@ -3,12 +3,15 @@ import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
+import { EmailService } from 'src/email/email.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
+    private emailService: EmailService,
   ) {}
 
   async validateUser(email: string, pass: string): Promise<Omit<User, 'password'>> {
@@ -110,6 +113,41 @@ export class AuthService {
         createdAt: true,
         avatar: true,
       },
+    });
+  }
+
+  async forgotPassword(email: string)
+  {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    if(!user || user.password === '') return;   //ignora a los usuarios de Google
+
+    const token = crypto.randomBytes(32).toString('hex');
+    const expires = new Date(Date.now() + 3600 * 1000);
+
+    await this.prisma.user.update({
+      where: { email },
+      data: { resetToken: token, resetTokenExpires: expires }
+    });
+
+    await this.emailService.sendPasswordReset(email, user.name, token)
+  }
+
+  async resetPassword(token: string, newPassword: string)
+  {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        resetToken: token,
+        resetTokenExpires: { gt: new Date() }
+      }
+    });
+
+    if(!user) throw new UnauthorizedException('Token inválido o expirado');
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { password: hashed, resetToken: null, resetTokenExpires: null }
     });
   }
 }
