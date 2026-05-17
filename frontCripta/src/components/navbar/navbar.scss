@@ -165,3 +165,16 @@
   border: 1px solid rgba(v.$neon-blue, 0.5);
   flex-shrink: 0;
 }
+.navbar-member-badge {
+  width: 14px;
+  height: 14px;
+  margin-left: 6px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 4px rgba(255, 46, 154, 0.8));
+  animation: crownPulse 2s ease-in-out infinite;
+}
+
+@keyframes crownPulse {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(255, 46, 154, 0.8)); }
+  50%       { filter: drop-shadow(0 0 8px rgba(255, 46, 154, 1)); }
+}

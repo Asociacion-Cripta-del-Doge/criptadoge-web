@@ -18,6 +18,8 @@ export const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
+  const isMember = user?.status === "Activo"
+
   return (
     <>
       <nav className={`navbar ${scrolled ? "navbar-scrolled" : ""}`}>
@@ -47,12 +49,29 @@ export const Navbar = () => {
                     <img src={user.avatar} alt={user.name} className="navbar-avatar" />
                   )}
                   {user.name.split(" ")[0]}
+                  {isMember && (
+                    <svg className="navbar-member-badge" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="6" y="0" width="4" height="2" fill="#ff2e9a"/>
+                      <rect x="4" y="2" width="2" height="2" fill="#ff2e9a"/>
+                      <rect x="10" y="2" width="2" height="2" fill="#ff2e9a"/>
+                      <rect x="2" y="4" width="2" height="2" fill="#ff2e9a"/>
+                      <rect x="12" y="4" width="2" height="2" fill="#ff2e9a"/>
+                      <rect x="0" y="6" width="2" height="2" fill="#ff2e9a"/>
+                      <rect x="14" y="6" width="2" height="2" fill="#ff2e9a"/>
+                      <rect x="0" y="8" width="16" height="2" fill="#ff2e9a"/>
+                      <rect x="2" y="10" width="12" height="2" fill="#ff2e9a"/>
+                      <rect x="4" y="12" width="8" height="2" fill="#ff2e9a"/>
+                      <rect x="6" y="14" width="4" height="2" fill="#ff2e9a"/>
+                    </svg>
+                  )}
                 </button>
               ) : (
                 <a href="/login" className="btn-outline">{text("nav.login")}</a>
               )
             )}
-            <a href="/#membresia" className="btn-pink">{text("nav.membership")}</a>
+            {!isMember && (
+              <a href="/#membresia" className="btn-pink">{text("nav.membership")}</a>
+            )}
           </div>
         </div>
       </nav>
