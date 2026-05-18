@@ -41,18 +41,18 @@ export class GalleryService {
   }
 
   findAll() {
-    return `This action returns all gallery`;
+    return this.galleryPhotoModel.find().sort({ createdAt: -1 });
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} gallery`;
+    return this.galleryPhotoModel.findById(id);
   }
 
   update(id: number, updateGalleryPhotoDto: UpdateGalleryPhotoDto) {
-    return `This action updates a #${id} gallery`;
+    return this.galleryPhotoModel.findByIdAndUpdate(id, updateGalleryPhotoDto, { new: true });
   }
 
   remove(id: number) {
-    return `This action removes a #${id} gallery`;
+    return this.galleryPhotoModel.findByIdAndDelete(id);
   }
 }

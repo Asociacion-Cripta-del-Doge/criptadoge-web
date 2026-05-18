@@ -43,6 +43,72 @@
   gap: v.$space-md;
 }
 
+.gallery-upload-form {
+    display: flex;
+    flex-direction: column;
+    gap: v.$space-md;
+
+    label{
+        font-size: 0.85rem;
+        color: v.$color-text-muted;
+    }
+
+    input{
+        width: 100%;
+
+        padding: v.$space-sm;
+        border-radius: v.$radius-sm;
+        border: 1px solid v.$color-border;
+
+        background: rgba(255,255,255,0.05);
+        color: v.$color-text-main;
+
+        &:focus{
+            outline: none;
+            border-color: v.$color-primary;
+        }
+    }
+}
+
+.gallery-upload-form form{
+  border: 2px solid white;
+  border-radius: v.$radius-md;
+  padding: v.$space-lg;
+  margin-bottom: v.$space-lg;
+}
+
+.submit{
+    width: 100%;
+    margin-top: v.$space-sm;
+    padding: v.$space-sm;
+    border-radius: v.$radius-sm;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+
+    background: v.$neon-blue;
+    color: v.$color-text-main;
+
+    box-shadow: 0 0 15px v.$neon-blue;
+
+    transition: v.$transition-fast;
+
+    &:hover{
+        transform: translateY(-1px);
+        box-shadow: 0 0 20px v.$neon-blue;
+    }
+
+    &.login{
+        background: v.$neon-blue;
+        box-shadow: 0 0 15px v.$neon-blue;
+    }
+
+    &.register{
+        background: v.$neon-pink;
+        box-shadow: 0 0 15px v.$neon-pink;
+    }
+}
+
 .gallery-image {
   padding: v.$space-xl;
   border: 2px solid white;
