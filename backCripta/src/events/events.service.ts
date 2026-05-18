@@ -22,7 +22,9 @@ export class EventsService {
 
   async create(createEventDto: CreateEventDto): Promise<Event> {
     const createdEvent = new this.eventModel(createEventDto);
-    return createdEvent.save();
+    const saved = await createdEvent.save();
+    this.eventsGateway.emitEventCreated(saved.toObject());
+    return saved;
   }
 
   async findAll(): Promise<Event[]> {
@@ -54,6 +56,7 @@ export class EventsService {
       throw new NotFoundException('Evento no encontrado');
     }
 
+    this.eventsGateway.emitEventDeleted(id);
     return event;
   }
 
@@ -70,6 +73,7 @@ export class EventsService {
       throw new NotFoundException('Evento no encontrado');
     }
 
+    this.eventsGateway.emitEventUpdated(event.toObject());
     return event;
   }
 

@@ -46,16 +46,44 @@ export function useEvents() {
   useEffect(() => {
     if (!socket) return
 
-    const handler = (data: { eventId: string; attendees: { userId: string }[] }) => {
+    const onAttendeeUpdate = (data: { eventId: string; attendees: { userId: string }[] }) => {
       setEventos(prev =>
         prev.map(ev =>
-          ev.id === data.eventId ? { ...ev, asistentes: data.attendees.length } : ev
+          ev.id === data.eventId
+            ? { ...ev, asistentes: data.attendees.length, attendeeIds: data.attendees.map(a => a.userId) }
+            : ev
         )
       )
     }
 
-    socket.on("attendee-update", handler)
-    return () => { socket.off("attendee-update", handler) }
+    const onEventCreated = (data: EventoAPI & { _id: string }) => {
+      setEventos(prev => {
+        if (prev.some(ev => ev.id === data._id)) return prev
+        return [...prev, mapEvento(data)]
+      })
+    }
+
+    const onEventUpdated = (data: EventoAPI & { _id: string }) => {
+      setEventos(prev =>
+        prev.map(ev => ev.id === data._id ? mapEvento(data) : ev)
+      )
+    }
+
+    const onEventDeleted = (data: { eventId: string }) => {
+      setEventos(prev => prev.filter(ev => ev.id !== data.eventId))
+    }
+
+    socket.on("attendee-update", onAttendeeUpdate)
+    socket.on("event-created", onEventCreated)
+    socket.on("event-updated", onEventUpdated)
+    socket.on("event-deleted", onEventDeleted)
+
+    return () => {
+      socket.off("attendee-update", onAttendeeUpdate)
+      socket.off("event-created", onEventCreated)
+      socket.off("event-updated", onEventUpdated)
+      socket.off("event-deleted", onEventDeleted)
+    }
   }, [socket])
 
   return { eventos, loading, error, refresh: load }
