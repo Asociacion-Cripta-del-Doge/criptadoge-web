@@ -15,6 +15,7 @@ import { ContactModule } from './contact/contact.module';
 import { MesasModule } from './mesas/mesas.module';
 import { ReservasModule } from './reservas/reservas.module';
 import { WebTextsModule } from './web-texts/web-texts.module';
+import { MembershipModule } from './membership/membership.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { WebTextsModule } from './web-texts/web-texts.module';
     MesasModule,
     ReservasModule,
     WebTextsModule,
+    MembershipModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -97,6 +97,7 @@ export const WEB_TEXT_DEFAULTS = {
   "home.events.modal.status": "Estado",
   "home.events.modal.attendees": "Asistentes",
   "home.events.modal.join": "Inscribirse",
+  "home.events.modal.leave": "Abandonar evento",
   "home.events.emptyValue": "Vacío",
 
   "home.location.badge": "Ubicación",

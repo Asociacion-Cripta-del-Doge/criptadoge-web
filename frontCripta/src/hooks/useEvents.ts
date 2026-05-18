@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { fetchEventos, type EventoAPI } from "../services/eventosService"
 import { useSocket } from "../context/SocketContext"
 
@@ -11,6 +11,7 @@ export interface Evento {
   label: string
   estado: string
   asistentes: number
+  attendeeIds: string[]
 }
 
 function mapEvento(e: EventoAPI): Evento {
@@ -23,6 +24,7 @@ function mapEvento(e: EventoAPI): Evento {
     label: e.label,
     estado: e.status,
     asistentes: e.attendees.length,
+    attendeeIds: e.attendees.map(a => a.userId),
   }
 }
 
@@ -32,12 +34,14 @@ export function useEvents() {
   const [error, setError] = useState<string | null>(null)
   const socket = useSocket()
 
-  useEffect(() => {
+  const load = useCallback(() => {
     fetchEventos()
       .then(data => setEventos(data.map(mapEvento)))
       .catch(err => setError(err.message))
       .finally(() => setLoading(false))
   }, [])
+
+  useEffect(() => { load() }, [load])
 
   useEffect(() => {
     if (!socket) return
@@ -54,5 +58,8 @@ export function useEvents() {
     return () => { socket.off("attendee-update", handler) }
   }, [socket])
 
-  return { eventos, loading, error }
+  return { eventos, loading, error, refresh: load }
+  
 }
+
+

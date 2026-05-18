@@ -2,8 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import "./App.scss";
-import Login from "./components/login/login";
 import { Navbar } from "./components/navbar/navbar";
+import Login from "./components/login/login";
+import ResetPassword from "./components/resetPassword/ResetPassword";
 import { Footer } from "./components/footer/footer";
 import { EventCalendar } from "./components/EventCalendar/EventCalendar";
 import { ContactoSection } from "./components/contact/contacto";
@@ -327,6 +328,16 @@ function App() {
         <Login />
       </>
     );
+  }
+
+  if (path === "/reset-password")
+  {
+    return(
+      <>
+        <Toaster position="top-right" />
+        <ResetPassword />
+      </>
+    )
   }
 
   if (loading) {

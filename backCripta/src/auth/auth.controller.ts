@@ -5,13 +5,20 @@ import { RegisterDto } from './dto/register.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
 export class AuthController {
+  private readonly frontendUrl: string;
+
   constructor(
     private authService: AuthService,
     private cloudinaryService: CloudinaryService,
-  ) {}
+    configService: ConfigService,
+  ) {
+    const callbackUrl = configService.get<string>('GOOGLE_CALLBACK_URL') ?? 'http://localhost:8080/api/auth/google/callback';
+    this.frontendUrl = new URL(callbackUrl).origin;
+  }
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
@@ -54,7 +61,26 @@ export class AuthController {
   async googleCallback(@Req() req: any, @Res() res: any) {
     const { access_token, user } = req.user;
     res.redirect(
-      `http://localhost:8080/auth/callback?token=${access_token}&user=${encodeURIComponent(JSON.stringify(user))}`
+      `${this.frontendUrl}/auth/callback?token=${access_token}&user=${encodeURIComponent(JSON.stringify(user))}`
     );
+  }
+
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  async forgotPassword(@Body('email') email: string)
+  {
+    await this.authService.forgotPassword(email);
+    return { message: 'Si el email existe, recibirás un enlace en breve.' }
+  }
+
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  async resetPassword(
+    @Body('token') token: string,
+    @Body('password') password: string
+  )
+  {
+    await this.authService.resetPassword(token, password);
+    return { message: 'Contraseña actualizada correctamente' }
   }
 }

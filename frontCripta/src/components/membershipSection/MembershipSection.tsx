@@ -1,78 +1,100 @@
 import { useState } from 'react';
 import MembershipModal from './MembershipModal';
 import './membershipSection.scss';
-import { useWebTexts } from '../../hooks/useWebTexts';
-import type { WebTextKey } from '../../data/webTextDefaults';
 
-const BENEFITS: {
-  icon: string;
-  titleKey: WebTextKey;
-  descriptionKey: WebTextKey;
-}[] = [
+const BENEFITS = [
   {
-    icon: '🎲',
-    titleKey: 'home.membership.benefits.boardGames.title',
-    descriptionKey: 'home.membership.benefits.boardGames.description',
+    icon: '🪑',
+    title: 'Reserva de Mesa',
+    description: 'Una mesa para hasta 4 personas durante una hora al día, completamente gratis.',
   },
   {
-    icon: '🃏',
-    titleKey: 'home.membership.benefits.tcg.title',
-    descriptionKey: 'home.membership.benefits.tcg.description',
+    icon: '🎉',
+    title: 'Eventos Gratis',
+    description: 'Accede y participa sin coste en todos los eventos organizados por la asociación.',
+  },
+];
+
+const STEPS = [
+  {
+    number: '01',
+    icon: '🌐',
+    title: 'Solicitud Online',
+    description: 'Rellena el formulario web para agilizar los tiempos y luego acércate presencialmente.',
   },
   {
-    icon: '🐉',
-    titleKey: 'home.membership.benefits.roleplay.title',
-    descriptionKey: 'home.membership.benefits.roleplay.description',
+    number: '02',
+    icon: '🏠',
+    title: 'Visítanos',
+    description: 'Pásate durante cualquier evento y te gestionamos el alta al momento.',
   },
   {
-    icon: '🕹️',
-    titleKey: 'home.membership.benefits.arcade.title',
-    descriptionKey: 'home.membership.benefits.arcade.description',
-  },
-  {
-    icon: '⚔️',
-    titleKey: 'home.membership.benefits.softcombat.title',
-    descriptionKey: 'home.membership.benefits.softcombat.description',
-  },
-  {
-    icon: '💻',
-    titleKey: 'home.membership.benefits.creative.title',
-    descriptionKey: 'home.membership.benefits.creative.description',
+    number: '03',
+    icon: '💬',
+    title: 'WhatsApp',
+    description: 'Escríbenos y organizamos un día contigo.',
   },
 ];
 
 export default function MembershipSection() {
   const [modalOpen, setModalOpen] = useState(false);
-  const text = useWebTexts('home.membership');
 
   return (
     <section className="membership-section" id="membresia">
       <div className="membership-section__container">
 
-        <div className="membership-section__header">
-          <span className="membership-section__badge">{text('home.membership.badge')}</span>
-          <h2 className="membership-section__title">{text('home.membership.title')}</h2>
-          <p className="membership-section__subtitle">{text('home.membership.subtitle')}</p>
+        <div className="membership-section__hero">
+          <span className="membership-section__badge">Membresía</span>
+          <h2 className="membership-section__title">Hazte Socio</h2>
+          <div className="membership-section__price">
+            <span className="membership-section__price-number">5€</span>
+            <span className="membership-section__price-period">al mes</span>
+          </div>
+          <p className="membership-section__price-note">Asociación sin ánimo de lucro</p>
         </div>
 
-        <div className="membership-section__grid">
-          {BENEFITS.map((benefit) => (
-            <div key={benefit.titleKey} className="membership-section__card">
-              <span className="membership-section__card-icon">{benefit.icon}</span>
-              <h3 className="membership-section__card-title">{text(benefit.titleKey)}</h3>
-              <p className="membership-section__card-desc">{text(benefit.descriptionKey)}</p>
-            </div>
-          ))}
+        <div className="membership-section__row">
+          <div className="membership-section__label">Qué incluye</div>
+          <div className="membership-section__benefits">
+            {BENEFITS.map((b) => (
+              <div key={b.title} className="membership-section__benefit">
+                <span className="membership-section__benefit-icon">{b.icon}</span>
+                <div>
+                  <h3 className="membership-section__benefit-title">{b.title}</h3>
+                  <p className="membership-section__benefit-desc">{b.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="membership-section__row">
+          <div className="membership-section__label">Cómo unirte</div>
+          <div className="membership-section__steps">
+            {STEPS.map((s, i) => (
+              <div key={s.number} className="membership-section__step">
+                <span className="membership-section__step-num">{s.number}</span>
+                <span className="membership-section__step-icon">{s.icon}</span>
+                <h3 className="membership-section__step-title">{s.title}</h3>
+                <p className="membership-section__step-desc">{s.description}</p>
+                {i < STEPS.length - 1 && (
+                  <div className="membership-section__step-connector" />
+                )}
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="membership-section__cta">
-          <p className="membership-section__cta-text">{text('home.membership.ctaText')}</p>
           <button
             className="btn-pink membership-section__cta-btn"
             onClick={() => setModalOpen(true)}
           >
-            {text('home.membership.ctaButton')}
+            Quiero ser socio
           </button>
+          <p className="membership-section__cta-note">
+            ¿Prefieres info por correo? Te escribimos todo.
+          </p>
         </div>
 
       </div>

@@ -8,11 +8,13 @@ import { JwtStrategy } from './jwt.strategy';
 import { GoogleStrategy } from './google.strategy';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
+import { EmailModule } from 'src/email/email.module';
 
 @Module({
   imports: [
     PassportModule,
     CloudinaryModule,
+    EmailModule,
     JwtModule.registerAsync({
       imports: [ConfigModule, PrismaModule],
       inject: [ConfigService],
