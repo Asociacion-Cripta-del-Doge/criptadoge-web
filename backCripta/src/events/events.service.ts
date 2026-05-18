@@ -10,17 +10,21 @@ import { Event, EventDocument } from './schemas/events.schema';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { UsersService } from '../users/users.service';
+import { EventsGateway } from './events.gateway';
 
 @Injectable()
 export class EventsService {
   constructor(
     @InjectModel(Event.name) private eventModel: Model<EventDocument>,
     private usersService: UsersService,
+    private eventsGateway: EventsGateway,
   ) {}
 
   async create(createEventDto: CreateEventDto): Promise<Event> {
     const createdEvent = new this.eventModel(createEventDto);
-    return createdEvent.save();
+    const saved = await createdEvent.save();
+    this.eventsGateway.emitEventCreated(saved.toObject());
+    return saved;
   }
 
   async findAll(): Promise<Event[]> {
@@ -52,6 +56,7 @@ export class EventsService {
       throw new NotFoundException('Evento no encontrado');
     }
 
+    this.eventsGateway.emitEventDeleted(id);
     return event;
   }
 
@@ -68,6 +73,7 @@ export class EventsService {
       throw new NotFoundException('Evento no encontrado');
     }
 
+    this.eventsGateway.emitEventUpdated(event.toObject());
     return event;
   }
 
@@ -94,6 +100,8 @@ export class EventsService {
     event.attendees.push({ userId, joinedAt: new Date() });
     await event.save();
 
+    this.eventsGateway.emitAttendeeUpdate(eventId, event.attendees as { userId: string; joinedAt: Date }[]);
+
     return event;
   }
 
@@ -114,6 +122,8 @@ export class EventsService {
 
     event.attendees.splice(index, 1);
     await event.save();
+
+    this.eventsGateway.emitAttendeeUpdate(eventId, event.attendees as { userId: string; joinedAt: Date }[]);
 
     return event;
   }
