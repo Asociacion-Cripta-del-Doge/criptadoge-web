@@ -13,6 +13,14 @@ export class MembershipService {
     private readonly emailService: EmailService,
   ) {}
 
+  async getRequests(): Promise<MembershipRequest[]> {
+    return this.membershipRequestModel
+      .find()
+      .sort({ createdAt: -1 })
+      .lean<MembershipRequest[]>()
+      .exec();
+  }
+
   async createRequest(dto: CreateMembershipRequestDto): Promise<void> {
     try {
       await this.membershipRequestModel.create(dto);

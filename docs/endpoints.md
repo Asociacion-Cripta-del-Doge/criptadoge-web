@@ -255,6 +255,7 @@ Estados disponibles:
 
 | Metodo | Ruta | Auth | Roles | Body / uso |
 | ------ | ---- | ---- | ----- | ---------- |
+| GET | `/membership/requests` | JWT | ADMIN | Lista solicitudes de membresia |
 | POST | `/membership/request` | No | Publico | Crea una solicitud de membresia |
 
 **CreateMembershipRequestDto:**
@@ -270,6 +271,24 @@ Estados disponibles:
 ```
 
 La solicitud se guarda con estado inicial `Pendiente` y envia un email de confirmacion al solicitante.
+
+**Response GET `/membership/requests`:**
+
+```json
+[
+  {
+    "_id": "string",
+    "name": "string",
+    "email": "string",
+    "phone": "string",
+    "birthdate": "string",
+    "howDidYouKnow": "string | undefined",
+    "status": "Pendiente | Revisada | Aprobada | Rechazada",
+    "createdAt": "ISO 8601",
+    "updatedAt": "ISO 8601"
+  }
+]
+```
 
 ---
 
