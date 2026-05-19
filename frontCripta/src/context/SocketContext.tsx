@@ -7,7 +7,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   const socketRef = useRef<Socket | null>(null)
 
   if (!socketRef.current) {
-    const token = localStorage.getItem("access_token")
+    const token = sessionStorage.getItem("access_token")
     socketRef.current = io("/", {
       path: "/socket.io",
       auth: token ? { token } : {},

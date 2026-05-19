@@ -59,7 +59,7 @@ const normalizeReserva = (reserva: ReservaMesa): ReservaMesa => ({
   precio: normalizePrecio(reserva.precio),
 });
 
-const getToken = () => localStorage.getItem("access_token");
+const getToken = () => sessionStorage.getItem("access_token");
 
 const authHeaders = (): Record<string, string> => {
   const token = getToken();

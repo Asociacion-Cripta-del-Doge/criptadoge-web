@@ -356,8 +356,8 @@ function App() {
     const oauthUser = params.get("user");
 
     if (token && oauthUser) {
-      localStorage.setItem("access_token", token);
-      localStorage.setItem("user", oauthUser);
+      sessionStorage.setItem("access_token", token);
+      sessionStorage.setItem("user", oauthUser);
     }
     window.location.href = "/";
   }

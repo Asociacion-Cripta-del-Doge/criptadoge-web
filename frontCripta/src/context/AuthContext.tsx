@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true)
 
   const fetchMe = async () => {
-    const token = localStorage.getItem("access_token")
+    const token = sessionStorage.getItem("access_token")
     if (!token) { setLoading(false); return }
 
     try {
@@ -41,7 +41,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log("fetchMe data:", data)
       setUser(data)
     } catch {
-      localStorage.removeItem("access_token")
+      sessionStorage.removeItem("access_token")
+      sessionStorage.removeItem("token")
+      sessionStorage.removeItem("user")
       setUser(null)
     } finally {
       setLoading(false)
@@ -51,7 +53,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => { fetchMe() }, [])
 
   const logout = () => {
-    localStorage.removeItem("access_token")
+    sessionStorage.removeItem("access_token")
+    sessionStorage.removeItem("token")
+    sessionStorage.removeItem("user")
     setUser(null)
     window.location.href = "/"
   }

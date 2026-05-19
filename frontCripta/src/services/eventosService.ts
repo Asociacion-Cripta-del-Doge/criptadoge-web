@@ -13,7 +13,7 @@ export interface EventoAPI {
 }
 
 function getToken(): string | null {
-  return localStorage.getItem("access_token")
+  return sessionStorage.getItem("access_token")
 }
 
 export async function fetchEventos(): Promise<EventoAPI[]> {

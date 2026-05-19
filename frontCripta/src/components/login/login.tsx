@@ -50,9 +50,9 @@ export default function Login(){
                     return
                 }
 
-                localStorage.setItem("access_token", data.access_token)
-                localStorage.setItem("token", data.access_token)
-                localStorage.setItem("user", JSON.stringify(data.user))
+                sessionStorage.setItem("access_token", data.access_token)
+                sessionStorage.setItem("token", data.access_token)
+                sessionStorage.setItem("user", JSON.stringify(data.user))
                 window.location.href = "/"
             }
             else if (mode === "register")
