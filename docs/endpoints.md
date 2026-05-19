@@ -480,6 +480,7 @@ Filtra las mesas con `esDePago = false` antes de calcular los huecos. Los usuari
 - Los socios activos tienen 1 hora gratis en mesas de pago; el precio de las horas restantes es solo informativo y no activa ningun cobro.
 - Cancelar una reserva cambia su estado a `CANCELADA`; no elimina el historico.
 - Solo el propietario de la reserva o un usuario `ADMIN` puede cancelarla.
+- Al crear o cancelar una reserva, el backend emite por Socket.IO el evento `reservation-changed` para que la pagina de reservas actualice huecos y avise a los usuarios conectados.
 
 ---
 

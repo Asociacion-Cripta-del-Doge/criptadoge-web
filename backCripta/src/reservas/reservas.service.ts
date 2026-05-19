@@ -10,6 +10,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { ConsultaDisponibilidadDto } from './dto/consulta-disponibilidad.dto';
 import { ConsultaHuecosDto } from './dto/consulta-huecos.dto';
 import { CreateReservaDto } from './dto/create-reserva.dto';
+import { ReservasGateway } from './reservas.gateway';
 
 const ACTIVE_RESERVATION_STATES = [
   EstadoReservaMesa.PENDIENTE,
@@ -42,7 +43,10 @@ const SERVER_BOOKING_SCHEDULE = {
 
 @Injectable()
 export class ReservasService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private reservasGateway?: ReservasGateway,
+  ) {}
 
   /**
    * Crea una reserva para el usuario autenticado si la mesa tiene asientos
@@ -86,7 +90,7 @@ export class ReservasService {
       user.status,
     );
 
-    return this.prisma.reservaMesa.create({
+    const reserva = await this.prisma.reservaMesa.create({
       data: {
         mesaId: data.mesaId,
         userId,
@@ -97,6 +101,18 @@ export class ReservasService {
       },
       include: this.defaultInclude(),
     });
+
+    this.reservasGateway?.emitReservationChanged({
+      action: 'created',
+      reservaId: reserva.id,
+      mesaId: reserva.mesaId,
+      userId: reserva.userId,
+      fechaHoraInicio: reserva.fechaHoraInicio,
+      fechaHoraFin: reserva.fechaHoraFin,
+      estado: reserva.estado,
+    });
+
+    return reserva;
   }
 
   /**
@@ -263,11 +279,23 @@ export class ReservasService {
       );
     }
 
-    return this.prisma.reservaMesa.update({
+    const updatedReserva = await this.prisma.reservaMesa.update({
       where: { id },
       data: { estado: EstadoReservaMesa.CANCELADA },
       include: this.defaultInclude(true),
     });
+
+    this.reservasGateway?.emitReservationChanged({
+      action: 'cancelled',
+      reservaId: updatedReserva.id,
+      mesaId: updatedReserva.mesaId,
+      userId: updatedReserva.userId,
+      fechaHoraInicio: updatedReserva.fechaHoraInicio,
+      fechaHoraFin: updatedReserva.fechaHoraFin,
+      estado: updatedReserva.estado,
+    });
+
+    return updatedReserva;
   }
 
   private async getAvailability(

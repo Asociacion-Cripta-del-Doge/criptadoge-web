@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { CSSProperties } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import "./App.scss";
@@ -15,6 +15,7 @@ import { HeroCarousel } from "./components/heroCarousel/HeroCarousel";
 import MembershipSection from "./components/membershipSection/MembershipSection";
 import { PatrocinadoresSection } from "./components/patrocinadores/patrocinadores";
 import { useAuth } from "./context/AuthContext";
+import { useSocket } from "./context/SocketContext";
 import { useWebTexts } from "./hooks/useWebTexts";
 import { reservasService } from "./services/reservasService";
 import type { HuecoReserva, Mesa, ReservaMesa } from "./services/reservasService";
@@ -82,6 +83,7 @@ const buildCalendarDays = (visibleMonth: Date) => {
 function App() {
   const path = window.location.pathname;
   const { user, loading } = useAuth();
+  const socket = useSocket();
   const text = useWebTexts("booking");
   const heroText = useWebTexts("home.hero");
   const [fecha, setFecha] = useState(getToday);
@@ -181,7 +183,7 @@ function App() {
     });
   };
 
-  const refreshOwnReservations = async () => {
+  const refreshOwnReservations = useCallback(async () => {
     if (!user) {
       setOwnReservations([]);
       return;
@@ -199,17 +201,30 @@ function App() {
     } finally {
       setOwnReservationsLoading(false);
     }
-  };
+  }, [text, user]);
 
-  const refreshSlots = async () => {
+  const refreshSlots = useCallback(async (preserveSelection = false) => {
     const huecosData = await reservasService.getHuecos({
       fecha,
       asientosReservados,
       duracionMinutos,
     });
+    const previousSlot = preserveSelection ? selectedSlot : null;
     setSlots(huecosData.slots);
-    setSlotIndex(0);
-  };
+    setSlotIndex(() => {
+      if (!previousSlot) {
+        return 0;
+      }
+
+      const nextIndex = huecosData.slots.findIndex(
+        (slot) =>
+          slot.fechaHoraInicio === previousSlot.fechaHoraInicio &&
+          slot.fechaHoraFin === previousSlot.fechaHoraFin,
+      );
+
+      return nextIndex >= 0 ? nextIndex : 0;
+    });
+  }, [asientosReservados, duracionMinutos, fecha, selectedSlot]);
 
   const handleCancelReservation = async (reservaId: string) => {
     setCancelingReservationId(reservaId);
@@ -273,6 +288,34 @@ function App() {
 
     load();
   }, [asientosReservados, duracionMinutos, fecha, text, user]);
+
+  useEffect(() => {
+    if (path !== "/reservas" || !socket || !user) {
+      return;
+    }
+
+    const onReservationChanged = async (data: { userId: string }) => {
+      setSelectedMesaId(null);
+
+      try {
+        await Promise.all([refreshSlots(true), refreshOwnReservations()]);
+
+        if (data.userId !== user.id) {
+          toast(text("booking.toast.reservationsUpdated"));
+        }
+      } catch (error) {
+        toast.error(
+          error instanceof Error ? error.message : text("booking.toast.error"),
+        );
+      }
+    };
+
+    socket.on("reservation-changed", onReservationChanged);
+
+    return () => {
+      socket.off("reservation-changed", onReservationChanged);
+    };
+  }, [path, refreshOwnReservations, refreshSlots, socket, text, user]);
 
   const handleReserve = async () => {
     if (!selectedMesa || !selectedSlot) {
