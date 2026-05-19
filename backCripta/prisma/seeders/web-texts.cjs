@@ -322,8 +322,6 @@ const WEB_TEXT_DEFAULTS = {
   'booking.toast.created': 'Reserva creada',
   'booking.toast.cancelled': 'Reserva cancelada',
   'booking.toast.error': 'No se ha podido reservar',
-  'booking.toast.reservationsUpdated':
-    'Las reservas de mesas se han actualizado',
 
   'footer.brand': 'LA CRIPTA DE DOGE',
   'footer.logoAlt': 'Logo de La Cripta de Doge',

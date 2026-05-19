@@ -294,15 +294,11 @@ function App() {
       return;
     }
 
-    const onReservationChanged = async (data: { userId: string }) => {
+    const onReservationChanged = async () => {
       setSelectedMesaId(null);
 
       try {
         await Promise.all([refreshSlots(true), refreshOwnReservations()]);
-
-        if (data.userId !== user.id) {
-          toast(text("booking.toast.reservationsUpdated"));
-        }
       } catch (error) {
         toast.error(
           error instanceof Error ? error.message : text("booking.toast.error"),
