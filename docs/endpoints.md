@@ -27,6 +27,8 @@ Base URL via Nginx: `http://localhost:8080/api`
 | PATCH | `/auth/avatar` | JWT | `{ base64 }` |
 | GET | `/auth/google` | No | Inicia login con Google OAuth |
 | GET | `/auth/google/callback` | Google OAuth | Callback de Google; redirige al frontend con token y usuario |
+| POST | `/auth/forgot-password` | No | Solicita un enlace de recuperacion de contrasena |
+| POST | `/auth/reset-password` | No | Actualiza la contrasena usando un token valido |
 
 **LoginDto:**
 
@@ -58,6 +60,25 @@ Base URL via Nginx: `http://localhost:8080/api`
     "email": "string",
     "role": "ADMIN | MEMBER"
   }
+}
+```
+
+**Forgot password:**
+
+```json
+{
+  "email": "string (requerido, email valido)"
+}
+```
+
+Si el email existe y corresponde a un usuario con contrasena local, se envia un enlace de recuperacion. La respuesta es generica para no revelar si el email esta registrado.
+
+**Reset password:**
+
+```json
+{
+  "token": "string (requerido)",
+  "password": "string (requerido)"
 }
 ```
 
@@ -227,6 +248,28 @@ Estados disponibles:
 - `respondido`: Respondido
 - `resuelto`: Resuelto
 - `archivado`: Archivado
+
+---
+
+## Membership `/membership`
+
+| Metodo | Ruta | Auth | Roles | Body / uso |
+| ------ | ---- | ---- | ----- | ---------- |
+| POST | `/membership/request` | No | Publico | Crea una solicitud de membresia |
+
+**CreateMembershipRequestDto:**
+
+```json
+{
+  "name": "string (requerido, min. 2 caracteres)",
+  "email": "string (requerido, email valido)",
+  "phone": "string (requerido)",
+  "birthdate": "string (requerido)",
+  "howDidYouKnow": "string (opcional)"
+}
+```
+
+La solicitud se guarda con estado inicial `Pendiente` y envia un email de confirmacion al solicitante.
 
 ---
 
@@ -454,4 +497,4 @@ Authorization: Bearer <access_token>
 - El backend acepta JSON y URL encoded con limite de **10 MB**.
 - Usuarios se almacenan en **PostgreSQL** con Prisma.
 - Mesas y reservas de mesa se almacenan en **PostgreSQL** con Prisma.
-- Eventos y etiquetas de eventos se almacenan en **MongoDB** con Mongoose.
+- Eventos, etiquetas de eventos y solicitudes de membresia se almacenan en **MongoDB** con Mongoose.
