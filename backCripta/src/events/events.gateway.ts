@@ -13,11 +13,11 @@ export class EventsGateway {
     this.server.emit('attendee-update', { eventId, attendees });
   }
 
-  emitEventCreated(event: Record<string, unknown>) {
+  emitEventCreated(event: object) {
     this.server.emit('event-created', event);
   }
 
-  emitEventUpdated(event: Record<string, unknown>) {
+  emitEventUpdated(event: object) {
     this.server.emit('event-updated', event);
   }
 
