@@ -74,7 +74,7 @@ export default function Login(){
                 setMode("login")
                 setEmail(email)
                 setPassword("")
-                toast.success("auth.success.accountCreated")
+                toast.success(text("auth.success.accountCreated"))
             }
             else if (mode === "forgot")
             {
@@ -86,7 +86,7 @@ export default function Login(){
 
                 if(!res.ok)
                 {
-                    toast.error("Error al enviar el email")
+                    toast.error(text("auth.forgot.errors.sendEmail"))
                     return
                 }
                 setForgotSent(true)
@@ -127,14 +127,14 @@ export default function Login(){
         <h2 className="login-title">
           {mode === "login" && text("auth.title.login")}
           {mode === "register" && text("auth.title.register")}
-          {mode === "forgot" && "RECUPERAR CONTRASEÑA"}
+          {mode === "forgot" && text("auth.forgot.title")}
         </h2>
 
         {mode === "forgot" && forgotSent ? (
           <div className="forgot-sent">
-            <p>📧 Si el email está registrado, recibirás un enlace en breve.</p>
+            <p>{text("auth.forgot.sentBody")}</p>
             <button className="back-to-login" onClick={() => handleModeChange("login")}>
-              Volver al inicio de sesión
+              {text("auth.forgot.backLogin")}
             </button>
           </div>
         ) : (
@@ -191,12 +191,12 @@ export default function Login(){
                 ? text("auth.submit.loading")
                 : mode === "login" ? text("auth.submit.login")
                 : mode === "register" ? text("auth.submit.register")
-                : "Enviar enlace de recuperación"}
+                : text("auth.forgot.submit")}
             </button>
 
             {mode === "forgot" && (
               <button type="button" className="back-to-login" onClick={() => handleModeChange("login")}>
-                Volver al inicio de sesión
+                {text("auth.forgot.backLogin")}
               </button>
             )}
           </form>

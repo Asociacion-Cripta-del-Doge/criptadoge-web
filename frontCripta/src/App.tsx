@@ -20,8 +20,6 @@ import { reservasService } from "./services/reservasService";
 import type { HuecoReserva, Mesa, ReservaMesa } from "./services/reservasService";
 import logo from "./assets/logo.png";
 
-const BOOKING_PAID_NOTE =
-  "En mesas de pago, la primera hora es gratis para socios activos y el resto se calcula automaticamente.";
 const ACTIVE_USER_STATUS = "Activo";
 const CANCELLABLE_RESERVATION_STATES = ["PENDIENTE", "CONFIRMADA"];
 
@@ -145,24 +143,24 @@ function App() {
     }
 
     if (!user) {
-      return "Inicia sesion para ver huecos disponibles y reservar.";
+      return text("booking.unavailable.loginRequired");
     }
 
     if (mesa.esDePago && user.status !== ACTIVE_USER_STATUS) {
-      return "Las mesas de pago solo estan disponibles para socios activos.";
+      return text("booking.unavailable.paidOnlyActive");
     }
 
     if (!selectedSlot) {
-      return "No hay franjas disponibles para la fecha, duracion y huecos seleccionados.";
+      return text("booking.unavailable.noSlots");
     }
 
     const asientosDisponibles = mesa.asientosDisponibles ?? 0;
 
     if (asientosDisponibles > 0) {
-      return `Solo quedan ${asientosDisponibles} huecos libres en esta franja.`;
+      return `${text("booking.unavailable.onlyPrefix")} ${asientosDisponibles} ${text("booking.unavailable.onlySuffix")}`;
     }
 
-    return "Esta mesa no tiene huecos libres en la franja seleccionada.";
+    return text("booking.unavailable.tableFull");
   };
 
   const handleSelectDate = (dateValue: string) => {
@@ -358,7 +356,7 @@ function App() {
         </div>
       </header>
 
-      <section className="booking-toolbar" aria-label="Filtros de reserva">
+      <section className="booking-toolbar" aria-label={text("booking.aria.filters")}>
         <label className="booking-date-control">
           {text("booking.controls.date")}
           <button
@@ -374,14 +372,14 @@ function App() {
             <div
               className="booking-calendar"
               role="dialog"
-              aria-label="Calendario de reservas"
+              aria-label={text("booking.aria.calendar")}
             >
               <div className="booking-calendar__header">
                 <button
                   type="button"
                   onClick={() => moveVisibleMonth(-1)}
                   disabled={!canGoToPreviousMonth}
-                  aria-label="Mes anterior"
+                  aria-label={text("booking.aria.previousMonth")}
                 >
                   ‹
                 </button>
@@ -389,7 +387,7 @@ function App() {
                 <button
                   type="button"
                   onClick={() => moveVisibleMonth(1)}
-                  aria-label="Mes siguiente"
+                  aria-label={text("booking.aria.nextMonth")}
                 >
                   ›
                 </button>
@@ -572,7 +570,7 @@ function App() {
             })}
           </div>
 
-          <div className="booking-legend" aria-label="Leyenda">
+          <div className="booking-legend" aria-label={text("booking.aria.legend")}>
             <span>
               <i className="legend-free" /> {text("booking.legend.free")}
             </span>
@@ -629,10 +627,10 @@ function App() {
               </dl>
 
               <p className="panel-copy">
-                Vas a reservar {asientosReservados}{" "}
+                {text("booking.panel.reservePrefix")} {asientosReservados}{" "}
                 {text("booking.panel.spacesWord")}.
                 <br />
-                {BOOKING_PAID_NOTE}
+                {text("booking.panel.paidNote")}
               </p>
 
               <button

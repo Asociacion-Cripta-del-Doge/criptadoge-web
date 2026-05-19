@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import toast from 'react-hot-toast';
+import { useWebTexts } from '../../hooks/useWebTexts';
 import './membershipSection.scss';
 
 interface MembershipModalProps {
@@ -28,6 +29,7 @@ export default function MembershipModal({ onClose }: MembershipModalProps) {
   const [errors, setErrors] = useState<Partial<FormData>>({});
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const text = useWebTexts('home.membership');
 
   const handleChange = (field: keyof FormData, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -37,13 +39,13 @@ export default function MembershipModal({ onClose }: MembershipModalProps) {
   const validate = (): boolean => {
     const newErrors: Partial<FormData> = {};
     if (!form.name.trim() || form.name.trim().length < 2)
-      newErrors.name = 'Introduce tu nombre completo';
+      newErrors.name = text('home.membership.request.errors.name');
     if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
-      newErrors.email = 'Email no válido';
+      newErrors.email = text('home.membership.request.errors.email');
     if (!form.phone.trim() || !/^\+?[\d\s\-]{9,}$/.test(form.phone))
-      newErrors.phone = 'Teléfono no válido';
+      newErrors.phone = text('home.membership.request.errors.phone');
     if (!form.birthdate)
-      newErrors.birthdate = 'Introduce tu fecha de nacimiento';
+      newErrors.birthdate = text('home.membership.request.errors.birthdate');
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -60,7 +62,7 @@ export default function MembershipModal({ onClose }: MembershipModalProps) {
       if (!res.ok) throw new Error();
       setSubmitted(true);
     } catch {
-      toast.error('Error al enviar la solicitud. Inténtalo de nuevo.');
+      toast.error(text('home.membership.request.errors.submit'));
     } finally {
       setLoading(false);
     }
@@ -69,26 +71,26 @@ export default function MembershipModal({ onClose }: MembershipModalProps) {
   return createPortal(
     <div className="membership-modal__overlay" onClick={onClose}>
       <div className="membership-modal" onClick={(e) => e.stopPropagation()}>
-        <button className="membership-modal__close" onClick={onClose} aria-label="Cerrar">
+        <button className="membership-modal__close" onClick={onClose} aria-label={text('home.membership.modal.close')}>
           ✕
         </button>
 
         {!submitted ? (
           <>
             <span className="membership-modal__hero-icon">🎮</span>
-            <h3 className="membership-modal__title">Solicitud de Membresía</h3>
+            <h3 className="membership-modal__title">{text('home.membership.request.title')}</h3>
             <p className="membership-modal__text">
-              Rellena el formulario y nos pondremos en contacto contigo para completar el alta presencialmente.
+              {text('home.membership.request.body')}
             </p>
 
             <div className="membership-modal__form">
 
               <div className="membership-modal__field">
-                <label className="membership-modal__label">Nombre completo *</label>
+                <label className="membership-modal__label">{text('home.membership.request.fields.name')}</label>
                 <input
                   type="text"
                   className={`membership-modal__input ${errors.name ? 'membership-modal__input--error' : ''}`}
-                  placeholder="Tu nombre y apellidos"
+                  placeholder={text('home.membership.request.fields.namePlaceholder')}
                   value={form.name}
                   onChange={(e) => handleChange('name', e.target.value)}
                   disabled={loading}
@@ -98,11 +100,11 @@ export default function MembershipModal({ onClose }: MembershipModalProps) {
               </div>
 
               <div className="membership-modal__field">
-                <label className="membership-modal__label">Email *</label>
+                <label className="membership-modal__label">{text('home.membership.request.fields.email')}</label>
                 <input
                   type="email"
                   className={`membership-modal__input ${errors.email ? 'membership-modal__input--error' : ''}`}
-                  placeholder="tu@email.com"
+                  placeholder={text('home.membership.request.fields.emailPlaceholder')}
                   value={form.email}
                   onChange={(e) => handleChange('email', e.target.value)}
                   disabled={loading}
@@ -112,11 +114,11 @@ export default function MembershipModal({ onClose }: MembershipModalProps) {
 
               <div className="membership-modal__row">
                 <div className="membership-modal__field">
-                  <label className="membership-modal__label">Teléfono *</label>
+                  <label className="membership-modal__label">{text('home.membership.request.fields.phone')}</label>
                   <input
                     type="tel"
                     className={`membership-modal__input ${errors.phone ? 'membership-modal__input--error' : ''}`}
-                    placeholder="600 000 000"
+                    placeholder={text('home.membership.request.fields.phonePlaceholder')}
                     value={form.phone}
                     onChange={(e) => handleChange('phone', e.target.value)}
                     disabled={loading}
@@ -126,7 +128,7 @@ export default function MembershipModal({ onClose }: MembershipModalProps) {
                 </div>
 
                 <div className="membership-modal__field">
-                  <label className="membership-modal__label">Fecha de nacimiento *</label>
+                  <label className="membership-modal__label">{text('home.membership.request.fields.birthdate')}</label>
                   <input
                     type="date"
                     className={`membership-modal__input ${errors.birthdate ? 'membership-modal__input--error' : ''}`}
@@ -140,13 +142,13 @@ export default function MembershipModal({ onClose }: MembershipModalProps) {
 
               <div className="membership-modal__field">
                 <label className="membership-modal__label">
-                  ¿Cómo nos conociste?{' '}
-                  <span className="membership-modal__optional">(opcional)</span>
+                  {text('home.membership.request.fields.howDidYouKnow')}{' '}
+                  <span className="membership-modal__optional">{text('home.membership.request.fields.optional')}</span>
                 </label>
                 <input
                   type="text"
                   className="membership-modal__input"
-                  placeholder="Redes sociales, un amigo, un evento..."
+                  placeholder={text('home.membership.request.fields.howDidYouKnowPlaceholder')}
                   value={form.howDidYouKnow}
                   onChange={(e) => handleChange('howDidYouKnow', e.target.value)}
                   disabled={loading}
@@ -161,18 +163,18 @@ export default function MembershipModal({ onClose }: MembershipModalProps) {
               onClick={handleSubmit}
               disabled={loading}
             >
-              {loading ? 'Enviando solicitud...' : 'Enviar solicitud'}
+              {loading ? text('home.membership.request.submit.loading') : text('home.membership.request.submit.idle')}
             </button>
           </>
         ) : (
           <>
             <span className="membership-modal__hero-icon">✅</span>
-            <h3 className="membership-modal__title">¡Solicitud recibida!</h3>
+            <h3 className="membership-modal__title">{text('home.membership.request.successTitle')}</h3>
             <p className="membership-modal__text">
-              Nos pondremos en contacto contigo en breve para completar el proceso. ¡Nos vemos en la Cripta!
+              {text('home.membership.request.successBody')}
             </p>
             <button className="btn-outline membership-modal__submit" onClick={onClose}>
-              Cerrar
+              {text('home.membership.modal.close')}
             </button>
           </>
         )}

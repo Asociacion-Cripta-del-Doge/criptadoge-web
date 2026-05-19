@@ -2,12 +2,14 @@ import { useState, useEffect } from "react";
 import slide1 from "../../assets/carousel/slide1.jpg";
 import slide2 from "../../assets/carousel/slide2.jpg";
 import slide3 from "../../assets/carousel/slide3.jpg";
+import { useWebTexts } from "../../hooks/useWebTexts";
 import "./heroCarousel.scss";
 
 const slides = [slide1, slide2, slide3];
 
 export const HeroCarousel = () => {
   const [current, setCurrent] = useState(0);
+  const text = useWebTexts("home.hero");
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -21,7 +23,7 @@ export const HeroCarousel = () => {
 
   return (
     <div className="hero-carousel">
-      <img src={slides[current]} alt={`Slide ${current + 1}`} />
+      <img src={slides[current]} alt={`${text("home.hero.slideAlt")} ${current + 1}`} />
       <button className="hero-carousel__arrow hero-carousel__arrow--prev" onClick={prev}>‹</button>
       <button className="hero-carousel__arrow hero-carousel__arrow--next" onClick={next}>›</button>
       <div className="hero-carousel__dots">

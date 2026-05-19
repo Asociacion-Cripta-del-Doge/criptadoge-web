@@ -1,5 +1,6 @@
 export const WEB_TEXT_DEFAULTS = {
   "nav.brand": "LA CRIPTA DE DOGE",
+  "nav.logoAlt": "Logo de La Cripta de Doge",
   "nav.links.home": "Inicio",
   "nav.links.events": "Eventos",
   "nav.links.booking": "Reservas",
@@ -16,6 +17,7 @@ export const WEB_TEXT_DEFAULTS = {
     "Asociación sin ánimo de lucro dedicada al ocio alternativo para jóvenes. Juegos de mesa, rol, videojuegos y mucho más.",
   "home.hero.primaryCta": "Únete al Club",
   "home.hero.secondaryCta": "Ver Eventos",
+  "home.hero.slideAlt": "Imagen de La Cripta de Doge",
 
   "home.about.badge": "Asociación sin ánimo de lucro",
   "home.about.title": "¿Quiénes somos?",
@@ -50,6 +52,18 @@ export const WEB_TEXT_DEFAULTS = {
   "home.membership.ctaText":
     "¿Te interesa? Te enviamos toda la información directamente a tu correo.",
   "home.membership.ctaButton": "Quiero ser socio",
+  "home.membership.price.amount": "5€",
+  "home.membership.price.period": "al mes",
+  "home.membership.price.note": "Asociación sin ánimo de lucro",
+  "home.membership.includesLabel": "Qué incluye",
+  "home.membership.howToJoinLabel": "Cómo unirte",
+  "home.membership.ctaNote": "¿Prefieres info por correo? Te escribimos todo.",
+  "home.membership.benefits.tableBooking.title": "Reserva de Mesa",
+  "home.membership.benefits.tableBooking.description":
+    "Una mesa para hasta 4 personas durante una hora al día, completamente gratis.",
+  "home.membership.benefits.freeEvents.title": "Eventos Gratis",
+  "home.membership.benefits.freeEvents.description":
+    "Accede y participa sin coste en todos los eventos organizados por la asociación.",
   "home.membership.benefits.boardGames.title": "Juegos de Mesa",
   "home.membership.benefits.boardGames.description":
     "Acceso a cientos de juegos modernos, cooperativos y de estrategia para todos los niveles.",
@@ -78,6 +92,38 @@ export const WEB_TEXT_DEFAULTS = {
   "home.membership.modal.successTitle": "¡Correo en camino!",
   "home.membership.modal.successBody":
     "En breve recibirás toda la información en tu bandeja de entrada. ¡Nos vemos en la Cripta!",
+  "home.membership.steps.online.title": "Solicitud Online",
+  "home.membership.steps.online.description":
+    "Rellena el formulario web para agilizar los tiempos y luego acércate presencialmente.",
+  "home.membership.steps.visit.title": "Visítanos",
+  "home.membership.steps.visit.description":
+    "Pásate durante cualquier evento y te gestionamos el alta al momento.",
+  "home.membership.steps.whatsapp.title": "WhatsApp",
+  "home.membership.steps.whatsapp.description": "Escríbenos y organizamos un día contigo.",
+  "home.membership.request.title": "Solicitud de Membresía",
+  "home.membership.request.body":
+    "Rellena el formulario y nos pondremos en contacto contigo para completar el alta presencialmente.",
+  "home.membership.request.fields.name": "Nombre completo *",
+  "home.membership.request.fields.namePlaceholder": "Tu nombre y apellidos",
+  "home.membership.request.fields.email": "Email *",
+  "home.membership.request.fields.emailPlaceholder": "tu@email.com",
+  "home.membership.request.fields.phone": "Teléfono *",
+  "home.membership.request.fields.phonePlaceholder": "600 000 000",
+  "home.membership.request.fields.birthdate": "Fecha de nacimiento *",
+  "home.membership.request.fields.howDidYouKnow": "¿Cómo nos conociste?",
+  "home.membership.request.fields.optional": "(opcional)",
+  "home.membership.request.fields.howDidYouKnowPlaceholder":
+    "Redes sociales, un amigo, un evento...",
+  "home.membership.request.errors.name": "Introduce tu nombre completo",
+  "home.membership.request.errors.email": "Email no válido",
+  "home.membership.request.errors.phone": "Teléfono no válido",
+  "home.membership.request.errors.birthdate": "Introduce tu fecha de nacimiento",
+  "home.membership.request.errors.submit": "Error al enviar la solicitud. Inténtalo de nuevo.",
+  "home.membership.request.submit.loading": "Enviando solicitud...",
+  "home.membership.request.submit.idle": "Enviar solicitud",
+  "home.membership.request.successTitle": "¡Solicitud recibida!",
+  "home.membership.request.successBody":
+    "Nos pondremos en contacto contigo en breve para completar el proceso. ¡Nos vemos en la Cripta!",
 
   "home.events.titleHighlight": "Calendario",
   "home.events.titleSuffix": "de Eventos",
@@ -89,6 +135,14 @@ export const WEB_TEXT_DEFAULTS = {
   "home.events.emptyDay": "No hay eventos este día",
   "home.events.emptyCategory": "de la categoría",
   "home.events.more": "Ver más →",
+  "home.events.aria.previousMonth": "Mes anterior",
+  "home.events.aria.nextMonth": "Mes siguiente",
+  "home.events.feedback.loginRequired": "Debes iniciar sesión para inscribirte.",
+  "home.events.feedback.left": "Te has dado de baja del evento.",
+  "home.events.feedback.joined": "¡Inscripción confirmada!",
+  "home.events.feedback.unexpectedError": "Error inesperado",
+  "home.events.attendees.singular": "asistente",
+  "home.events.attendees.plural": "asistentes",
   "home.events.modal.close": "Cerrar",
   "home.events.modal.description": "Descripción",
   "home.events.modal.date": "Fecha",
@@ -181,6 +235,7 @@ export const WEB_TEXT_DEFAULTS = {
   "home.contact.twitch.offlineShort": "⚫ Offline",
   "home.contact.twitch.watchLive": "Ver Directo",
   "home.contact.twitch.watchChannel": "Ver Canal",
+  "home.contact.twitch.thumbnailAlt": "Canal de Twitch",
   "home.contact.instagramTitle": "Instagram",
   "home.contact.instagramCta": "Ver Perfil",
 
@@ -201,6 +256,11 @@ export const WEB_TEXT_DEFAULTS = {
   "booking.controls.seatsUnit": "asientos",
   "booking.controls.slot": "Franja",
   "booking.controls.noSlots": "Sin huecos",
+  "booking.aria.filters": "Filtros de reserva",
+  "booking.aria.calendar": "Calendario de reservas",
+  "booking.aria.previousMonth": "Mes anterior",
+  "booking.aria.nextMonth": "Mes siguiente",
+  "booking.aria.legend": "Leyenda",
   "booking.stage": "Mostrador",
   "booking.table.prefix": "Mesa",
   "booking.table.shortPrefix": "M",
@@ -221,6 +281,17 @@ export const WEB_TEXT_DEFAULTS = {
   "booking.panel.spacesWord": "huecos",
   "booking.panel.empty":
     "Selecciona fecha, franja y una mesa disponible para ver el detalle de la reserva.",
+  "booking.panel.reservePrefix": "Vas a reservar",
+  "booking.panel.paidNote":
+    "En mesas de pago, la primera hora es gratis para socios activos y el resto se calcula automáticamente.",
+  "booking.unavailable.loginRequired": "Inicia sesión para ver huecos disponibles y reservar.",
+  "booking.unavailable.paidOnlyActive":
+    "Las mesas de pago solo están disponibles para socios activos.",
+  "booking.unavailable.noSlots":
+    "No hay franjas disponibles para la fecha, duración y huecos seleccionados.",
+  "booking.unavailable.onlyPrefix": "Solo quedan",
+  "booking.unavailable.onlySuffix": "huecos libres en esta franja.",
+  "booking.unavailable.tableFull": "Esta mesa no tiene huecos libres en la franja seleccionada.",
   "booking.actions.loginToReserve": "Inicia sesion para reservar",
   "booking.actions.reserving": "Reservando...",
   "booking.actions.reserve": "Reservar huecos",
@@ -238,6 +309,7 @@ export const WEB_TEXT_DEFAULTS = {
   "booking.toast.error": "No se ha podido reservar",
 
   "footer.brand": "LA CRIPTA DE DOGE",
+  "footer.logoAlt": "Logo de La Cripta de Doge",
   "footer.description":
     "Asociación sin ánimo de lucro dedicada al ocio alternativo para jóvenes en Puertollano.",
   "footer.linksTitle": "Enlaces",
@@ -266,6 +338,8 @@ export const WEB_TEXT_DEFAULTS = {
   "auth.fields.forgotPassword": "¿Olvidaste tu contraseña?",
   "auth.fields.password": "Contraseña",
   "auth.fields.confirmPassword": "Confirmar contraseña",
+  "auth.password.show": "Mostrar contraseña",
+  "auth.password.hide": "Ocultar contraseña",
   "auth.submit.loading": "Cargando...",
   "auth.submit.login": "Iniciar sesión",
   "auth.submit.register": "Crear cuenta",
@@ -281,6 +355,19 @@ export const WEB_TEXT_DEFAULTS = {
   "auth.errors.createAccount": "Error al crear la cuenta",
   "auth.errors.connection": "Error de conexión. Inténtalo de nuevo",
   "auth.success.accountCreated": "¡Cuenta creada! Ya puedes iniciar sesión.",
+  "auth.forgot.title": "RECUPERAR CONTRASEÑA",
+  "auth.forgot.submit": "Enviar enlace de recuperación",
+  "auth.forgot.backLogin": "Volver al inicio de sesión",
+  "auth.forgot.sentBody": "📧 Si el email está registrado, recibirás un enlace en breve.",
+  "auth.forgot.errors.sendEmail": "Error al enviar el email",
+  "auth.reset.title": "NUEVA CONTRASEÑA",
+  "auth.reset.fields.password": "Nueva contraseña",
+  "auth.reset.submit.loading": "Guardando...",
+  "auth.reset.submit.idle": "Guardar contraseña",
+  "auth.reset.errors.invalidToken": "Token inválido o expirado",
+  "auth.reset.successToast": "¡Contraseña actualizada!",
+  "auth.reset.doneBody": "✅ Tu contraseña ha sido actualizada correctamente.",
+  "auth.reset.backLogin": "Ir al inicio de sesión",
 
   "profile.status.active": "Activo",
   "profile.status.pending": "Pendiente de activación",

@@ -11,7 +11,7 @@ export const Footer = () => {
             <div className="footer-container">
                 <div className="footer-brand">
                     <div className="footer-logo">
-                        <img src={logo} alt="logo" />
+                        <img src={logo} alt={text("footer.logoAlt")} />
                         <span>{text("footer.brand")}</span>
                     </div>
 
