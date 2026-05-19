@@ -8,7 +8,8 @@ export interface EventoAPI {
   time?: string
   label: string
   status: string
-  attendees: { userId: string; joinedAt: string }[]
+  attendeesCount: number
+  isAttending?: boolean
 }
 
 function getToken(): string | null {
@@ -18,6 +19,17 @@ function getToken(): string | null {
 export async function fetchEventos(): Promise<EventoAPI[]> {
   const res = await fetch(`${API_BASE}/eventos`)
   if (!res.ok) throw new Error(`Error ${res.status}`)
+  return res.json()
+}
+
+export async function fetchMisAsistencias(): Promise<string[]> {
+  const token = getToken()
+  if (!token) return []
+
+  const res = await fetch(`${API_BASE}/eventos/mis-asistencias`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (!res.ok) return []
   return res.json()
 }
 

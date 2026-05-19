@@ -50,7 +50,7 @@ const EventoModal = ({
   const [busy, setBusy] = useState(false)
   const [feedback, setFeedback] = useState<{ msg: string; ok: boolean } | null>(null)
 
-  const isInscrito = !!user && ev.attendeeIds.includes(user.id)
+  const isInscrito = !!user && ev.attendeeIds.length > 0
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose()
@@ -69,11 +69,10 @@ const EventoModal = ({
       const updated = isInscrito
         ? await leaveEvento(ev.id)
         : await joinEvento(ev.id)
-      const newAttendeeIds = updated.attendees.map(a => a.userId)
       onUpdated({
         ...ev,
-        asistentes: updated.attendees.length,
-        attendeeIds: newAttendeeIds,
+        asistentes: updated.attendeesCount,
+        attendeeIds: updated.isAttending ? ["me"] : [],
       })
       setFeedback({
         msg: isInscrito ? text("home.events.feedback.left") : text("home.events.feedback.joined"),

@@ -138,8 +138,10 @@ Si el email existe y corresponde a un usuario con contrasena local, se envia un 
 | POST | `/eventos` | JWT | ADMIN | `CreateEventDto` |
 | PUT | `/eventos/:id` | JWT | ADMIN | `UpdateEventDto` |
 | DELETE | `/eventos/:id` | JWT | ADMIN | Elimina evento |
-| POST | `/eventos/:id/asistentes` | JWT | MEMBER | Unirse al evento |
-| DELETE | `/eventos/:id/asistentes` | JWT | MEMBER | Salir del evento |
+| GET | `/eventos/mis-asistencias` | JWT | MEMBER, ADMIN | IDs de eventos en los que participa el usuario autenticado |
+| POST | `/eventos/:id/asistentes` | JWT | MEMBER, ADMIN | Unirse al evento |
+| DELETE | `/eventos/:id/asistentes` | JWT | MEMBER, ADMIN | Salir del evento |
+| GET | `/eventos/:id/asistentes/count` | No | Publico | Numero de asistentes del evento |
 | GET | `/eventos/:id/asistentes` | JWT | ADMIN | Lista asistentes del evento |
 
 **CreateEventDto:**
@@ -165,6 +167,30 @@ Si el email existe y corresponde a un usuario con contrasena local, se envia un 
   "description": "string",
   "time": "string",
   "status": "string"
+}
+```
+
+**Response GET `/eventos` y `/eventos/:id`:**
+
+```json
+{
+  "_id": "string",
+  "title": "string",
+  "date": "string",
+  "label": "string",
+  "description": "string",
+  "time": "string",
+  "status": "string",
+  "attendeesCount": 3
+}
+```
+
+**Response GET `/eventos/:id/asistentes/count`:**
+
+```json
+{
+  "eventId": "string",
+  "attendeesCount": 3
 }
 ```
 

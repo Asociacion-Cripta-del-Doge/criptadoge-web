@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react"
-import { fetchEventos, type EventoAPI } from "../services/eventosService"
+import { fetchEventos, fetchMisAsistencias, type EventoAPI } from "../services/eventosService"
 import { useSocket } from "../context/SocketContext"
 
 export interface Evento {
@@ -23,8 +23,8 @@ function mapEvento(e: EventoAPI): Evento {
     hora: e.time,
     label: e.label,
     estado: e.status,
-    asistentes: e.attendees.length,
-    attendeeIds: e.attendees.map(a => a.userId),
+    asistentes: e.attendeesCount,
+    attendeeIds: e.isAttending ? ["me"] : [],
   }
 }
 
@@ -35,8 +35,14 @@ export function useEvents() {
   const socket = useSocket()
 
   const load = useCallback(() => {
-    fetchEventos()
-      .then(data => setEventos(data.map(mapEvento)))
+    Promise.all([fetchEventos(), fetchMisAsistencias()])
+      .then(([data, myAttendances]) => {
+        const myAttendanceSet = new Set(myAttendances)
+        setEventos(data.map(event => ({
+          ...mapEvento(event),
+          attendeeIds: event.isAttending || myAttendanceSet.has(event._id) ? ["me"] : [],
+        })))
+      })
       .catch(err => setError(err.message))
       .finally(() => setLoading(false))
   }, [])
@@ -46,11 +52,11 @@ export function useEvents() {
   useEffect(() => {
     if (!socket) return
 
-    const onAttendeeUpdate = (data: { eventId: string; attendees: { userId: string }[] }) => {
+    const onAttendeeUpdate = (data: { eventId: string; attendeesCount: number }) => {
       setEventos(prev =>
         prev.map(ev =>
           ev.id === data.eventId
-            ? { ...ev, asistentes: data.attendees.length, attendeeIds: data.attendees.map(a => a.userId) }
+            ? { ...ev, asistentes: data.attendeesCount }
             : ev
         )
       )
@@ -65,7 +71,11 @@ export function useEvents() {
 
     const onEventUpdated = (data: EventoAPI & { _id: string }) => {
       setEventos(prev =>
-        prev.map(ev => ev.id === data._id ? mapEvento(data) : ev)
+        prev.map(ev =>
+          ev.id === data._id
+            ? { ...mapEvento(data), attendeeIds: data.isAttending ? ["me"] : ev.attendeeIds }
+            : ev
+        )
       )
     }
 
