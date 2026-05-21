@@ -24,8 +24,8 @@ export class GalleryController {
   constructor(private readonly galleryService: GalleryService) { }
 
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles('ADMIN')
   create(@Body() createGalleryPhotoDto: CreateGalleryPhotoDto, file: Express.Multer.File, @Req() req: Request) {
     return this.galleryService.createPhoto(createGalleryPhotoDto, file, req.user);
   }

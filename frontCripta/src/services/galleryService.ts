@@ -3,6 +3,10 @@ import type { GalleryPhoto, GalleryComment } from '../types/gallery';
 
 const API_BASE = "http://localhost:8080/api"
 
+export function getToken(): string | null {
+  return localStorage.getItem("token")
+}
+
 export async function getGalleryPhotos(): Promise<GalleryPhoto[]> {
 const response = await fetch(`${API_BASE}/gallery`);
 
@@ -31,22 +35,20 @@ description?: string;
 file: File;
 },
 ): Promise<GalleryPhoto> {
-const formData = new FormData();
 
-formData.append('title', data.title);
-formData.append('file', data.file);
-
-if (data.description) {
-formData.append('description', data.description);
-}
+console.log(data.file);
+const formData = {"title": data.title, "description": data.description, "file": data.file};
 
 const response = await fetch(`${API_BASE}/gallery`, {
 method: 'POST',
 headers: {
 Authorization: `Bearer ${token}`,
+'Content-Type': 'application/json',
 },
-body: formData,
+body: JSON.stringify(formData),
 });
+
+console.log("Upload response:", response.json());
 
 if (!response.ok) {
 throw new Error('No se pudo subir la foto');
