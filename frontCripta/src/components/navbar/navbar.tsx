@@ -5,10 +5,12 @@ import logo from "../../assets/logo.png"
 import { useAuth } from "../../context/AuthContext"
 import { useWebTexts } from "../../hooks/useWebTexts"
 import { ProfileModal } from "../profile/ProfileModal"
+import { PackReveal } from "../packReveal/PackReveal"
 
 export const Navbar = () => {
   const [scrolled, setScrolled] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
+  const [showPackReveal, setShowPackReveal] = useState(false)
   const { user, loading } = useAuth()
   const text = useWebTexts("nav")
 
@@ -27,6 +29,13 @@ export const Navbar = () => {
           <div className="navbar-left">
             <img src={logo} alt={text("nav.logoAlt")} />
             <span className="brand-text"> {text("nav.brand")} </span>
+            <button
+              className="btn-pack"
+              onClick={() => setShowPackReveal(true)}
+              aria-label="Abrir sobre"
+            >
+              🃏 Mis Sobres
+            </button>
           </div>
           <ul className="navbar-links">
             <li><a href="/#inicio">{text("nav.links.home")}</a></li>
@@ -78,6 +87,11 @@ export const Navbar = () => {
 
       {showProfile && createPortal(
         <ProfileModal onClose={() => setShowProfile(false)} />,
+        document.body
+      )}
+
+      {showPackReveal && createPortal(
+        <PackReveal onClose={() => setShowPackReveal(false)} />,
         document.body
       )}
     </>

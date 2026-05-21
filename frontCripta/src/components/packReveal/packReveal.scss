@@ -1,0 +1,425 @@
+@use "../../styles/variables" as v;
+@use "sass:color";
+
+/* ═══════════════════════════════════════════════════════════════
+   Variables locales del sobre
+   ═══════════════════════════════════════════════════════════════ */
+$pack-w:      200px;
+$pack-h:      340px;
+$pack-radius: 14px;
+$pack-border: rgba(160, 100, 255, 0.65);
+$card-w:      165px;
+$card-h:      231px;   /* ratio TCG 2.5:3.5 */
+$card-radius: 10px;
+
+/* ═══════════════════════════════════════════════════════════════
+   OVERLAY — cubre todo el viewport por encima de la navbar
+   ═══════════════════════════════════════════════════════════════ */
+.pack-reveal {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.95);
+
+  /* Glow neon (igual que _globals.scss body::before) */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 30% 20%, v.$neon-blue 0%, transparent 40%),
+      radial-gradient(circle at 70% 80%, v.$neon-pink  0%, transparent 40%);
+    opacity: 0.08;
+    pointer-events: none;
+  }
+
+  /* Grid de líneas (igual que _globals.scss body::after) */
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0, 191, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 191, 255, 0.04) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+  }
+}
+
+/* ── Botón de cerrar ──────────────────────────────────────────── */
+.pack-reveal__close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 10;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(v.$color-text-main, 0.18);
+  border-radius: v.$radius-sm;
+  background: rgba(v.$color-bg-surface, 0.72);
+  color: v.$color-text-muted;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    border-color v.$transition-fast,
+    color v.$transition-fast,
+    background v.$transition-fast;
+
+  &:hover {
+    border-color: rgba(v.$neon-blue, 0.5);
+    color: v.$color-text-main;
+    background: rgba(v.$neon-blue, 0.1);
+  }
+}
+
+/* ── Flash de revelación ─────────────────────────────────────── */
+.pack-reveal__flash {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(200, 160, 255, 0.85) 0%,
+    transparent 70%
+  );
+  z-index: 50;
+}
+
+/* ── Hint de reset ───────────────────────────────────────────── */
+.pack-reveal__reset-hint {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  pointer-events: none;
+  font-family: v.$font-primary;
+  font-size: 0.78rem;
+  color: rgba(v.$color-text-muted, 0.6);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ESCENA — zona con perspectiva para el tilt 3D
+   ═══════════════════════════════════════════════════════════════ */
+.pack-reveal__scene {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Stack — apila sobre + carta en el mismo espacio ────────── */
+.pack-reveal__stack {
+  position: relative;
+  width: $pack-w;
+  height: $pack-h;
+  perspective: 1200px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CARTA — detrás del sobre, se revela al abrirlo
+   ═══════════════════════════════════════════════════════════════ */
+.pack-reveal__card-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  perspective: 1000px;
+}
+
+.pack-reveal__card {
+  position: relative;
+  width: $card-w;
+  height: $card-h;
+  transform-style: preserve-3d;
+  will-change: transform;
+  cursor: grab;
+
+  &:active { cursor: grabbing; }
+}
+
+/* Dorso de la carta */
+.pack-reveal__c-back {
+  position: absolute;
+  inset: 0;
+  border-radius: $card-radius;
+  backface-visibility: hidden;
+  overflow: hidden;
+  border: 2px solid #7c3dff;
+  box-shadow: 0 0 20px rgba(124, 61, 255, 0.5);
+}
+
+.pack-reveal__c-back-img {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(145deg, #0d0820, #1a0f40, #0a1830);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: v.$font-display;
+  font-size: 0.5rem;
+  color: rgba(255, 255, 255, 0.25);
+  text-align: center;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  line-height: 1.8;
+}
+
+/* Frente de la carta — rotado 180° en reposo (backface = oculto) */
+.pack-reveal__c-front {
+  position: absolute;
+  inset: 0;
+  border-radius: $card-radius;
+  transform: rotateY(180deg);
+  backface-visibility: hidden;
+  overflow: hidden;
+  border: 2px solid #00e5ff;
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
+}
+
+.pack-reveal__c-front-img {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #0e0e1a 0%, #0a1a2e 50%, #0e0e1a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: v.$font-display;
+  font-size: 0.5rem;
+  color: rgba(0, 229, 255, 0.3);
+  text-align: center;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  line-height: 1.8;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SOBRE — delante de la carta, se divide en dos mitades
+   ═══════════════════════════════════════════════════════════════ */
+.pack-reveal__pack {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  transform-style: preserve-3d;
+  will-change: transform;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+
+  &:active { cursor: grabbing; }
+}
+
+/* Cara trasera del sobre */
+.pack-reveal__pack-back {
+  position: absolute;
+  inset: 0;
+  border-radius: $pack-radius;
+  transform: rotateY(180deg);
+  backface-visibility: hidden;
+  overflow: hidden;
+  border: 1.5px solid rgba(160, 100, 255, 0.5);
+}
+
+.pack-reveal__pack-back-img {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(145deg, #1a0840, #0a1830, #120435);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: v.$font-display;
+  font-size: 0.5rem;
+  color: rgba(255, 255, 255, 0.25);
+  text-align: center;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  line-height: 1.8;
+}
+
+/* Mitad superior — 18%, pivota desde su borde inferior (la costura) */
+.pack-reveal__pack-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 18%;
+  transform-origin: 50% 100%;
+  backface-visibility: hidden;
+  overflow: hidden;
+  border-radius: $pack-radius $pack-radius 0 0;
+  border: 1.5px solid $pack-border;
+  border-bottom: none;
+}
+
+.pack-reveal__pack-top-img {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #5800d4, #2800a0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: v.$font-display;
+  font-size: 0.45rem;
+  color: rgba(255, 255, 255, 0.3);
+  text-align: center;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  line-height: 1.8;
+}
+
+/* ── Zona de perforación ─────────────────────────────────────── */
+.pack-reveal__perf-zone {
+  position: absolute;
+  top: 18%;
+  left: 0;
+  right: 0;
+  height: 18px;
+  transform: translateY(-50%);
+  z-index: 10;
+  cursor: col-resize;
+}
+
+.pack-reveal__perf-fill {
+  position: absolute;
+  inset: 0;
+  width: 0%;
+  background: rgba(200, 160, 255, 0.8);
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+.pack-reveal__perf-dots {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 8px;
+  pointer-events: none;
+}
+
+.pack-reveal__perf-dot {
+  flex-shrink: 0;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+/* Mitad inferior — 82%, pivota desde su borde superior (la costura) */
+.pack-reveal__pack-bot {
+  position: absolute;
+  top: 18%;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transform-origin: 50% 0%;
+  backface-visibility: hidden;
+  overflow: hidden;
+  border-radius: 0 0 $pack-radius $pack-radius;
+  border: 1.5px solid $pack-border;
+  border-top: none;
+}
+
+.pack-reveal__pack-bot-img {
+  width: 100%;
+  height: 100%;
+  /* Gradiente del prompt */
+  background: linear-gradient(180deg,
+    #2800a0 0%,
+    #001280 28%,
+    #0044b8 62%,
+    #0077d4 100%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: v.$font-display;
+  font-size: 0.45rem;
+  color: rgba(255, 255, 255, 0.25);
+  text-align: center;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  line-height: 1.8;
+  padding: 8px;
+}
+
+/* Glare reactivo al cursor — cubre todo el sobre */
+.pack-reveal__pack-glare {
+  position: absolute;
+  inset: 0;
+  border-radius: $pack-radius;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(255, 255, 255, 0.12) 0%,
+    transparent 65%
+  );
+  mix-blend-mode: screen;
+  z-index: 5;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   HINT DE SWIPE
+   ═══════════════════════════════════════════════════════════════ */
+.pack-reveal__swipe-hint {
+  position: absolute;
+  top: calc(#{$pack-h} + 18px);
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.pack-reveal__hint-text {
+  font-family: v.$font-primary;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(v.$color-text-main, 0.65);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.pack-reveal__hint-dots {
+  display: flex;
+  gap: 5px;
+}
+
+.pack-reveal__hint-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(200, 160, 255, 0.85);
+  animation: packHintPulse 0.7s ease-in-out infinite;
+
+  &:nth-child(1) { animation-delay: 0s;    }
+  &:nth-child(2) { animation-delay: 0.14s; }
+  &:nth-child(3) { animation-delay: 0.28s; }
+  &:nth-child(4) { animation-delay: 0.42s; }
+  &:nth-child(5) { animation-delay: 0.56s; }
+}
+
+@keyframes packHintPulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.8);  }
+  50%       { opacity: 1;   transform: scale(1.35); }
+}
