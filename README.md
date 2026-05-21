@@ -10,7 +10,7 @@ Proyecto fullstack para la web de La Cripta de Doge.
 ## Requisitos
 
 - Docker + Docker Compose
-- `make`
+- `make` opcional
 - Opcional para correr sin Docker:
   - Node.js 24+
   - Corepack habilitado (`corepack enable`)
@@ -22,6 +22,13 @@ Crear los archivos de variables locales:
 ```bash
 make env-init-dev
 make env-init-prod
+```
+
+Sin `make`:
+
+```bash
+copy .env.development.example .env.development
+copy .env.production.example .env.production
 ```
 
 Esto crea `.env.development` y `.env.production` desde sus ejemplos. Ambos archivos quedan fuera de git. Revisa y ajusta valores reales, especialmente secretos de produccion. Usa formato `CLAVE=valor`, sin espacios alrededor del `=`.
@@ -43,7 +50,7 @@ JWT_EXPIRES_IN=1d
 VITE_API_URL=http://localhost:8080/api
 ```
 
-Si prefieres ejecutar Docker Compose sin `make`, pasa siempre el env file correspondiente:
+Si ejecutas Docker Compose sin `make`, pasa siempre el env file correspondiente:
 
 ```bash
 docker compose --env-file .env.development up -d
@@ -84,6 +91,49 @@ Accesos:
 - API via Nginx: `http://localhost:8080/api`
 
 En desarrollo el frontend corre con Vite, el backend con `yarn start:dev` y los servicios leen `.env.development`.
+
+### Desarrollo sin Make
+
+Arrancar:
+
+```bash
+docker compose --env-file .env.development up -d
+```
+
+Reconstruir imagenes y arrancar:
+
+```bash
+docker compose --env-file .env.development up -d --build
+```
+
+Ver estado y logs:
+
+```bash
+docker compose --env-file .env.development ps
+docker compose --env-file .env.development logs -f --tail=200
+```
+
+Logs por servicio:
+
+```bash
+docker compose --env-file .env.development logs -f --tail=200 front
+docker compose --env-file .env.development logs -f --tail=200 back
+docker compose --env-file .env.development logs -f --tail=200 db
+docker compose --env-file .env.development logs -f --tail=200 mongo
+docker compose --env-file .env.development logs -f --tail=200 nginx
+```
+
+Detener:
+
+```bash
+docker compose --env-file .env.development down
+```
+
+Limpiar servicios y volumenes:
+
+```bash
+docker compose --env-file .env.development down -v --remove-orphans
+```
 
 ## Docker en produccion
 
@@ -131,6 +181,49 @@ Accesos:
 
 - App: `http://localhost:8080`
 - API via Nginx: `http://localhost:8080/api`
+
+### Produccion sin Make
+
+Arrancar:
+
+```bash
+docker compose --env-file .env.production -f docker-compose.prod.yml up -d
+```
+
+Reconstruir imagenes y arrancar:
+
+```bash
+docker compose --env-file .env.production -f docker-compose.prod.yml up -d --build
+```
+
+Ver estado y logs:
+
+```bash
+docker compose --env-file .env.production -f docker-compose.prod.yml ps
+docker compose --env-file .env.production -f docker-compose.prod.yml logs -f --tail=200
+```
+
+Logs por servicio:
+
+```bash
+docker compose --env-file .env.production -f docker-compose.prod.yml logs -f --tail=200 front
+docker compose --env-file .env.production -f docker-compose.prod.yml logs -f --tail=200 back
+docker compose --env-file .env.production -f docker-compose.prod.yml logs -f --tail=200 db
+docker compose --env-file .env.production -f docker-compose.prod.yml logs -f --tail=200 mongo
+docker compose --env-file .env.production -f docker-compose.prod.yml logs -f --tail=200 nginx
+```
+
+Detener:
+
+```bash
+docker compose --env-file .env.production -f docker-compose.prod.yml down
+```
+
+Limpiar servicios y volumenes de produccion:
+
+```bash
+docker compose --env-file .env.production -f docker-compose.prod.yml down -v --remove-orphans
+```
 
 ## Comandos Make mas usados
 
