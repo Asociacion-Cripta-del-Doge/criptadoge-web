@@ -25,7 +25,7 @@ export const Navbar = () => {
       <nav className={`navbar ${scrolled ? "navbar-scrolled" : ""}`}>
         <div className="navbar-container">
           <div className="navbar-left">
-            <img src={logo} alt="Logo" />
+            <img src={logo} alt={text("nav.logoAlt")} />
             <span className="brand-text"> {text("nav.brand")} </span>
           </div>
           <ul className="navbar-links">

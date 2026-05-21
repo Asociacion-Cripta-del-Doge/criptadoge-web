@@ -223,7 +223,7 @@ export const ContactoSection = () => {
               >
                 <div className="ct-twitch-thumbnail">
                   {twitch.thumbnail
-                    ? <img src={twitch.thumbnail} alt="canal" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "8px" }} />
+                    ? <img src={twitch.thumbnail} alt={text("home.contact.twitch.thumbnailAlt")} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "8px" }} />
                     : <span className="ct-twitch-play"><IconTwitch /></span>
                   }
                   <div className="ct-twitch-overlay">

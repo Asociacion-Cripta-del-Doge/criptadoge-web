@@ -50,7 +50,7 @@ export const ProfileModal = ({ onClose }: Props) => {
     if (!file) return
     setUploadingAvatar(true)
     try {
-      const token = localStorage.getItem("access_token")
+      const token = sessionStorage.getItem("access_token")
       const base64 = await new Promise<string>((resolve) => {
         const reader = new FileReader()
         reader.onload = () => resolve(reader.result as string)
@@ -75,7 +75,7 @@ export const ProfileModal = ({ onClose }: Props) => {
     setSaving(true)
     setNameError("")
     try {
-      const token = localStorage.getItem("access_token")
+      const token = sessionStorage.getItem("access_token")
       const res = await fetch("/api/auth/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },

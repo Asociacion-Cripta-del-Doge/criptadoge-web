@@ -50,7 +50,7 @@ const EventoModal = ({
   const [busy, setBusy] = useState(false)
   const [feedback, setFeedback] = useState<{ msg: string; ok: boolean } | null>(null)
 
-  const isInscrito = !!user && ev.attendeeIds.includes(user.id)
+  const isInscrito = !!user && ev.attendeeIds.length > 0
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose()
@@ -60,7 +60,7 @@ const EventoModal = ({
 
   const handleInscripcion = async () => {
     if (!user) {
-      setFeedback({ msg: "Debes iniciar sesión para inscribirte.", ok: false })
+      setFeedback({ msg: text("home.events.feedback.loginRequired"), ok: false })
       return
     }
     setBusy(true)
@@ -69,18 +69,17 @@ const EventoModal = ({
       const updated = isInscrito
         ? await leaveEvento(ev.id)
         : await joinEvento(ev.id)
-      const newAttendeeIds = updated.attendees.map(a => a.userId)
       onUpdated({
         ...ev,
-        asistentes: updated.attendees.length,
-        attendeeIds: newAttendeeIds,
+        asistentes: updated.attendeesCount,
+        attendeeIds: updated.isAttending ? ["me"] : [],
       })
       setFeedback({
-        msg: isInscrito ? "Te has dado de baja del evento." : "¡Inscripción confirmada!",
+        msg: isInscrito ? text("home.events.feedback.left") : text("home.events.feedback.joined"),
         ok: true,
       })
     } catch (err: unknown) {
-      setFeedback({ msg: err instanceof Error ? err.message : "Error inesperado", ok: false })
+      setFeedback({ msg: err instanceof Error ? err.message : text("home.events.feedback.unexpectedError"), ok: false })
     } finally {
       setBusy(false)
     }
@@ -219,9 +218,9 @@ export const EventCalendar = () => {
       <div className="ec-layout">
         <div className="ec-calendar">
           <div className="ec-cal-nav">
-            <button className="ec-nav-btn" onClick={prevMonth} aria-label="Mes anterior">‹</button>
+            <button className="ec-nav-btn" onClick={prevMonth} aria-label={text("home.events.aria.previousMonth")}>‹</button>
             <span className="ec-cal-month">{MESES_ES[month]} {year}</span>
-            <button className="ec-nav-btn" onClick={nextMonth} aria-label="Mes siguiente">›</button>
+            <button className="ec-nav-btn" onClick={nextMonth} aria-label={text("home.events.aria.nextMonth")}>›</button>
           </div>
 
           <div className="ec-cal-grid">
@@ -332,7 +331,7 @@ export const EventCalendar = () => {
                         {ev.hora && <span title={text("home.events.modal.time")}>🕐 {ev.hora}</span>}
                         {ev.asistentes > 0 && (
                           <span className="ec-event-plazas" title={text("home.events.modal.attendees")}>
-                            👥 {ev.asistentes} asistente{ev.asistentes !== 1 ? "s" : ""}
+                            👥 {ev.asistentes} {ev.asistentes === 1 ? text("home.events.attendees.singular") : text("home.events.attendees.plural")}
                           </span>
                         )}
                       </div>

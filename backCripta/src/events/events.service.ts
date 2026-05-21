@@ -12,6 +12,12 @@ import { UpdateEventDto } from './dto/update-event.dto';
 import { UsersService } from '../users/users.service';
 import { EventsGateway } from './events.gateway';
 
+type PublicEvent = Omit<Event, 'attendees'> & {
+  _id: unknown;
+  attendeesCount: number;
+  isAttending?: boolean;
+};
+
 @Injectable()
 export class EventsService {
   constructor(
@@ -20,18 +26,29 @@ export class EventsService {
     private eventsGateway: EventsGateway,
   ) {}
 
+  private toPublicEvent(event: EventDocument, userId?: string): PublicEvent {
+    const { attendees = [], ...publicEvent } = event.toObject();
+
+    return {
+      ...publicEvent,
+      attendeesCount: attendees.length,
+      ...(userId ? { isAttending: attendees.some((a) => a.userId === userId) } : {}),
+    } as PublicEvent;
+  }
+
   async create(createEventDto: CreateEventDto): Promise<Event> {
     const createdEvent = new this.eventModel(createEventDto);
     const saved = await createdEvent.save();
-    this.eventsGateway.emitEventCreated(saved.toObject());
+    this.eventsGateway.emitEventCreated(this.toPublicEvent(saved));
     return saved;
   }
 
-  async findAll(): Promise<Event[]> {
-    return this.eventModel.find().exec();
+  async findAll(userId?: string): Promise<PublicEvent[]> {
+    const events = await this.eventModel.find().exec();
+    return events.map((event) => this.toPublicEvent(event, userId));
   }
 
-  async findOne(id: string): Promise<Event> {
+  async findOne(id: string, userId?: string): Promise<PublicEvent> {
     if (!isValidObjectId(id)) {
       throw new BadRequestException('ID de evento inválido');
     }
@@ -42,7 +59,7 @@ export class EventsService {
       throw new NotFoundException('Evento no encontrado');
     }
 
-    return event;
+    return this.toPublicEvent(event, userId);
   }
 
   async remove(id: string): Promise<Event> {
@@ -73,11 +90,11 @@ export class EventsService {
       throw new NotFoundException('Evento no encontrado');
     }
 
-    this.eventsGateway.emitEventUpdated(event.toObject());
+    this.eventsGateway.emitEventUpdated(this.toPublicEvent(event));
     return event;
   }
 
-  async joinEvent(eventId: string, userId: string): Promise<Event> {
+  async joinEvent(eventId: string, userId: string): Promise<PublicEvent> {
     if (!isValidObjectId(eventId)) {
       throw new BadRequestException('ID de evento inválido');
     }
@@ -100,12 +117,12 @@ export class EventsService {
     event.attendees.push({ userId, joinedAt: new Date() });
     await event.save();
 
-    this.eventsGateway.emitAttendeeUpdate(eventId, event.attendees as { userId: string; joinedAt: Date }[]);
+    this.eventsGateway.emitAttendeeUpdate(eventId, event.attendees.length);
 
-    return event;
+    return this.toPublicEvent(event, userId);
   }
 
-  async leaveEvent(eventId: string, userId: string): Promise<Event> {
+  async leaveEvent(eventId: string, userId: string): Promise<PublicEvent> {
     if (!isValidObjectId(eventId)) {
       throw new BadRequestException('ID de evento inválido');
     }
@@ -123,9 +140,31 @@ export class EventsService {
     event.attendees.splice(index, 1);
     await event.save();
 
-    this.eventsGateway.emitAttendeeUpdate(eventId, event.attendees as { userId: string; joinedAt: Date }[]);
+    this.eventsGateway.emitAttendeeUpdate(eventId, event.attendees.length);
 
-    return event;
+    return this.toPublicEvent(event, userId);
+  }
+
+  async getAttendeesCount(eventId: string) {
+    if (!isValidObjectId(eventId)) {
+      throw new BadRequestException('ID de evento invalido');
+    }
+
+    const event = await this.eventModel.findById(eventId).select('attendees').exec();
+    if (!event) {
+      throw new NotFoundException('Evento no encontrado');
+    }
+
+    return { eventId, attendeesCount: event.attendees.length };
+  }
+
+  async getMyAttendances(userId: string) {
+    const events = await this.eventModel
+      .find({ 'attendees.userId': userId })
+      .select('_id')
+      .exec();
+
+    return events.map((event) => event._id.toString());
   }
 
   async getAttendees(eventId: string) {

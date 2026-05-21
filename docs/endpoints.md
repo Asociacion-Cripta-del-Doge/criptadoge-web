@@ -27,6 +27,8 @@ Base URL via Nginx: `http://localhost:8080/api`
 | PATCH | `/auth/avatar` | JWT | `{ base64 }` |
 | GET | `/auth/google` | No | Inicia login con Google OAuth |
 | GET | `/auth/google/callback` | Google OAuth | Callback de Google; redirige al frontend con token y usuario |
+| POST | `/auth/forgot-password` | No | Solicita un enlace de recuperacion de contrasena |
+| POST | `/auth/reset-password` | No | Actualiza la contrasena usando un token valido |
 
 **LoginDto:**
 
@@ -58,6 +60,25 @@ Base URL via Nginx: `http://localhost:8080/api`
     "email": "string",
     "role": "ADMIN | MEMBER"
   }
+}
+```
+
+**Forgot password:**
+
+```json
+{
+  "email": "string (requerido, email valido)"
+}
+```
+
+Si el email existe y corresponde a un usuario con contrasena local, se envia un enlace de recuperacion. La respuesta es generica para no revelar si el email esta registrado.
+
+**Reset password:**
+
+```json
+{
+  "token": "string (requerido)",
+  "password": "string (requerido)"
 }
 ```
 
@@ -117,8 +138,10 @@ Base URL via Nginx: `http://localhost:8080/api`
 | POST | `/eventos` | JWT | ADMIN | `CreateEventDto` |
 | PUT | `/eventos/:id` | JWT | ADMIN | `UpdateEventDto` |
 | DELETE | `/eventos/:id` | JWT | ADMIN | Elimina evento |
-| POST | `/eventos/:id/asistentes` | JWT | MEMBER | Unirse al evento |
-| DELETE | `/eventos/:id/asistentes` | JWT | MEMBER | Salir del evento |
+| GET | `/eventos/mis-asistencias` | JWT | MEMBER, ADMIN | IDs de eventos en los que participa el usuario autenticado |
+| POST | `/eventos/:id/asistentes` | JWT | MEMBER, ADMIN | Unirse al evento |
+| DELETE | `/eventos/:id/asistentes` | JWT | MEMBER, ADMIN | Salir del evento |
+| GET | `/eventos/:id/asistentes/count` | No | Publico | Numero de asistentes del evento |
 | GET | `/eventos/:id/asistentes` | JWT | ADMIN | Lista asistentes del evento |
 
 **CreateEventDto:**
@@ -144,6 +167,30 @@ Base URL via Nginx: `http://localhost:8080/api`
   "description": "string",
   "time": "string",
   "status": "string"
+}
+```
+
+**Response GET `/eventos` y `/eventos/:id`:**
+
+```json
+{
+  "_id": "string",
+  "title": "string",
+  "date": "string",
+  "label": "string",
+  "description": "string",
+  "time": "string",
+  "status": "string",
+  "attendeesCount": 3
+}
+```
+
+**Response GET `/eventos/:id/asistentes/count`:**
+
+```json
+{
+  "eventId": "string",
+  "attendeesCount": 3
 }
 ```
 
@@ -227,6 +274,47 @@ Estados disponibles:
 - `respondido`: Respondido
 - `resuelto`: Resuelto
 - `archivado`: Archivado
+
+---
+
+## Membership `/membership`
+
+| Metodo | Ruta | Auth | Roles | Body / uso |
+| ------ | ---- | ---- | ----- | ---------- |
+| GET | `/membership/requests` | JWT | ADMIN | Lista solicitudes de membresia |
+| POST | `/membership/request` | No | Publico | Crea una solicitud de membresia |
+
+**CreateMembershipRequestDto:**
+
+```json
+{
+  "name": "string (requerido, min. 2 caracteres)",
+  "email": "string (requerido, email valido)",
+  "phone": "string (requerido)",
+  "birthdate": "string (requerido)",
+  "howDidYouKnow": "string (opcional)"
+}
+```
+
+La solicitud se guarda con estado inicial `Pendiente` y envia un email de confirmacion al solicitante.
+
+**Response GET `/membership/requests`:**
+
+```json
+[
+  {
+    "_id": "string",
+    "name": "string",
+    "email": "string",
+    "phone": "string",
+    "birthdate": "string",
+    "howDidYouKnow": "string | undefined",
+    "status": "Pendiente | Revisada | Aprobada | Rechazada",
+    "createdAt": "ISO 8601",
+    "updatedAt": "ISO 8601"
+  }
+]
+```
 
 ---
 
@@ -392,6 +480,7 @@ Filtra las mesas con `esDePago = false` antes de calcular los huecos. Los usuari
 - Los socios activos tienen 1 hora gratis en mesas de pago; el precio de las horas restantes es solo informativo y no activa ningun cobro.
 - Cancelar una reserva cambia su estado a `CANCELADA`; no elimina el historico.
 - Solo el propietario de la reserva o un usuario `ADMIN` puede cancelarla.
+- Al crear o cancelar una reserva, el backend emite por Socket.IO el evento `reservation-changed` para que la pagina de reservas actualice huecos en tiempo real.
 
 ---
 
@@ -454,4 +543,4 @@ Authorization: Bearer <access_token>
 - El backend acepta JSON y URL encoded con limite de **10 MB**.
 - Usuarios se almacenan en **PostgreSQL** con Prisma.
 - Mesas y reservas de mesa se almacenan en **PostgreSQL** con Prisma.
-- Eventos y etiquetas de eventos se almacenan en **MongoDB** con Mongoose.
+- Eventos, etiquetas de eventos y solicitudes de membresia se almacenan en **MongoDB** con Mongoose.

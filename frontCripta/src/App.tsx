@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { CSSProperties } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import "./App.scss";
@@ -15,13 +15,12 @@ import { HeroCarousel } from "./components/heroCarousel/HeroCarousel";
 import MembershipSection from "./components/membershipSection/MembershipSection";
 import { PatrocinadoresSection } from "./components/patrocinadores/patrocinadores";
 import { useAuth } from "./context/AuthContext";
+import { useSocket } from "./context/SocketContext";
 import { useWebTexts } from "./hooks/useWebTexts";
 import { reservasService } from "./services/reservasService";
 import type { HuecoReserva, Mesa, ReservaMesa } from "./services/reservasService";
 import logo from "./assets/logo.png";
 
-const BOOKING_PAID_NOTE =
-  "En mesas de pago, la primera hora es gratis para socios activos y el resto se calcula automaticamente.";
 const ACTIVE_USER_STATUS = "Activo";
 const CANCELLABLE_RESERVATION_STATES = ["PENDIENTE", "CONFIRMADA"];
 
@@ -84,6 +83,7 @@ const buildCalendarDays = (visibleMonth: Date) => {
 function App() {
   const path = window.location.pathname;
   const { user, loading } = useAuth();
+  const socket = useSocket();
   const text = useWebTexts("booking");
   const heroText = useWebTexts("home.hero");
   const [fecha, setFecha] = useState(getToday);
@@ -145,24 +145,24 @@ function App() {
     }
 
     if (!user) {
-      return "Inicia sesion para ver huecos disponibles y reservar.";
+      return text("booking.unavailable.loginRequired");
     }
 
     if (mesa.esDePago && user.status !== ACTIVE_USER_STATUS) {
-      return "Las mesas de pago solo estan disponibles para socios activos.";
+      return text("booking.unavailable.paidOnlyActive");
     }
 
     if (!selectedSlot) {
-      return "No hay franjas disponibles para la fecha, duracion y huecos seleccionados.";
+      return text("booking.unavailable.noSlots");
     }
 
     const asientosDisponibles = mesa.asientosDisponibles ?? 0;
 
     if (asientosDisponibles > 0) {
-      return `Solo quedan ${asientosDisponibles} huecos libres en esta franja.`;
+      return `${text("booking.unavailable.onlyPrefix")} ${asientosDisponibles} ${text("booking.unavailable.onlySuffix")}`;
     }
 
-    return "Esta mesa no tiene huecos libres en la franja seleccionada.";
+    return text("booking.unavailable.tableFull");
   };
 
   const handleSelectDate = (dateValue: string) => {
@@ -183,7 +183,7 @@ function App() {
     });
   };
 
-  const refreshOwnReservations = async () => {
+  const refreshOwnReservations = useCallback(async () => {
     if (!user) {
       setOwnReservations([]);
       return;
@@ -201,17 +201,30 @@ function App() {
     } finally {
       setOwnReservationsLoading(false);
     }
-  };
+  }, [text, user]);
 
-  const refreshSlots = async () => {
+  const refreshSlots = useCallback(async (preserveSelection = false) => {
     const huecosData = await reservasService.getHuecos({
       fecha,
       asientosReservados,
       duracionMinutos,
     });
+    const previousSlot = preserveSelection ? selectedSlot : null;
     setSlots(huecosData.slots);
-    setSlotIndex(0);
-  };
+    setSlotIndex(() => {
+      if (!previousSlot) {
+        return 0;
+      }
+
+      const nextIndex = huecosData.slots.findIndex(
+        (slot) =>
+          slot.fechaHoraInicio === previousSlot.fechaHoraInicio &&
+          slot.fechaHoraFin === previousSlot.fechaHoraFin,
+      );
+
+      return nextIndex >= 0 ? nextIndex : 0;
+    });
+  }, [asientosReservados, duracionMinutos, fecha, selectedSlot]);
 
   const handleCancelReservation = async (reservaId: string) => {
     setCancelingReservationId(reservaId);
@@ -276,6 +289,30 @@ function App() {
     load();
   }, [asientosReservados, duracionMinutos, fecha, text, user]);
 
+  useEffect(() => {
+    if (path !== "/reservas" || !socket || !user) {
+      return;
+    }
+
+    const onReservationChanged = async () => {
+      setSelectedMesaId(null);
+
+      try {
+        await Promise.all([refreshSlots(true), refreshOwnReservations()]);
+      } catch (error) {
+        toast.error(
+          error instanceof Error ? error.message : text("booking.toast.error"),
+        );
+      }
+    };
+
+    socket.on("reservation-changed", onReservationChanged);
+
+    return () => {
+      socket.off("reservation-changed", onReservationChanged);
+    };
+  }, [path, refreshOwnReservations, refreshSlots, socket, text, user]);
+
   const handleReserve = async () => {
     if (!selectedMesa || !selectedSlot) {
       return;
@@ -315,8 +352,8 @@ function App() {
     const oauthUser = params.get("user");
 
     if (token && oauthUser) {
-      localStorage.setItem("access_token", token);
-      localStorage.setItem("user", oauthUser);
+      sessionStorage.setItem("access_token", token);
+      sessionStorage.setItem("user", oauthUser);
     }
     window.location.href = "/";
   }
@@ -358,7 +395,7 @@ function App() {
         </div>
       </header>
 
-      <section className="booking-toolbar" aria-label="Filtros de reserva">
+      <section className="booking-toolbar" aria-label={text("booking.aria.filters")}>
         <label className="booking-date-control">
           {text("booking.controls.date")}
           <button
@@ -374,14 +411,14 @@ function App() {
             <div
               className="booking-calendar"
               role="dialog"
-              aria-label="Calendario de reservas"
+              aria-label={text("booking.aria.calendar")}
             >
               <div className="booking-calendar__header">
                 <button
                   type="button"
                   onClick={() => moveVisibleMonth(-1)}
                   disabled={!canGoToPreviousMonth}
-                  aria-label="Mes anterior"
+                  aria-label={text("booking.aria.previousMonth")}
                 >
                   ‹
                 </button>
@@ -389,7 +426,7 @@ function App() {
                 <button
                   type="button"
                   onClick={() => moveVisibleMonth(1)}
-                  aria-label="Mes siguiente"
+                  aria-label={text("booking.aria.nextMonth")}
                 >
                   ›
                 </button>
@@ -572,7 +609,7 @@ function App() {
             })}
           </div>
 
-          <div className="booking-legend" aria-label="Leyenda">
+          <div className="booking-legend" aria-label={text("booking.aria.legend")}>
             <span>
               <i className="legend-free" /> {text("booking.legend.free")}
             </span>
@@ -629,10 +666,10 @@ function App() {
               </dl>
 
               <p className="panel-copy">
-                Vas a reservar {asientosReservados}{" "}
+                {text("booking.panel.reservePrefix")} {asientosReservados}{" "}
                 {text("booking.panel.spacesWord")}.
                 <br />
-                {BOOKING_PAID_NOTE}
+                {text("booking.panel.paidNote")}
               </p>
 
               <button
