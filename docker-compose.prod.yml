@@ -1,0 +1,75 @@
+services:
+  front:
+    build:
+      context: ./frontCripta
+      target: prod
+    container_name: criptaDoge-front-prod
+    restart: always
+    expose:
+      - "80"
+
+  back:
+    build:
+      context: ./backCripta
+      target: prod
+    container_name: criptaDoge-back-prod
+    restart: always
+    env_file:
+      - ./.env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      MONGO_URL: mongodb://mongo:27017/cripta-db
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8080}
+      PORT: 3000
+    depends_on:
+      db:
+        condition: service_healthy
+      mongo:
+        condition: service_started
+    expose:
+      - "3000"
+    command: sh -c "yarn prisma migrate deploy && yarn start:prod"
+
+  db:
+    image: postgres:17-alpine
+    container_name: criptaDoge-db-prod
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    expose:
+      - "5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+    volumes:
+      - db_prod_data:/var/lib/postgresql/data
+
+  mongo:
+    image: mongo:8
+    container_name: criptaDoge-mongo-prod
+    restart: always
+    expose:
+      - "27017"
+    volumes:
+      - mongo_prod_data:/data/db
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: criptaDoge-nginx-prod
+    restart: always
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - front
+      - back
+
+volumes:
+  db_prod_data:
+  mongo_prod_data:

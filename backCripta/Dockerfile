@@ -1,26 +1,43 @@
-# Dockerfile
-FROM node:24-alpine3.20
+FROM node:24-alpine3.20 AS base
 
-# Activar Corepack para usar Yarn 4
 RUN corepack enable
 RUN corepack prepare yarn@4.12.0 --activate
 
 WORKDIR /app
 
-# Copiamos package.json y yarn.lock primero para cachear dependencias
-COPY package.json yarn.lock ./
+COPY package.json yarn.lock .yarnrc.yml ./
 
-# Instalamos dependencias con Yarn 4
+FROM base AS deps
 RUN yarn install --immutable
 
-# Copiamos el resto del proyecto
+FROM deps AS dev
 COPY . .
-
-# Generamos el cliente Prisma
 RUN npx prisma generate
 
-# Exponemos el puerto
 EXPOSE 3000
 
-# Comando por defecto
 CMD ["yarn", "start:dev"]
+
+FROM deps AS build
+COPY . .
+RUN npx prisma generate
+RUN yarn build
+
+FROM node:24-alpine3.20 AS prod
+
+RUN corepack enable
+RUN corepack prepare yarn@4.12.0 --activate
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+COPY package.json yarn.lock .yarnrc.yml ./
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/prisma ./prisma
+COPY --from=build /app/prisma.config.ts ./prisma.config.ts
+
+EXPOSE 3000
+
+CMD ["yarn", "start:prod"]

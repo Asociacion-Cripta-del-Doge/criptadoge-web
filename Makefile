@@ -6,7 +6,7 @@ BACK_DIR ?= backCripta
 
 .DEFAULT_GOAL := help
 
-.PHONY: help env-init up up-build down restart ps logs logs-front logs-back logs-db logs-mongo logs-nginx clean prune \
+.PHONY: help env-init up up-build up-prod up-prod-build down down-prod restart ps ps-prod logs logs-prod logs-front logs-back logs-db logs-mongo logs-nginx clean clean-prod prune \
 	shell-front shell-back shell-db shell-mongo \
 	front-install front-dev front-build front-lint \
 	back-install back-dev back-build back-lint back-test back-test-e2e back-format
@@ -24,8 +24,17 @@ up: ## Levanta todos los servicios (modo detach)
 up-build: ## Reconstruye imágenes y levanta servicios
 	@$(DOCKER_COMPOSE) up -d --build
 
+up-prod: ## Levanta todos los servicios en produccion (modo detach)
+	@$(DOCKER_COMPOSE) -f docker-compose.prod.yml up -d
+
+up-prod-build: ## Reconstruye imagenes y levanta servicios en produccion
+	@$(DOCKER_COMPOSE) -f docker-compose.prod.yml up -d --build
+
 down: ## Baja todos los servicios
 	@$(DOCKER_COMPOSE) down
+
+down-prod: ## Baja todos los servicios de produccion
+	@$(DOCKER_COMPOSE) -f docker-compose.prod.yml down
 
 restart: ## Reinicia todos los servicios
 	@$(DOCKER_COMPOSE) restart
@@ -33,8 +42,14 @@ restart: ## Reinicia todos los servicios
 ps: ## Muestra estado de contenedores
 	@$(DOCKER_COMPOSE) ps
 
+ps-prod: ## Muestra estado de contenedores de produccion
+	@$(DOCKER_COMPOSE) -f docker-compose.prod.yml ps
+
 logs: ## Sigue logs de todos los servicios
 	@$(DOCKER_COMPOSE) logs -f --tail=200
+
+logs-prod: ## Sigue logs de todos los servicios de produccion
+	@$(DOCKER_COMPOSE) -f docker-compose.prod.yml logs -f --tail=200
 
 logs-front: ## Sigue logs del frontend
 	@$(DOCKER_COMPOSE) logs -f --tail=200 front
@@ -53,6 +68,9 @@ logs-nginx: ## Sigue logs de Nginx
 
 clean: ## Baja servicios y elimina volúmenes huérfanos
 	@$(DOCKER_COMPOSE) down -v --remove-orphans
+
+clean-prod: ## Baja servicios de produccion y elimina volumenes
+	@$(DOCKER_COMPOSE) -f docker-compose.prod.yml down -v --remove-orphans
 
 prune: ## Limpia recursos Docker no usados (sistema)
 	@docker system prune -f
