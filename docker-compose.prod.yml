@@ -15,7 +15,7 @@ services:
     container_name: criptaDoge-back-prod
     restart: always
     env_file:
-      - ./.env
+      - ./.env.production
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       MONGO_URL: mongodb://mongo:27017/cripta-db

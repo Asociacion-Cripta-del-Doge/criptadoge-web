@@ -17,15 +17,16 @@ Proyecto fullstack para la web de La Cripta de Doge.
 
 ## Configuracion inicial
 
-Crear el archivo de variables:
+Crear los archivos de variables locales:
 
 ```bash
-make env-init
+make env-init-dev
+make env-init-prod
 ```
 
-Revisar y ajustar `.env`. Usa formato `CLAVE=valor`, sin espacios alrededor del `=`.
+Esto crea `.env.development` y `.env.production` desde sus ejemplos. Ambos archivos quedan fuera de git. Revisa y ajusta valores reales, especialmente secretos de produccion. Usa formato `CLAVE=valor`, sin espacios alrededor del `=`.
 
-Ejemplo base:
+Ejemplo base de desarrollo:
 
 ```env
 POSTGRES_USER=postgres
@@ -40,6 +41,13 @@ FRONTEND_URL=http://localhost:8080
 JWT_SECRET=your_jwt_secret_key
 JWT_EXPIRES_IN=1d
 VITE_API_URL=http://localhost:8080/api
+```
+
+Si prefieres ejecutar Docker Compose sin `make`, pasa siempre el env file correspondiente:
+
+```bash
+docker compose --env-file .env.development up -d
+docker compose --env-file .env.production -f docker-compose.prod.yml up -d --build
 ```
 
 ## Docker en desarrollo
@@ -75,7 +83,7 @@ Accesos:
 - App: `http://localhost:8080`
 - API via Nginx: `http://localhost:8080/api`
 
-En desarrollo el frontend corre con Vite y el backend con `yarn start:dev`.
+En desarrollo el frontend corre con Vite, el backend con `yarn start:dev` y los servicios leen `.env.development`.
 
 ## Docker en produccion
 
@@ -84,8 +92,9 @@ El archivo `docker-compose.prod.yml` esta orientado a produccion:
 - Nginx es el unico servicio publicado al host.
 - El frontend ejecuta `npm run build` durante la construccion de imagen y sirve `dist` con Nginx interno.
 - El backend se compila con `yarn build` y arranca con `yarn start:prod`.
-- Antes de arrancar el backend se ejecuta `prisma migrate deploy`.
+- Antes de arrancar el backend se ejecuta `prisma migrate deploy` y `seed:prod`.
 - PostgreSQL y MongoDB no publican puertos al host.
+- Los servicios leen `.env.production`.
 
 Arrancar:
 
