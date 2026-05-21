@@ -111,6 +111,31 @@
   }
 }
 
+.btn-album {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border: 1px solid rgba(v.$neon-blue, 0.35);
+  border-radius: v.$radius-sm;
+  background: rgba(v.$neon-blue, 0.07);
+  color: v.$neon-blue;
+  font-family: v.$font-display;
+  font-size: 0.72rem;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition:
+    background v.$transition-fast,
+    box-shadow v.$transition-fast,
+    transform v.$transition-fast;
+
+  &:hover {
+    background: rgba(v.$neon-blue, 0.14);
+    box-shadow: 0 0 10px rgba(v.$neon-blue, 0.2);
+    transform: translateY(-1px);
+  }
+}
+
 .navbar-buttons{
     display: flex;
     gap: v.$space-sm;

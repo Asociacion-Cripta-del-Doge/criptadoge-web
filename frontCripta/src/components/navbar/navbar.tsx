@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import "./navbar.scss"
 import logo from "../../assets/logo.png"
@@ -6,12 +6,20 @@ import { useAuth } from "../../context/AuthContext"
 import { useWebTexts } from "../../hooks/useWebTexts"
 import { ProfileModal } from "../profile/ProfileModal"
 import { PackReveal } from "../packReveal/PackReveal"
+import { CardAlbum, type CardAlbumHandle } from "../cardAlbum/CardAlbum"
 
 export const Navbar = () => {
-  const [scrolled, setScrolled] = useState(false)
-  const [showProfile, setShowProfile] = useState(false)
+  const [scrolled, setScrolled]           = useState(false)
+  const [showProfile, setShowProfile]     = useState(false)
   const [showPackReveal, setShowPackReveal] = useState(false)
+  const [showAlbum, setShowAlbum]         = useState(false)
+  const albumRef = useRef<CardAlbumHandle>(null)
   const { user, loading } = useAuth()
+
+  /* Cuando PackReveal revela una carta, la manda al álbum */
+  const handleCardRevealed = (cardId: number) => {
+    albumRef.current?.addCard(cardId)
+  }
   const text = useWebTexts("nav")
 
   useEffect(() => {
@@ -35,6 +43,13 @@ export const Navbar = () => {
               aria-label="Abrir sobre"
             >
               🃏 Mis Sobres
+            </button>
+            <button
+              className="btn-album"
+              onClick={() => setShowAlbum(true)}
+              aria-label="Ver álbum"
+            >
+              📖 Colección
             </button>
           </div>
           <ul className="navbar-links">
@@ -91,7 +106,15 @@ export const Navbar = () => {
       )}
 
       {showPackReveal && createPortal(
-        <PackReveal onClose={() => setShowPackReveal(false)} />,
+        <PackReveal
+          onClose={() => setShowPackReveal(false)}
+          onCardRevealed={handleCardRevealed}
+        />,
+        document.body
+      )}
+
+      {showAlbum && createPortal(
+        <CardAlbum ref={albumRef} onClose={() => setShowAlbum(false)} />,
         document.body
       )}
     </>

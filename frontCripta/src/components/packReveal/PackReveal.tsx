@@ -15,16 +15,19 @@ const DOT_COUNT       = 26  // puntos de perforación
 /* ─── Tipos ─────────────────────────────────────────────────── */
 interface Props {
   onClose: () => void
+  onCardRevealed?: (cardId: number) => void
 }
 
 /* ═══════════════════════════════════════════════════════════════
    COMPONENTE
    ═══════════════════════════════════════════════════════════════ */
-export const PackReveal = ({ onClose }: Props) => {
+export const PackReveal = ({ onClose, onCardRevealed }: Props) => {
 
-  /* ── Ref estable para onClose (evita re-runs en useEffect) ── */
-  const onCloseRef = useRef(onClose)
-  useEffect(() => { onCloseRef.current = onClose }, [onClose])
+  /* ── Refs estables para callbacks (evita re-runs en useEffect) ── */
+  const onCloseRef         = useRef(onClose)
+  const onCardRevealedRef  = useRef(onCardRevealed)
+  useEffect(() => { onCloseRef.current        = onClose        }, [onClose])
+  useEffect(() => { onCardRevealedRef.current = onCardRevealed }, [onCardRevealed])
 
   /* ── Estado de la máquina ───────────────────────────────────
      0 = idle  1 = opening  2 = revealed  3 = resetting
@@ -321,6 +324,9 @@ export const PackReveal = ({ onClose }: Props) => {
           cardWrap.style.pointerEvents = 'auto'
           startCardIdle()
           gsap.to(resetHint, { opacity: 1, duration: 0.5, delay: 0.6 })
+          /* Notificar al álbum con una carta aleatoria (1-10) */
+          const cardId = Math.ceil(Math.random() * 10)
+          onCardRevealedRef.current?.(cardId)
         },
       })
 
