@@ -28,7 +28,7 @@ services:
         condition: service_started
     expose:
       - "3000"
-    command: sh -c "until yarn prisma migrate deploy; do echo 'PostgreSQL no esta listo, reintentando migraciones en 5s...'; sleep 5; done; yarn start:prod"
+    command: sh -c "until yarn prisma migrate deploy; do echo 'PostgreSQL no esta listo, reintentando migraciones en 5s...'; sleep 5; done; yarn seed:prod && yarn start:prod"
 
   db:
     image: postgres:17-alpine
