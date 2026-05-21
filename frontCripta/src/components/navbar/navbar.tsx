@@ -37,20 +37,6 @@ export const Navbar = () => {
           <div className="navbar-left">
             <img src={logo} alt={text("nav.logoAlt")} />
             <span className="brand-text"> {text("nav.brand")} </span>
-            <button
-              className="btn-pack"
-              onClick={() => setShowPackReveal(true)}
-              aria-label="Abrir sobre"
-            >
-              🃏 Mis Sobres
-            </button>
-            <button
-              className="btn-album"
-              onClick={() => setShowAlbum(true)}
-              aria-label="Ver álbum"
-            >
-              📖 Colección
-            </button>
           </div>
           <ul className="navbar-links">
             <li><a href="/#inicio">{text("nav.links.home")}</a></li>
@@ -62,6 +48,26 @@ export const Navbar = () => {
             <li><a href="/#contacto">{text("nav.links.contact")}</a></li>
           </ul>
           <div className="navbar-buttons">
+            {!loading && user && (
+              <>
+                <button
+                  className="btn-icon"
+                  onClick={() => setShowPackReveal(true)}
+                  aria-label="Mis Sobres"
+                  data-tooltip="Mis Sobres"
+                >
+                  🃏
+                </button>
+                <button
+                  className="btn-icon"
+                  onClick={() => setShowAlbum(true)}
+                  aria-label="Colección"
+                  data-tooltip="Colección"
+                >
+                  📖
+                </button>
+              </>
+            )}
             {!loading && (
               user ? (
                 <button
