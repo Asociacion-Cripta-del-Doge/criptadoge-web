@@ -3,6 +3,8 @@ services:
     build:
       context: ./frontCripta
       target: prod
+      args:
+        VITE_API_URL: ${VITE_API_URL:?define VITE_API_URL in .env.production}
     container_name: criptaDoge-front-prod
     restart: always
     expose:
@@ -62,13 +64,30 @@ services:
     image: nginx:1.27-alpine
     container_name: criptaDoge-nginx-prod
     restart: always
+    environment:
+      NGINX_SERVER_NAME: ${NGINX_SERVER_NAME:?define NGINX_SERVER_NAME in .env.production}
+      TLS_CERTIFICATE: ${TLS_CERTIFICATE:?define TLS_CERTIFICATE in .env.production}
+      TLS_CERTIFICATE_KEY: ${TLS_CERTIFICATE_KEY:?define TLS_CERTIFICATE_KEY in .env.production}
     ports:
-      - "8080:80"
+      - "80:80"
+      - "443:443"
     volumes:
-      - ./nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/nginx.prod.conf:/etc/nginx/templates/default.conf.template:ro
+      - ./letsencrypt:/etc/letsencrypt:ro
+      - ./certbot/www:/var/www/certbot:ro
     depends_on:
       - front
       - back
+
+  certbot:
+    image: certbot/certbot:latest
+    profiles:
+      - certbot
+    ports:
+      - "80:80"
+    volumes:
+      - ./letsencrypt:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
 
 volumes:
   db_prod_data:

@@ -11,7 +11,7 @@ PROD_COMPOSE := $(DOCKER_COMPOSE) --env-file $(PROD_ENV) -f docker-compose.prod.
 
 .DEFAULT_GOAL := help
 
-.PHONY: help env-init env-init-dev env-init-prod up up-build up-prod up-prod-build down down-prod restart ps ps-prod logs logs-prod logs-front logs-back logs-db logs-mongo logs-nginx clean clean-prod prune \
+.PHONY: help env-init env-init-dev env-init-prod up up-build up-prod up-prod-build down down-prod restart ps ps-prod logs logs-prod logs-front logs-back logs-db logs-mongo logs-nginx clean clean-prod prune certbot-issue-prod certbot-renew-prod \
 	shell-front shell-back shell-db shell-mongo \
 	front-install front-dev front-build front-lint \
 	back-install back-dev back-build back-lint back-test back-test-e2e back-format
@@ -85,6 +85,15 @@ clean-prod: ## Baja servicios de produccion y elimina volumenes
 
 prune: ## Limpia recursos Docker no usados (sistema)
 	@docker system prune -f
+
+certbot-issue-prod: ## Emite certificados Let's Encrypt iniciales. Uso: make certbot-issue-prod CERTBOT_DOMAIN=dominio.com CERTBOT_EMAIL=admin@dominio.com CERTBOT_EXTRA_DOMAINS="www.dominio.com"
+	@test -n "$(CERTBOT_DOMAIN)" || (echo "Falta CERTBOT_DOMAIN"; exit 1)
+	@test -n "$(CERTBOT_EMAIL)" || (echo "Falta CERTBOT_EMAIL"; exit 1)
+	@$(PROD_COMPOSE) run --rm --service-ports certbot certonly --standalone --preferred-challenges http -d $(CERTBOT_DOMAIN) $(foreach domain,$(CERTBOT_EXTRA_DOMAINS),-d $(domain)) --email $(CERTBOT_EMAIL) --agree-tos --no-eff-email
+
+certbot-renew-prod: ## Renueva certificados Let's Encrypt y recarga Nginx de produccion
+	@$(PROD_COMPOSE) run --rm certbot renew --webroot -w /var/www/certbot
+	@$(PROD_COMPOSE) exec nginx nginx -s reload
 
 shell-front: ## Abre shell en el contenedor frontend de desarrollo
 	@$(DEV_COMPOSE) exec front sh
