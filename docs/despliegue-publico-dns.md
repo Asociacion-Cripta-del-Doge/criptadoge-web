@@ -2,6 +2,8 @@
 
 Este documento explica como sacar CriptaDoge Web fuera de la red local y dejarlo accesible desde Internet usando Docker Compose, DNS, Nginx y HTTPS.
 
+Si el despliegue se hara desde una maquina local, revisar tambien `docs/pendientes-despliegue-local.md` para ver la lista concreta de tareas pendientes de red, router, DNS y certificados.
+
 ## Objetivo
 
 La aplicacion debe poder ejecutarse en un servidor y estar disponible desde un dominio, por ejemplo:
@@ -152,14 +154,7 @@ services:
       - "443:443"
 ```
 
-Si todavia no se configura HTTPS, se puede empezar publicando solo HTTP:
-
-```yaml
-ports:
-  - "80:80"
-```
-
-Para una entrega final publica, lo correcto es tener HTTPS activo.
+El archivo real del proyecto ya sigue esta estrategia: `front`, `back`, `db` y `mongo` usan `expose`, y solo `nginx` publica puertos al host.
 
 ## HTTPS
 
@@ -167,38 +162,37 @@ Hay dos enfoques razonables.
 
 ### Opcion A: Nginx del proyecto gestiona HTTPS
 
-El contenedor `nginx` publica `80` y `443`, monta certificados y define:
+Esta es la opcion configurada en el repositorio. El contenedor `nginx` publica `80` y `443`, monta certificados desde `./letsencrypt` y define:
 
 - Un `server` en puerto `80` para redirigir a HTTPS.
 - Un `server` en puerto `443 ssl` para servir la aplicacion.
+- Un webroot en `./certbot/www` para renovaciones ACME.
 
-Ejemplo conceptual:
+La configuracion vive en `nginx/nginx.prod.conf` y se monta como template de la imagen oficial de Nginx. Las variables se toman de `.env.production`:
 
-```nginx
-server {
-    listen 80;
-    server_name cripta.example.com www.cripta.example.com;
-    return 301 https://$host$request_uri;
-}
-
-server {
-    listen 443 ssl;
-    server_name cripta.example.com www.cripta.example.com;
-
-    ssl_certificate /etc/letsencrypt/live/cripta.example.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/cripta.example.com/privkey.pem;
-
-    location / {
-        proxy_pass http://front:80;
-    }
-
-    location /api/ {
-        proxy_pass http://back:3000/;
-    }
-}
+```env
+NGINX_SERVER_NAME=cripta.example.com www.cripta.example.com
+TLS_CERTIFICATE=/etc/letsencrypt/live/cripta.example.com/fullchain.pem
+TLS_CERTIFICATE_KEY=/etc/letsencrypt/live/cripta.example.com/privkey.pem
 ```
 
-Los certificados se pueden generar con Let's Encrypt y Certbot.
+Los certificados se generan con Let's Encrypt y Certbot. Para la primera emision, el puerto `80` debe estar libre y el DNS ya debe apuntar al servidor:
+
+```bash
+make certbot-issue-prod CERTBOT_DOMAIN=cripta.example.com CERTBOT_EMAIL=admin@cripta.example.com CERTBOT_EXTRA_DOMAINS="www.cripta.example.com"
+```
+
+Despues se arranca la aplicacion:
+
+```bash
+make up-prod-build
+```
+
+Para renovar certificados con la aplicacion ya levantada:
+
+```bash
+make certbot-renew-prod
+```
 
 ### Opcion B: proxy externo para HTTPS
 
@@ -214,19 +208,19 @@ Esta opcion suele ser mas comoda si en el mismo servidor van a convivir varias a
 
 ## Nginx del proyecto
 
-En `nginx/nginx.prod.conf` hay que cambiar:
+En `nginx/nginx.prod.conf` no se escribe el dominio directamente. Se usa:
 
 ```nginx
-server_name localhost;
+server_name ${NGINX_SERVER_NAME};
 ```
 
-por el dominio real:
+Y en `.env.production` se define el dominio real:
 
-```nginx
-server_name cripta.example.com www.cripta.example.com;
+```env
+NGINX_SERVER_NAME=cripta.example.com www.cripta.example.com
 ```
 
-Tambien conviene mantener estas cabeceras hacia el backend:
+La configuracion mantiene estas cabeceras hacia el backend:
 
 ```nginx
 proxy_set_header Host $host;
@@ -244,10 +238,14 @@ Ejemplo:
 ```env
 FRONTEND_URL=https://cripta.example.com
 VITE_API_URL=https://cripta.example.com/api
+GOOGLE_CALLBACK_URL=https://cripta.example.com/api/auth/google/callback
 DATABASE_URL=postgresql://usuario:password@db:5432/backCripta
 MONGO_URL=mongodb://mongo:27017/cripta-db
 JWT_SECRET=un_secreto_largo_y_privado
 JWT_EXPIRES_IN=1d
+NGINX_SERVER_NAME=cripta.example.com www.cripta.example.com
+TLS_CERTIFICATE=/etc/letsencrypt/live/cripta.example.com/fullchain.pem
+TLS_CERTIFICATE_KEY=/etc/letsencrypt/live/cripta.example.com/privkey.pem
 ```
 
 Importante:
@@ -291,22 +289,34 @@ En ese caso, una alternativa es usar un tunel como Cloudflare Tunnel o Tailscale
 
 ## Comandos de arranque
 
+Emitir certificados iniciales:
+
+```bash
+make certbot-issue-prod CERTBOT_DOMAIN=cripta.example.com CERTBOT_EMAIL=admin@cripta.example.com CERTBOT_EXTRA_DOMAINS="www.cripta.example.com"
+```
+
 Produccion:
 
 ```bash
-docker compose --env-file .env.production -f docker-compose.prod.yml up -d --build
+make up-prod-build
 ```
 
 Ver logs:
 
 ```bash
-docker compose --env-file .env.production -f docker-compose.prod.yml logs -f --tail=200
+make logs-prod
 ```
 
 Parar:
 
 ```bash
-docker compose --env-file .env.production -f docker-compose.prod.yml down
+make down-prod
+```
+
+Renovar certificados:
+
+```bash
+make certbot-renew-prod
 ```
 
 ## Checklist

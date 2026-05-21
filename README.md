@@ -139,12 +139,31 @@ docker compose --env-file .env.development down -v --remove-orphans
 
 El archivo `docker-compose.prod.yml` esta orientado a produccion:
 
-- Nginx es el unico servicio publicado al host.
+- Nginx es el unico servicio publicado al host, en los puertos `80` y `443`.
 - El frontend ejecuta `npm run build` durante la construccion de imagen y sirve `dist` con Nginx interno.
 - El backend se compila con `yarn build` y arranca con `yarn start:prod`.
 - Antes de arrancar el backend se ejecuta `prisma migrate deploy` y `seed:prod`.
 - PostgreSQL y MongoDB no publican puertos al host.
 - Los servicios leen `.env.production`.
+- HTTPS se configura con certificados Let's Encrypt montados en `./letsencrypt`.
+
+Antes del primer arranque publico, ajusta `.env.production` con tu dominio real:
+
+```env
+PUBLIC_DOMAIN=cripta.example.com
+NGINX_SERVER_NAME=cripta.example.com www.cripta.example.com
+FRONTEND_URL=https://cripta.example.com
+VITE_API_URL=https://cripta.example.com/api
+GOOGLE_CALLBACK_URL=https://cripta.example.com/api/auth/google/callback
+TLS_CERTIFICATE=/etc/letsencrypt/live/cripta.example.com/fullchain.pem
+TLS_CERTIFICATE_KEY=/etc/letsencrypt/live/cripta.example.com/privkey.pem
+```
+
+Con los registros DNS apuntando al servidor y el puerto `80` libre, emite los certificados iniciales:
+
+```bash
+make certbot-issue-prod CERTBOT_DOMAIN=cripta.example.com CERTBOT_EMAIL=admin@cripta.example.com CERTBOT_EXTRA_DOMAINS="www.cripta.example.com"
+```
 
 Arrancar:
 
@@ -179,8 +198,14 @@ make clean-prod
 
 Accesos:
 
-- App: `http://localhost:8080`
-- API via Nginx: `http://localhost:8080/api`
+- App: `https://cripta.example.com`
+- API via Nginx: `https://cripta.example.com/api`
+
+Renovar certificados:
+
+```bash
+make certbot-renew-prod
+```
 
 ### Produccion sin Make
 
