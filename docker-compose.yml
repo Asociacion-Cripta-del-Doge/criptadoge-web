@@ -1,6 +1,8 @@
 services:
   front:
-    build: ./frontCripta
+    build:
+      context: ./frontCripta
+      target: dev
     container_name: criptaDoge-front
     restart: always
     volumes:
@@ -9,30 +11,29 @@ services:
     expose:
       - "5173"
     env_file:
-      - ./.env
+      - ./.env.development
     command: sh -c "npm install && npm run dev"
 
   back:
-    build: ./backCripta
+    build:
+      context: ./backCripta
+      target: dev
     container_name: criptaDoge-back
     restart: always
     volumes:
       - ./backCripta:/app
     environment:
       MONGO_URL: mongodb://mongo:27017/cripta-db
-      EMAIL_USER: "lacriptadedoge@gmail.com"
-      EMAIL_PASS: "cvwfjipzwiuhcjhg"
-      EMAIL_FROM: "La Cripta de Doge <lacriptadedoge@gmail.com>"
       FRONTEND_URL: "http://localhost:8080"
     depends_on:
       db:
         condition: service_healthy
       mongo:
         condition: service_started
-    ports:
-      - "3000:3000"
+    expose:
+      - "3000"
     env_file:
-      - ./.env
+      - ./.env.development
     command: sh -c "yarn install --immutable && npx prisma generate && npx prisma db push --force-reset --accept-data-loss && yarn seed && yarn start:dev"
 
   db:
@@ -43,8 +44,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
-    ports:
-      - ${POSTGRES_PORT}:5432
+    expose:
+      - "5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
@@ -59,8 +60,8 @@ services:
     container_name: criptaDoge-mongo
     restart: always
     command: sh -c "rm -rf /data/db/* && docker-entrypoint.sh mongod"
-    ports:
-      - "27017:27017"
+    expose:
+      - "27017"
     volumes:
       - mongo_data:/data/db
 

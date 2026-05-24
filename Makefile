@@ -3,10 +3,15 @@ SHELL := /bin/bash
 DOCKER_COMPOSE ?= docker compose
 FRONT_DIR ?= frontCripta
 BACK_DIR ?= backCripta
+DEV_ENV ?= .env.development
+PROD_ENV ?= .env.production
+
+DEV_COMPOSE := $(DOCKER_COMPOSE) --env-file $(DEV_ENV)
+PROD_COMPOSE := $(DOCKER_COMPOSE) --env-file $(PROD_ENV) -f docker-compose.prod.yml
 
 .DEFAULT_GOAL := help
 
-.PHONY: help env-init up up-build down restart ps logs logs-front logs-back logs-db logs-mongo logs-nginx clean prune \
+.PHONY: help env-init env-init-dev env-init-prod up up-build up-prod up-prod-build down down-prod restart ps ps-prod logs logs-prod logs-front logs-back logs-db logs-mongo logs-nginx clean clean-prod prune certbot-issue-prod certbot-renew-prod \
 	shell-front shell-back shell-db shell-mongo \
 	front-install front-dev front-build front-lint \
 	back-install back-dev back-build back-lint back-test back-test-e2e back-format
@@ -18,56 +23,89 @@ help: ## Muestra esta ayuda
 env-init: ## Crea .env desde .env.example si no existe
 	@test -f .env || cp .env.example .env
 
-up: ## Levanta todos los servicios (modo detach)
-	@$(DOCKER_COMPOSE) up -d
+env-init-dev: ## Crea .env.development desde el ejemplo si no existe
+	@test -f $(DEV_ENV) || cp .env.development.example $(DEV_ENV)
 
-up-build: ## Reconstruye imágenes y levanta servicios
-	@$(DOCKER_COMPOSE) up -d --build
+env-init-prod: ## Crea .env.production desde el ejemplo si no existe
+	@test -f $(PROD_ENV) || cp .env.production.example $(PROD_ENV)
 
-down: ## Baja todos los servicios
-	@$(DOCKER_COMPOSE) down
+up: ## Levanta todos los servicios de desarrollo (modo detach)
+	@$(DEV_COMPOSE) up -d
 
-restart: ## Reinicia todos los servicios
-	@$(DOCKER_COMPOSE) restart
+up-build: ## Reconstruye imagenes y levanta servicios de desarrollo
+	@$(DEV_COMPOSE) up -d --build
 
-ps: ## Muestra estado de contenedores
-	@$(DOCKER_COMPOSE) ps
+up-prod: ## Levanta todos los servicios en produccion (modo detach)
+	@$(PROD_COMPOSE) up -d
 
-logs: ## Sigue logs de todos los servicios
-	@$(DOCKER_COMPOSE) logs -f --tail=200
+up-prod-build: ## Reconstruye imagenes y levanta servicios en produccion
+	@$(PROD_COMPOSE) up -d --build
 
-logs-front: ## Sigue logs del frontend
-	@$(DOCKER_COMPOSE) logs -f --tail=200 front
+down: ## Baja todos los servicios de desarrollo
+	@$(DEV_COMPOSE) down
 
-logs-back: ## Sigue logs del backend
-	@$(DOCKER_COMPOSE) logs -f --tail=200 back
+down-prod: ## Baja todos los servicios de produccion
+	@$(PROD_COMPOSE) down
 
-logs-db: ## Sigue logs de PostgreSQL
-	@$(DOCKER_COMPOSE) logs -f --tail=200 db
+restart: ## Reinicia todos los servicios de desarrollo
+	@$(DEV_COMPOSE) restart
 
-logs-mongo: ## Sigue logs de MongoDB
-	@$(DOCKER_COMPOSE) logs -f --tail=200 mongo
+ps: ## Muestra estado de contenedores de desarrollo
+	@$(DEV_COMPOSE) ps
 
-logs-nginx: ## Sigue logs de Nginx
-	@$(DOCKER_COMPOSE) logs -f --tail=200 nginx
+ps-prod: ## Muestra estado de contenedores de produccion
+	@$(PROD_COMPOSE) ps
 
-clean: ## Baja servicios y elimina volúmenes huérfanos
-	@$(DOCKER_COMPOSE) down -v --remove-orphans
+logs: ## Sigue logs de todos los servicios de desarrollo
+	@$(DEV_COMPOSE) logs -f --tail=200
+
+logs-prod: ## Sigue logs de todos los servicios de produccion
+	@$(PROD_COMPOSE) logs -f --tail=200
+
+logs-front: ## Sigue logs del frontend de desarrollo
+	@$(DEV_COMPOSE) logs -f --tail=200 front
+
+logs-back: ## Sigue logs del backend de desarrollo
+	@$(DEV_COMPOSE) logs -f --tail=200 back
+
+logs-db: ## Sigue logs de PostgreSQL de desarrollo
+	@$(DEV_COMPOSE) logs -f --tail=200 db
+
+logs-mongo: ## Sigue logs de MongoDB de desarrollo
+	@$(DEV_COMPOSE) logs -f --tail=200 mongo
+
+logs-nginx: ## Sigue logs de Nginx de desarrollo
+	@$(DEV_COMPOSE) logs -f --tail=200 nginx
+
+clean: ## Baja servicios de desarrollo y elimina volumenes huerfanos
+	@$(DEV_COMPOSE) down -v --remove-orphans
+
+clean-prod: ## Baja servicios de produccion y elimina volumenes
+	@$(PROD_COMPOSE) down -v --remove-orphans
 
 prune: ## Limpia recursos Docker no usados (sistema)
 	@docker system prune -f
 
-shell-front: ## Abre shell en el contenedor frontend
-	@$(DOCKER_COMPOSE) exec front sh
+certbot-issue-prod: ## Emite certificados Let's Encrypt iniciales. Uso: make certbot-issue-prod CERTBOT_DOMAIN=dominio.com CERTBOT_EMAIL=admin@dominio.com CERTBOT_EXTRA_DOMAINS="www.dominio.com"
+	@test -n "$(CERTBOT_DOMAIN)" || (echo "Falta CERTBOT_DOMAIN"; exit 1)
+	@test -n "$(CERTBOT_EMAIL)" || (echo "Falta CERTBOT_EMAIL"; exit 1)
+	@$(PROD_COMPOSE) run --rm --service-ports certbot certonly --standalone --preferred-challenges http -d $(CERTBOT_DOMAIN) $(foreach domain,$(CERTBOT_EXTRA_DOMAINS),-d $(domain)) --email $(CERTBOT_EMAIL) --agree-tos --no-eff-email
 
-shell-back: ## Abre shell en el contenedor backend
-	@$(DOCKER_COMPOSE) exec back sh
+certbot-renew-prod: ## Renueva certificados Let's Encrypt y recarga Nginx de produccion
+	@$(PROD_COMPOSE) run --rm certbot renew --webroot -w /var/www/certbot
+	@$(PROD_COMPOSE) exec nginx nginx -s reload
 
-shell-db: ## Abre psql dentro del contenedor de PostgreSQL
-	@$(DOCKER_COMPOSE) exec db psql -U $${POSTGRES_USER:-postgres} -d $${POSTGRES_DB:-backCripta}
+shell-front: ## Abre shell en el contenedor frontend de desarrollo
+	@$(DEV_COMPOSE) exec front sh
 
-shell-mongo: ## Abre mongosh dentro del contenedor de MongoDB
-	@$(DOCKER_COMPOSE) exec mongo mongosh
+shell-back: ## Abre shell en el contenedor backend de desarrollo
+	@$(DEV_COMPOSE) exec back sh
+
+shell-db: ## Abre psql dentro del contenedor de PostgreSQL de desarrollo
+	@$(DEV_COMPOSE) exec db psql -U $${POSTGRES_USER:-postgres} -d $${POSTGRES_DB:-backCripta}
+
+shell-mongo: ## Abre mongosh dentro del contenedor de MongoDB de desarrollo
+	@$(DEV_COMPOSE) exec mongo mongosh
 
 front-install: ## Instala dependencias del frontend (local)
 	@cd $(FRONT_DIR) && npm install
