@@ -44,9 +44,11 @@ up-prod-build: ## Reconstruye imagenes y levanta servicios en produccion
 
 up-prod-local: ## Levanta servicios de produccion en local sin TLS
 	@$(PROD_LOCAL_COMPOSE) up -d
+	@$(PROD_LOCAL_COMPOSE) restart nginx
 
 up-prod-local-build: ## Reconstruye imagenes y levanta produccion local sin TLS
 	@$(PROD_LOCAL_COMPOSE) up -d --build
+	@$(PROD_LOCAL_COMPOSE) restart nginx
 
 down: ## Baja todos los servicios de desarrollo
 	@$(DEV_COMPOSE) down
