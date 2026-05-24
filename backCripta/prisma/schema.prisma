@@ -11,6 +11,13 @@ enum Role {
   ADMIN
 }
 
+enum Rarity {
+  COMUN
+  RARA
+  EPICA
+  LEGENDARIA
+}
+
 enum EstadoReservaMesa {
   PENDIENTE
   CONFIRMADA
@@ -32,11 +39,92 @@ model User {
 
   resetToken     String?
   resetTokenExpires DateTime?
-  
+
+  coins          Int      @default(100)
+
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  reservas ReservaMesa[]
+  reservas        ReservaMesa[]
+  packs           Pack[]
+  userCards       UserCard[]
+  coinTransactions CoinTransaction[]
+}
+
+model Collection {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  imageUrl    String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  cards       Card[]
+}
+
+model PackConfig {
+  id           Int      @id @default(autoincrement())
+  price        Int      @default(100)
+  cardsPerPack Int      @default(2)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Card {
+  id           Int         @id @default(autoincrement())
+  name         String
+  rarity       Rarity
+  dropWeight   Int
+  imageUrl     String?
+  collectionId Int?
+  createdAt    DateTime    @default(now())
+
+  collection   Collection? @relation(fields: [collectionId], references: [id], onDelete: SetNull)
+  packCards    PackCard[]
+  userCards    UserCard[]
+}
+
+model Pack {
+  id        Int       @id @default(autoincrement())
+  userId    String
+  openedAt  DateTime?
+  createdAt DateTime  @default(now())
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cards     PackCard[]
+}
+
+model PackCard {
+  id     Int  @id @default(autoincrement())
+  packId Int
+  cardId Int
+
+  pack   Pack @relation(fields: [packId], references: [id], onDelete: Cascade)
+  card   Card @relation(fields: [cardId], references: [id])
+}
+
+model UserCard {
+  id       Int    @id @default(autoincrement())
+  userId   String
+  cardId   Int
+  quantity Int    @default(1)
+
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  card     Card   @relation(fields: [cardId], references: [id])
+
+  @@unique([userId, cardId])
+}
+
+model CoinTransaction {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  amount    Int
+  reason    String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Mesa {

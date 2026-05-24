@@ -1,15 +1,55 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import "./navbar.scss"
 import logo from "../../assets/logo.png"
 import { useAuth } from "../../context/AuthContext"
 import { useWebTexts } from "../../hooks/useWebTexts"
 import { ProfileModal } from "../profile/ProfileModal"
+import { PackReveal } from "../packReveal/PackReveal"
+import { CardAlbum, type CardAlbumHandle } from "../cardAlbum/CardAlbum"
 
 export const Navbar = () => {
-  const [scrolled, setScrolled] = useState(false)
-  const [showProfile, setShowProfile] = useState(false)
+  const [scrolled, setScrolled]             = useState(false)
+  const [showProfile, setShowProfile]       = useState(false)
+  const [showPackReveal, setShowPackReveal] = useState(false)
+  const [showAlbum, setShowAlbum]           = useState(false)
+  const [noCoinsMsg, setNoCoinsMsg]         = useState(false)
+  const [packPrice, setPackPrice]           = useState(100)
+  const [albumRefreshKey, setAlbumRefreshKey] = useState(0)
+  const albumRef = useRef<CardAlbumHandle>(null)
   const { user, loading } = useAuth()
+
+  /* Leer precio del sobre desde la API (respeta PackConfig de la BD) */
+  useEffect(() => {
+    fetch('/api/packs/price')
+      .then(r => r.json())
+      .then(data => { if (data?.price) setPackPrice(data.price) })
+      .catch(() => {})
+  }, [])
+
+  const openPackReveal = () => {
+    if ((user?.coins ?? 0) < packPrice) {
+      setNoCoinsMsg(true)
+      setTimeout(() => setNoCoinsMsg(false), 3000)
+      return
+    }
+    setShowPackReveal(true)
+  }
+
+  /* Cuando PackReveal revela una carta:
+     - Comprueba si ya era del usuario (para badge de duplicado)
+     - La añade al álbum en tiempo real
+     - Devuelve si era duplicado */
+  const handleCardRevealed = (cardId: number): boolean => {
+    const wasDuplicate = albumRef.current?.isOwned(cardId) ?? false
+    albumRef.current?.addCard(cardId)
+    return wasDuplicate
+  }
+
+  /* Cuando se termina de abrir un sobre: fuerza re-fetch silencioso del álbum */
+  const handlePackOpened = () => {
+    setAlbumRefreshKey(k => k + 1)
+  }
   const text = useWebTexts("nav")
 
   useEffect(() => {
@@ -38,6 +78,31 @@ export const Navbar = () => {
             <li><a href="/#contacto">{text("nav.links.contact")}</a></li>
           </ul>
           <div className="navbar-buttons">
+            {!loading && user && (
+              <>
+                <button
+                  className="btn-icon"
+                  onClick={openPackReveal}
+                  aria-label="Mis Sobres"
+                  data-tooltip="Mis Sobres"
+                >
+                  🃏
+                </button>
+                {noCoinsMsg && (
+                  <span className="navbar-no-coins">
+                    Necesitas {packPrice} monedas
+                  </span>
+                )}
+                <button
+                  className="btn-icon"
+                  onClick={() => setShowAlbum(true)}
+                  aria-label="Colección"
+                  data-tooltip="Colección"
+                >
+                  📖
+                </button>
+              </>
+            )}
             {!loading && (
               user ? (
                 <button
@@ -78,6 +143,26 @@ export const Navbar = () => {
 
       {showProfile && createPortal(
         <ProfileModal onClose={() => setShowProfile(false)} />,
+        document.body
+      )}
+
+      {showPackReveal && createPortal(
+        <PackReveal
+          onClose={() => setShowPackReveal(false)}
+          onCardRevealed={handleCardRevealed}
+          onPackOpened={handlePackOpened}
+          packPrice={packPrice}
+        />,
+        document.body
+      )}
+
+      {createPortal(
+        <CardAlbum
+          ref={albumRef}
+          visible={showAlbum}
+          onClose={() => setShowAlbum(false)}
+          refreshKey={albumRefreshKey}
+        />,
         document.body
       )}
     </>

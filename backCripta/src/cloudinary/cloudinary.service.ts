@@ -24,4 +24,30 @@ export class CloudinaryService {
     })
     return result.secure_url
   }
+
+  async uploadCardImage(base64: string, cardId: number): Promise<string> {
+    const result = await cloudinary.uploader.upload(base64, {
+      folder: 'cards',
+      public_id: `card_${cardId}`,
+      overwrite: true,
+      transformation: [
+        { width: 400, height: 560, crop: 'fill' },
+        { quality: 'auto', fetch_format: 'auto' },
+      ],
+    })
+    return result.secure_url
+  }
+
+  async uploadCollectionImage(base64: string, collectionId: number): Promise<string> {
+    const result = await cloudinary.uploader.upload(base64, {
+      folder: 'collections',
+      public_id: `collection_${collectionId}`,
+      overwrite: true,
+      transformation: [
+        { width: 800, height: 400, crop: 'fill' },
+        { quality: 'auto', fetch_format: 'auto' },
+      ],
+    })
+    return result.secure_url
+  }
 }
