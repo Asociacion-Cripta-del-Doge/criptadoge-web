@@ -141,6 +141,7 @@ El seeder inicial cubre el inventario completo de textos visibles actuales de la
 - `home.location`: cabecera, direccion, horario y contacto rapido.
 - `home.sponsors`: cabecera, tiers, CTA y textos de patrocinadores mock.
 - `home.contact`: cabecera, formulario, estados, redes sociales, Twitch e Instagram.
+- `cards`: album, rarezas, compra y apertura de sobres.
 - `footer`: marca, columnas, legales, contacto, copyright y vuelta arriba.
 - `auth`: pantalla de login/registro, placeholders, CTAs, errores y mensajes.
 - `profile`: modal de perfil, estados, membresia, errores y logout.

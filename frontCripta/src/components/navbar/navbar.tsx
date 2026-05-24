@@ -83,21 +83,21 @@ export const Navbar = () => {
                 <button
                   className="btn-icon"
                   onClick={openPackReveal}
-                  aria-label="Mis Sobres"
-                  data-tooltip="Mis Sobres"
+                  aria-label={text("nav.packs")}
+                  data-tooltip={text("nav.packs")}
                 >
                   🃏
                 </button>
                 {noCoinsMsg && (
                   <span className="navbar-no-coins">
-                    Necesitas {packPrice} monedas
+                    {text("nav.packs.needCoinsPrefix")} {packPrice} {text("nav.packs.needCoinsSuffix")}
                   </span>
                 )}
                 <button
                   className="btn-icon"
                   onClick={() => setShowAlbum(true)}
-                  aria-label="Colección"
-                  data-tooltip="Colección"
+                  aria-label={text("nav.collection")}
+                  data-tooltip={text("nav.collection")}
                 >
                   📖
                 </button>
