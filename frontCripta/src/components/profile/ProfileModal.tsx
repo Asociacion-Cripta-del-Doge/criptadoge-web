@@ -59,8 +59,6 @@ export const ProfileModal = ({ onClose }: Props) => {
   const isExpiringSoon = hasMembership && daysLeft !== null && daysLeft <= 7
   const statusCfg = STATUS_CONFIG[user.status] ?? STATUS_CONFIG.Pendiente
   const memberPercent = daysLeft !== null ? Math.min(100, Math.round((daysLeft / 30) * 100)) : 0
-  const joinYear = new Date(user.createdAt).toLocaleDateString("es-ES", { month: "long", year: "numeric" })
-
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return

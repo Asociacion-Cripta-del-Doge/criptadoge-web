@@ -335,7 +335,9 @@ export const PackReveal = ({ onClose, onCardRevealed, onPackOpened, packPrice = 
           gsap.to(card, { rotateY: 180, duration: 0.44, ease: 'back.out(1.4)',
             onComplete: () => {
               gsap.to(card, { scale: 1.05, duration: 0.15, ease: 'power2.out',
-                onComplete: () => gsap.to(card, { scale: 1, duration: 0.6, ease: 'elastic.out(1,0.5)', onComplete: onDone })
+                onComplete: () => {
+                  gsap.to(card, { scale: 1, duration: 0.6, ease: 'elastic.out(1,0.5)', onComplete: onDone })
+                }
               })
             },
           })

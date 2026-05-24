@@ -8,10 +8,11 @@ PROD_ENV ?= .env.production
 
 DEV_COMPOSE := $(DOCKER_COMPOSE) --env-file $(DEV_ENV)
 PROD_COMPOSE := $(DOCKER_COMPOSE) --env-file $(PROD_ENV) -f docker-compose.prod.yml
+PROD_LOCAL_COMPOSE := $(DOCKER_COMPOSE) --env-file $(PROD_ENV) -f docker-compose.prod-local.yml
 
 .DEFAULT_GOAL := help
 
-.PHONY: help env-init env-init-dev env-init-prod up up-build up-prod up-prod-build down down-prod restart ps ps-prod logs logs-prod logs-front logs-back logs-db logs-mongo logs-nginx clean clean-prod prune certbot-issue-prod certbot-renew-prod \
+.PHONY: help env-init env-init-dev env-init-prod up up-build up-prod up-prod-build up-prod-local up-prod-local-build down down-prod down-prod-local restart ps ps-prod ps-prod-local logs logs-prod logs-prod-local logs-front logs-back logs-db logs-mongo logs-nginx clean clean-prod clean-prod-local prune certbot-issue-prod certbot-renew-prod \
 	shell-front shell-back shell-db shell-mongo \
 	front-install front-dev front-build front-lint \
 	back-install back-dev back-build back-lint back-test back-test-e2e back-format
@@ -41,11 +42,20 @@ up-prod: ## Levanta todos los servicios en produccion (modo detach)
 up-prod-build: ## Reconstruye imagenes y levanta servicios en produccion
 	@$(PROD_COMPOSE) up -d --build
 
+up-prod-local: ## Levanta servicios de produccion en local sin TLS
+	@$(PROD_LOCAL_COMPOSE) up -d
+
+up-prod-local-build: ## Reconstruye imagenes y levanta produccion local sin TLS
+	@$(PROD_LOCAL_COMPOSE) up -d --build
+
 down: ## Baja todos los servicios de desarrollo
 	@$(DEV_COMPOSE) down
 
 down-prod: ## Baja todos los servicios de produccion
 	@$(PROD_COMPOSE) down
+
+down-prod-local: ## Baja servicios de produccion local
+	@$(PROD_LOCAL_COMPOSE) down
 
 restart: ## Reinicia todos los servicios de desarrollo
 	@$(DEV_COMPOSE) restart
@@ -56,11 +66,17 @@ ps: ## Muestra estado de contenedores de desarrollo
 ps-prod: ## Muestra estado de contenedores de produccion
 	@$(PROD_COMPOSE) ps
 
+ps-prod-local: ## Muestra estado de contenedores de produccion local
+	@$(PROD_LOCAL_COMPOSE) ps
+
 logs: ## Sigue logs de todos los servicios de desarrollo
 	@$(DEV_COMPOSE) logs -f --tail=200
 
 logs-prod: ## Sigue logs de todos los servicios de produccion
 	@$(PROD_COMPOSE) logs -f --tail=200
+
+logs-prod-local: ## Sigue logs de servicios de produccion local
+	@$(PROD_LOCAL_COMPOSE) logs -f --tail=200
 
 logs-front: ## Sigue logs del frontend de desarrollo
 	@$(DEV_COMPOSE) logs -f --tail=200 front
@@ -82,6 +98,9 @@ clean: ## Baja servicios de desarrollo y elimina volumenes huerfanos
 
 clean-prod: ## Baja servicios de produccion y elimina volumenes
 	@$(PROD_COMPOSE) down -v --remove-orphans
+
+clean-prod-local: ## Baja produccion local y elimina volumenes
+	@$(PROD_LOCAL_COMPOSE) down -v --remove-orphans
 
 prune: ## Limpia recursos Docker no usados (sistema)
 	@docker system prune -f
