@@ -95,6 +95,7 @@ Si el email existe y corresponde a un usuario con contrasena local, se envia un 
 | GET | `/usuarios/:id` | Detalle de usuario |
 | PUT | `/usuarios/:id` | `UpdateUserDto` |
 | PUT | `/usuarios/:id/membresia` | Renueva membresia |
+| POST | `/usuarios/:id/coins` | Concede monedas a un usuario |
 | DELETE | `/usuarios/:id` | Desactiva usuario |
 
 **CreateUserDto:**
@@ -124,6 +125,25 @@ Si el email existe y corresponde a un usuario con contrasena local, se envia un 
   "status": "string",
   "lastRenewal": "string",
   "expirationDate": "string"
+}
+```
+
+**POST `/usuarios/:id/coins`:**
+
+Concede monedas a un socio concreto y registra una transaccion en el historial. Devuelve el saldo actualizado.
+
+```json
+{
+  "amount": 100,
+  "reason": "premio torneo"
+}
+```
+
+Respuesta:
+
+```json
+{
+  "coins": 250
 }
 ```
 

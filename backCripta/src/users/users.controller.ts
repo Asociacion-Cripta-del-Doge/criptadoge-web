@@ -15,6 +15,7 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { GrantUserCoinsDto } from './dto/grant-user-coins.dto';
 
 @Controller('usuarios')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -49,6 +50,15 @@ export class UsersController {
   @Roles('ADMIN')
   async renewMembership(@Param('id') id: string) {
     return this.usersService.renewMembership(id);
+  }
+
+  @Post(':id/coins')
+  @Roles('ADMIN')
+  async grantCoins(
+    @Param('id') id: string,
+    @Body() grantUserCoinsDto: GrantUserCoinsDto,
+  ) {
+    return this.usersService.grantCoins(id, grantUserCoinsDto);
   }
 
   @Delete(':id')
