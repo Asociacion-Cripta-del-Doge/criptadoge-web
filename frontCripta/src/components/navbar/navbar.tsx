@@ -28,6 +28,12 @@ export const Navbar = () => {
   }, [])
 
   const openPackReveal = () => {
+    const token = sessionStorage.getItem("access_token")
+    if (!user || !token) {
+      window.location.href = "/login"
+      return
+    }
+
     if ((user?.coins ?? 0) < packPrice) {
       setNoCoinsMsg(true)
       setTimeout(() => setNoCoinsMsg(false), 3000)
@@ -78,7 +84,7 @@ export const Navbar = () => {
             <li><a href="/#contacto">{text("nav.links.contact")}</a></li>
           </ul>
           <div className="navbar-buttons">
-            {!loading && user && (
+            {!loading && (
               <>
                 <button
                   className="btn-icon"
@@ -93,14 +99,16 @@ export const Navbar = () => {
                     {text("nav.packs.needCoinsPrefix")} {packPrice} {text("nav.packs.needCoinsSuffix")}
                   </span>
                 )}
-                <button
-                  className="btn-icon"
-                  onClick={() => setShowAlbum(true)}
-                  aria-label={text("nav.collection")}
-                  data-tooltip={text("nav.collection")}
-                >
+                {user && (
+                  <button
+                    className="btn-icon"
+                    onClick={() => setShowAlbum(true)}
+                    aria-label={text("nav.collection")}
+                    data-tooltip={text("nav.collection")}
+                  >
                   📖
-                </button>
+                  </button>
+                )}
               </>
             )}
             {!loading && (

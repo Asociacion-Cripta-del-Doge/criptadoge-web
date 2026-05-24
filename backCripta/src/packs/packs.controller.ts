@@ -4,9 +4,8 @@ import {
 import { PacksService } from './packs.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
-/* Todos los endpoints requieren sesión iniciada */
+/* El precio del sobre es público; la gestión de sobres requiere sesión. */
 @Controller('packs')
-@UseGuards(JwtAuthGuard)
 export class PacksController {
   constructor(private readonly packsService: PacksService) {}
 
@@ -18,6 +17,7 @@ export class PacksController {
 
   /* GET /packs/my — sobres del usuario autenticado (abiertos y cerrados) */
   @Get('my')
+  @UseGuards(JwtAuthGuard)
   findMyPacks(@Req() req: any) {
     return this.packsService.findMyPacks(req.user.id);
   }
@@ -25,6 +25,7 @@ export class PacksController {
   /* POST /packs/buy — compra un sobre descontando monedas
      Devuelve el Pack creado con sus cartas incluidas.       */
   @Post('buy')
+  @UseGuards(JwtAuthGuard)
   buyPack(@Req() req: any) {
     return this.packsService.buyPack(req.user.id);
   }
@@ -32,6 +33,7 @@ export class PacksController {
   /* POST /packs/:id/open — abre un sobre, añade cartas a la colección
      Devuelve array de Card con las cartas obtenidas.               */
   @Post(':id/open')
+  @UseGuards(JwtAuthGuard)
   openPack(
     @Param('id', ParseIntPipe) id: number,
     @Req() req: any,
