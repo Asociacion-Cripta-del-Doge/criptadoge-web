@@ -469,3 +469,42 @@
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
 }
+
+/* ── Saldo de monedas en stats ────────────────────────────────── */
+.profile-modal__stat-value--coins {
+  color: v.$neon-blue;
+  text-shadow: 0 0 8px rgba(v.$neon-blue, 0.5);
+}
+
+/* ── Botón de test (solo admin) ───────────────────────────────── */
+.profile-modal__test-coins {
+  padding: 0 20px 4px;
+  display: flex;
+  justify-content: center;
+}
+
+.profile-modal__test-coins-btn {
+  background: transparent;
+  border: 1px dashed rgba(v.$neon-blue, 0.4);
+  color: rgba(v.$neon-blue, 0.7);
+  padding: 6px 16px;
+  border-radius: v.$radius-sm;
+  font-size: 0.72rem;
+  font-family: v.$font-mono;
+  cursor: pointer;
+  transition:
+    border-color v.$transition-fast,
+    color v.$transition-fast,
+    background v.$transition-fast;
+
+  &:hover:not(:disabled) {
+    border-color: v.$neon-blue;
+    color: v.$neon-blue;
+    background: rgba(v.$neon-blue, 0.07);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}

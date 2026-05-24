@@ -33,8 +33,24 @@ export const ProfileModal = ({ onClose }: Props) => {
   const [nameError, setNameError] = useState("")
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
   const [confirmLogout, setConfirmLogout] = useState(false)
-  const [showMembershipModal, setShowMembershipModal] = useState(false);
+  const [showMembershipModal, setShowMembershipModal] = useState(false)
+  const [grantingCoins, setGrantingCoins] = useState(false)
   const text = useWebTexts("profile")
+
+  const handleGrantCoins = async () => {
+    setGrantingCoins(true)
+    try {
+      const token = sessionStorage.getItem("access_token")
+      await fetch("/api/coins/grant", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ amount: 500 }),
+      })
+      await refreshUser()
+    } finally {
+      setGrantingCoins(false)
+    }
+  }
 
   if (!user) return null
 
@@ -166,8 +182,10 @@ export const ProfileModal = ({ onClose }: Props) => {
         </div>
         <div className="profile-modal__stat-divider" />
         <div className="profile-modal__stat">
-          <span className="profile-modal__stat-value">{joinYear}</span>
-          <span className="profile-modal__stat-label">{text("profile.stats.memberSince")}</span>
+          <span className="profile-modal__stat-value profile-modal__stat-value--coins">
+            {user.coins ?? 0}
+          </span>
+          <span className="profile-modal__stat-label">Dogecoins</span>
         </div>
         <div className="profile-modal__stat-divider" />
         <div className="profile-modal__stat">
@@ -177,6 +195,19 @@ export const ProfileModal = ({ onClose }: Props) => {
           <span className="profile-modal__stat-label">{text("profile.stats.status")}</span>
         </div>
       </div>
+
+      {/* Botón de test — solo visible para admins */}
+      {user.role === "ADMIN" && (
+        <div className="profile-modal__test-coins">
+          <button
+            className="profile-modal__test-coins-btn"
+            onClick={handleGrantCoins}
+            disabled={grantingCoins}
+          >
+            {grantingCoins ? "Añadiendo..." : "+ 500 monedas (test)"}
+          </button>
+        </div>
+      )}
 
       <div className="profile-modal__section">
         <div className="profile-modal__section-header">

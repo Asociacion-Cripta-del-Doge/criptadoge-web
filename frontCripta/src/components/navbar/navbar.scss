@@ -142,7 +142,22 @@
 
 .navbar-buttons{
     display: flex;
+    align-items: center;
     gap: v.$space-sm;
+}
+
+.navbar-no-coins {
+  font-size: 0.72rem;
+  color: v.$neon-pink;
+  white-space: nowrap;
+  animation: fadeInOut 3s ease forwards;
+}
+
+@keyframes fadeInOut {
+  0%   { opacity: 0; }
+  15%  { opacity: 1; }
+  75%  { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 .btn-outline{

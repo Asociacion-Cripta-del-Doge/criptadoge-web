@@ -15,7 +15,12 @@ import { ContactModule } from './contact/contact.module';
 import { MesasModule } from './mesas/mesas.module';
 import { ReservasModule } from './reservas/reservas.module';
 import { WebTextsModule } from './web-texts/web-texts.module';
-import { MembershipModule } from './membership/membership.module';
+import { MembershipModule } from './membership/membership.module';
+import { CardsModule } from './cards/cards.module';
+import { PacksModule } from './packs/packs.module';
+import { CoinsModule } from './coins/coins.module';
+import { CollectionsModule } from './collections/collections.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -41,6 +46,11 @@ import { MembershipModule } from './membership/membership.module';
     ReservasModule,
     WebTextsModule,
     MembershipModule,
+    CardsModule,
+    PacksModule,
+    CoinsModule,
+    CollectionsModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],

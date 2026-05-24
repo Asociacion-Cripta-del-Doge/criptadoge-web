@@ -24,6 +24,7 @@ async function main() {
       password: hashedPassword,
       role: 'ADMIN',
       status: 'Activo',
+      coins: 500,
     },
     create: {
       dni: '00000000A',
@@ -32,6 +33,7 @@ async function main() {
       password: hashedPassword,
       role: 'ADMIN',
       status: 'Activo',
+      coins: 500,
     },
   });
 

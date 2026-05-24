@@ -70,6 +70,7 @@ export class AuthService {
         expirationDate: true,
         createdAt: true,
         avatar: true,
+        coins: true,
       },
     });
     if (!user) throw new UnauthorizedException('Usuario no encontrado');
@@ -94,6 +95,7 @@ export class AuthService {
         expirationDate: true,
         createdAt: true,
         avatar: true,
+        coins: true,
       },
     });
   }
@@ -112,6 +114,7 @@ export class AuthService {
         expirationDate: true,
         createdAt: true,
         avatar: true,
+        coins: true,
       },
     });
   }

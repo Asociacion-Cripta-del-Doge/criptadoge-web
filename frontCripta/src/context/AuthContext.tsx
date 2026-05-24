@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 
 interface User {
   id: string
@@ -10,6 +10,7 @@ interface User {
   expirationDate: string | null
   createdAt: string
   avatar: string | null
+  coins: number
 }
 
 interface AuthContextType {
@@ -60,7 +61,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     window.location.href = "/"
   }
 
-  const refreshUser = async () => { await fetchMe() }
+  const refreshUser = useCallback(async () => { await fetchMe() }, [])
 
   return (
     <AuthContext.Provider value={{ user, loading, logout, refreshUser }}>

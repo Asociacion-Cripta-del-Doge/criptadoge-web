@@ -22,6 +22,7 @@ async function main() {
       status: 'Activo',
       lastRenewal: '2024-01-15',
       expirationDate: '2025-01-15',
+      coins: 100,
     },
     {
       dni: '22222222C',
@@ -32,6 +33,7 @@ async function main() {
       status: 'Pendiente',
       lastRenewal: null,
       expirationDate: null,
+      coins: 100,
     },
     {
       dni: '33333333D',
@@ -42,6 +44,7 @@ async function main() {
       status: 'Inactivo',
       lastRenewal: '2022-05-10',
       expirationDate: '2023-05-10',
+      coins: 100,
     },
   ];
 
