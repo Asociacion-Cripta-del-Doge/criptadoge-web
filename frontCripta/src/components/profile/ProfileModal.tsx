@@ -59,8 +59,6 @@ export const ProfileModal = ({ onClose }: Props) => {
   const isExpiringSoon = hasMembership && daysLeft !== null && daysLeft <= 7
   const statusCfg = STATUS_CONFIG[user.status] ?? STATUS_CONFIG.Pendiente
   const memberPercent = daysLeft !== null ? Math.min(100, Math.round((daysLeft / 30) * 100)) : 0
-  const joinYear = new Date(user.createdAt).toLocaleDateString("es-ES", { month: "long", year: "numeric" })
-
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -120,7 +118,7 @@ export const ProfileModal = ({ onClose }: Props) => {
 
       <div className="profile-modal__hero">
         <div className="profile-modal__hero-bg" />
-        <button className="profile-modal__close" onClick={onClose}>✕</button>
+        <button className="profile-modal__close" onClick={onClose} aria-label={text("profile.actions.close")}>✕</button>
 
         <div className="profile-modal__avatar-wrap">
           <div className="profile-modal__avatar" onClick={() => document.getElementById("avatar-input")?.click()}>
@@ -155,17 +153,17 @@ export const ProfileModal = ({ onClose }: Props) => {
                   autoFocus
                   maxLength={32}
                 />
-                <button className="profile-modal__name-btn profile-modal__name-btn--save" onClick={handleSaveName} disabled={saving}>
+                <button className="profile-modal__name-btn profile-modal__name-btn--save" onClick={handleSaveName} disabled={saving} aria-label={text("profile.actions.saveName")}>
                   {saving ? "..." : "✓"}
                 </button>
-                <button className="profile-modal__name-btn profile-modal__name-btn--cancel" onClick={() => { setEditingName(false); setNameValue(user.name); setNameError("") }}>
+                <button className="profile-modal__name-btn profile-modal__name-btn--cancel" onClick={() => { setEditingName(false); setNameValue(user.name); setNameError("") }} aria-label={text("profile.actions.cancelName")}>
                   ✕
                 </button>
               </div>
             ) : (
               <>
                 <h2 className="profile-modal__name">{user.name}</h2>
-                <button className="profile-modal__edit-btn" onClick={() => { setEditingName(true); setNameValue(user.name) }}>✏️</button>
+                <button className="profile-modal__edit-btn" onClick={() => { setEditingName(true); setNameValue(user.name) }} aria-label={text("profile.actions.editName")}>✏️</button>
               </>
             )}
             {user.role === "ADMIN" && !editingName && <span className="profile-modal__badge">{text("profile.badge.admin")}</span>}
@@ -185,7 +183,7 @@ export const ProfileModal = ({ onClose }: Props) => {
           <span className="profile-modal__stat-value profile-modal__stat-value--coins">
             {user.coins ?? 0}
           </span>
-          <span className="profile-modal__stat-label">Dogecoins</span>
+          <span className="profile-modal__stat-label">{text("profile.stats.coins")}</span>
         </div>
         <div className="profile-modal__stat-divider" />
         <div className="profile-modal__stat">
@@ -204,7 +202,7 @@ export const ProfileModal = ({ onClose }: Props) => {
             onClick={handleGrantCoins}
             disabled={grantingCoins}
           >
-            {grantingCoins ? "Añadiendo..." : "+ 500 monedas (test)"}
+            {grantingCoins ? text("profile.admin.addingCoins") : text("profile.admin.addTestCoins")}
           </button>
         </div>
       )}

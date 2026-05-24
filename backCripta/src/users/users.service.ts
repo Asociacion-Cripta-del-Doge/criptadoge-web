@@ -7,6 +7,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { GrantUserCoinsDto } from './dto/grant-user-coins.dto';
 
 @Injectable()
 export class UsersService {
@@ -28,6 +29,7 @@ export class UsersService {
           email: true,
           role: true,
           status: true,
+          coins: true,
         },
       });
     } catch (error) {
@@ -50,6 +52,7 @@ export class UsersService {
         status: true,
         lastRenewal: true,
         expirationDate: true,
+        coins: true,
       },
     });
   }
@@ -66,6 +69,7 @@ export class UsersService {
         status: true,
         lastRenewal: true,
         expirationDate: true,
+        coins: true,
       },
     });
 
@@ -99,6 +103,7 @@ export class UsersService {
           email: true,
           role: true,
           status: true,
+          coins: true,
         },
       });
     } catch (error) {
@@ -136,6 +141,30 @@ export class UsersService {
           expirationDate: true,
         },
       });
+    } catch (error) {
+      if (error.code === 'P2025') {
+        throw new NotFoundException('Usuario no encontrado');
+      }
+      throw error;
+    }
+  }
+
+  async grantCoins(id: string, data: GrantUserCoinsDto) {
+    const reason = data.reason?.trim() || 'manual_grant';
+
+    try {
+      const [user] = await this.prisma.$transaction([
+        this.prisma.user.update({
+          where: { id },
+          data: { coins: { increment: data.amount } },
+          select: { coins: true },
+        }),
+        this.prisma.coinTransaction.create({
+          data: { userId: id, amount: data.amount, reason },
+        }),
+      ]);
+
+      return user;
     } catch (error) {
       if (error.code === 'P2025') {
         throw new NotFoundException('Usuario no encontrado');

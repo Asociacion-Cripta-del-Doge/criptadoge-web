@@ -74,7 +74,7 @@ const AboutUs = () => {
                             <span className="about-us__stat-label">{text('home.about.stats.nonProfit')}</span>
                         </div>
                         <div className="about-us__stat">
-                            <span className="about-us__stat-number">Puer.</span>
+                            <span className="about-us__stat-number">{text('home.about.stats.locationShort')}</span>
                             <span className="about-us__stat-label">{text('home.about.stats.location')}</span>
                         </div>
                     </div>

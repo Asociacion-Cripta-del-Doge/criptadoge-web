@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState, useCallback } from 'react'
 import './packReveal.scss'
 import { useAuth } from '../../context/AuthContext'
+import { useWebTexts } from '../../hooks/useWebTexts'
 
 declare const gsap: typeof import('gsap').gsap
 
@@ -74,6 +75,7 @@ async function openPackWithRetry(packId: number, token: string): Promise<boolean
    COMPONENTE
    ═══════════════════════════════════════════════════════════════ */
 export const PackReveal = ({ onClose, onCardRevealed, onPackOpened, packPrice = 100 }: Props) => {
+  const text = useWebTexts('cards')
   const onCloseRef        = useRef(onClose)
   const onCardRevealedRef = useRef(onCardRevealed)
   const onPackOpenedRef   = useRef(onPackOpened)
@@ -137,7 +139,7 @@ export const PackReveal = ({ onClose, onCardRevealed, onPackOpened, packPrice = 
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
-        setCoinsError(data.message ?? 'Monedas insuficientes')
+        setCoinsError(data.message ?? text('cards.pack.errors.notEnoughCoins'))
         return
       }
       const pack = await res.json()
@@ -149,9 +151,9 @@ export const PackReveal = ({ onClose, onCardRevealed, onPackOpened, packPrice = 
       setRevealedCards(cards)
       refreshUserRef.current()
     } catch {
-      setCoinsError('Error de conexión')
+      setCoinsError(text('cards.pack.errors.connection'))
     }
-  }, [])
+  }, [text])
 
   const handleBuyClick = async () => {
     setBuying(true)
@@ -335,7 +337,9 @@ export const PackReveal = ({ onClose, onCardRevealed, onPackOpened, packPrice = 
           gsap.to(card, { rotateY: 180, duration: 0.44, ease: 'back.out(1.4)',
             onComplete: () => {
               gsap.to(card, { scale: 1.05, duration: 0.15, ease: 'power2.out',
-                onComplete: () => gsap.to(card, { scale: 1, duration: 0.6, ease: 'elastic.out(1,0.5)', onComplete: onDone })
+                onComplete: () => {
+                  gsap.to(card, { scale: 1, duration: 0.6, ease: 'elastic.out(1,0.5)', onComplete: onDone })
+                }
               })
             },
           })
@@ -509,27 +513,27 @@ export const PackReveal = ({ onClose, onCardRevealed, onPackOpened, packPrice = 
      ══════════════════════════════════════════════════════════ */
   return (
     <div className="pack-reveal">
-      <button className="pack-reveal__close" onClick={onClose} aria-label="Cerrar">✕</button>
+      <button className="pack-reveal__close" onClick={onClose} aria-label={text('cards.actions.close')}>✕</button>
 
       {/* ── Pantalla de compra ───────────────────────────────── */}
       {phase === 'buy' && (
         <div className="pack-reveal__buy-screen">
           <div className="pack-reveal__buy-pack-icon" />
 
-          <h2 className="pack-reveal__buy-title">Sobre de Cartas</h2>
-          <p className="pack-reveal__buy-subtitle">2 cartas aleatorias · sorteo ponderado por rareza</p>
+          <h2 className="pack-reveal__buy-title">{text('cards.pack.title')}</h2>
+          <p className="pack-reveal__buy-subtitle">{text('cards.pack.subtitle')}</p>
 
           {/* Saldo del usuario */}
           <div className="pack-reveal__buy-balance">
             <span className="pack-reveal__buy-balance-coins">{coins} 🪙</span>
             {canAfford && packsCanBuy > 1 && (
               <span className="pack-reveal__buy-balance-hint">
-                puedes comprar {packsCanBuy} sobres
+                {text('cards.pack.balance.canBuyPrefix')} {packsCanBuy} {text('cards.pack.balance.canBuySuffix')}
               </span>
             )}
             {!canAfford && (
               <span className="pack-reveal__buy-balance-short">
-                te faltan {packPrice - coins} 🪙
+                {text('cards.pack.balance.missingPrefix')} {packPrice - coins} 🪙
               </span>
             )}
           </div>
@@ -539,7 +543,7 @@ export const PackReveal = ({ onClose, onCardRevealed, onPackOpened, packPrice = 
           {/* Error de apertura (reintentos fallidos) */}
           {openError && (
             <p className="pack-reveal__buy-error">
-              Error al registrar las cartas. Contacta con un administrador.
+              {text('cards.pack.errors.registerCards')}
             </p>
           )}
 
@@ -548,7 +552,7 @@ export const PackReveal = ({ onClose, onCardRevealed, onPackOpened, packPrice = 
             onClick={handleBuyClick}
             disabled={buying || !canAfford}
           >
-            {buying ? 'Comprando…' : `Comprar sobre — ${packPrice} 🪙`}
+            {buying ? text('cards.pack.actions.buying') : `${text('cards.pack.actions.buy')} — ${packPrice} 🪙`}
           </button>
         </div>
       )}
@@ -559,7 +563,7 @@ export const PackReveal = ({ onClose, onCardRevealed, onPackOpened, packPrice = 
           <div className="pack-reveal__flash" ref={flashRef} />
 
           <p className="pack-reveal__reset-hint" ref={resetHintRef}>
-            Haz clic para abrir otro sobre
+            {text('cards.pack.resetHint')}
           </p>
 
           <div className="pack-reveal__scene" ref={sceneRef}>
@@ -578,7 +582,7 @@ export const PackReveal = ({ onClose, onCardRevealed, onPackOpened, packPrice = 
                         </div>
                     }
                     {duplicates[0] && (
-                      <div className="pack-reveal__dupe-badge">¡Ya la tienes!</div>
+                      <div className="pack-reveal__dupe-badge">{text('cards.pack.duplicateBadge')}</div>
                     )}
                   </div>
                 </div>
@@ -594,7 +598,7 @@ export const PackReveal = ({ onClose, onCardRevealed, onPackOpened, packPrice = 
                         </div>
                     }
                     {duplicates[1] && (
-                      <div className="pack-reveal__dupe-badge">¡Ya la tienes!</div>
+                      <div className="pack-reveal__dupe-badge">{text('cards.pack.duplicateBadge')}</div>
                     )}
                   </div>
                 </div>
@@ -604,10 +608,18 @@ export const PackReveal = ({ onClose, onCardRevealed, onPackOpened, packPrice = 
               {/* Sobre */}
               <div className="pack-reveal__pack" ref={packRef}>
                 <div className="pack-reveal__pack-back">
-                  <div className="pack-reveal__pack-back-img">ESPALDA<br />DEL SOBRE</div>
+                  <div className="pack-reveal__pack-back-img">
+                    {text('cards.pack.backLine1')}
+                    <br />
+                    {text('cards.pack.backLine2')}
+                  </div>
                 </div>
                 <div className="pack-reveal__pack-top" ref={packTopRef}>
-                  <div className="pack-reveal__pack-top-img">CRIPTA DE DOGE<br />ASOCIACION</div>
+                  <div className="pack-reveal__pack-top-img">
+                    {text('cards.pack.topLine1')}
+                    <br />
+                    {text('cards.pack.topLine2')}
+                  </div>
                 </div>
                 <div className="pack-reveal__perf-zone perf-zone" ref={perfZoneRef}>
                   <div className="pack-reveal__perf-fill" ref={perfFillRef} />
@@ -619,14 +631,18 @@ export const PackReveal = ({ onClose, onCardRevealed, onPackOpened, packPrice = 
                 </div>
                 <div className="pack-reveal__pack-bot" ref={packBotRef}>
                   <div className="pack-reveal__pack-bot-img">
-                    FRENTE SOBRE<br />IMAGEN PRINCIPAL<br />85-90% ALTURA
+                    {text('cards.pack.frontLine1')}
+                    <br />
+                    {text('cards.pack.frontLine2')}
+                    <br />
+                    {text('cards.pack.frontLine3')}
                   </div>
                   <div className="pack-reveal__pack-glare" ref={packGlareRef} />
                 </div>
               </div>
 
               <div className="pack-reveal__swipe-hint" ref={swipeHintRef}>
-                <span className="pack-reveal__hint-text">Desliza para abrir</span>
+                <span className="pack-reveal__hint-text">{text('cards.pack.swipeHint')}</span>
                 <div className="pack-reveal__hint-dots">
                   {Array.from({ length: 5 }, (_, i) => (
                     <span key={i} className="pack-reveal__hint-dot" />

@@ -1,5 +1,7 @@
 import { forwardRef, useImperativeHandle, useState, useEffect, useRef, useCallback } from 'react'
 import './cardAlbum.scss'
+import { useWebTexts } from '../../hooks/useWebTexts'
+import type { WebTextKey } from '../../data/webTextDefaults'
 
 declare const gsap: typeof import('gsap').gsap
 
@@ -42,14 +44,18 @@ const RARITY_BORDER: Record<string, string> = {
   EPICA:      'rgba(160, 0, 255, 0.7)',
   LEGENDARIA: '#ffd700',
 }
-const RARITY_LABEL: Record<string, string> = {
-  COMUN: 'Común', RARA: 'Rara', EPICA: 'Épica', LEGENDARIA: 'Legendaria',
+const RARITY_LABEL_KEY: Record<string, WebTextKey> = {
+  COMUN: 'cards.rarity.common',
+  RARA: 'cards.rarity.rare',
+  EPICA: 'cards.rarity.epic',
+  LEGENDARIA: 'cards.rarity.legendary',
 }
 
 /* ═══════════════════════════════════════════════════════════════
    COMPONENTE
    ═══════════════════════════════════════════════════════════════ */
 const CardAlbum = forwardRef<CardAlbumHandle, Props>(({ onClose, visible, refreshKey = 0 }, ref) => {
+  const text = useWebTexts('cards')
 
   const [allCards,  setAllCards]  = useState<ApiCard[]>([])
   const [ownedMap,  setOwnedMap]  = useState<Map<number, UserCard>>(new Map())
@@ -193,12 +199,12 @@ const CardAlbum = forwardRef<CardAlbumHandle, Props>(({ onClose, visible, refres
         {/* Cabecera */}
         <div className="card-album__header">
           <div className="card-album__title-wrap">
-            <h2 className="card-album__title">ÁLBUM DE CARTAS</h2>
+            <h2 className="card-album__title">{text('cards.album.title')}</h2>
             <span className="card-album__count">
-              {loading ? '…' : `${ownedCount} / ${total}`}
+              {loading ? text('cards.album.loadingShort') : `${ownedCount} / ${total}`}
             </span>
           </div>
-          <button className="card-album__close" onClick={onClose} aria-label="Cerrar">✕</button>
+          <button className="card-album__close" onClick={onClose} aria-label={text('cards.actions.close')}>✕</button>
         </div>
 
         {/* Barra de progreso */}
@@ -211,7 +217,7 @@ const CardAlbum = forwardRef<CardAlbumHandle, Props>(({ onClose, visible, refres
 
         {/* Cargando */}
         {loading && (
-          <div className="card-album__loading">Cargando colección…</div>
+          <div className="card-album__loading">{text('cards.album.loading')}</div>
         )}
 
         {/* Grid */}
@@ -243,7 +249,7 @@ const CardAlbum = forwardRef<CardAlbumHandle, Props>(({ onClose, visible, refres
                       {card.imageUrl
                         ? <img src={card.imageUrl} alt={card.name} className="card-album__slot-art-img" />
                         : <div className="card-album__slot-art" style={{ background: RARITY_GRADIENT[rarity] }}>
-                            <span className="card-album__slot-rarity">{RARITY_LABEL[rarity]}</span>
+                            <span className="card-album__slot-rarity">{text(RARITY_LABEL_KEY[rarity])}</span>
                           </div>
                       }
                       <div className="card-album__slot-name-overlay">{card.name}</div>
@@ -275,12 +281,16 @@ const CardAlbum = forwardRef<CardAlbumHandle, Props>(({ onClose, visible, refres
             {detail.imageUrl
               ? <img src={detail.imageUrl} alt={detail.name} className="card-album__detail-img" />
               : <div className="card-album__detail-art" style={{ background: RARITY_GRADIENT[detail.rarity] }}>
-                  <span className="card-album__detail-art-label">IMAGEN<br />CARTA</span>
+                  <span className="card-album__detail-art-label">
+                    {text('cards.album.imagePlaceholderLine1')}
+                    <br />
+                    {text('cards.album.imagePlaceholderLine2')}
+                  </span>
                 </div>
             }
             <div className="card-album__detail-footer">
               <span className="card-album__detail-rarity" style={{ color: RARITY_BORDER[detail.rarity] }}>
-                {RARITY_LABEL[detail.rarity]}
+                {text(RARITY_LABEL_KEY[detail.rarity])}
               </span>
               <span className="card-album__detail-name">{detail.name}</span>
               {detail.collection && (

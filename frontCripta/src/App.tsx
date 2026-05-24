@@ -23,6 +23,15 @@ import logo from "./assets/logo.png";
 
 const ACTIVE_USER_STATUS = "Activo";
 const CANCELLABLE_RESERVATION_STATES = ["PENDIENTE", "CONFIRMADA"];
+const BOOKING_WEEKDAY_KEYS = [
+  "booking.weekdays.mondayShort",
+  "booking.weekdays.tuesdayShort",
+  "booking.weekdays.wednesdayShort",
+  "booking.weekdays.thursdayShort",
+  "booking.weekdays.fridayShort",
+  "booking.weekdays.saturdayShort",
+  "booking.weekdays.sundayShort",
+] as const;
 
 const getToday = () => {
   const date = new Date();
@@ -433,8 +442,8 @@ function App() {
               </div>
 
               <div className="booking-calendar__weekdays" aria-hidden="true">
-                {["L", "M", "X", "J", "V", "S", "D"].map((day) => (
-                  <span key={day}>{day}</span>
+                {BOOKING_WEEKDAY_KEYS.map((dayKey) => (
+                  <span key={dayKey}>{text(dayKey)}</span>
                 ))}
               </div>
 

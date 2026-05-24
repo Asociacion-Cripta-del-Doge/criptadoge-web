@@ -6,12 +6,30 @@ import { useWebTexts } from "../../hooks/useWebTexts"
 import type { WebTextKey } from "../../data/webTextDefaults"
 import "./EventCalendar.scss"
 
-const MESES_ES = [
-  "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-  "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
-]
+const MONTH_KEYS = [
+  "home.events.months.january",
+  "home.events.months.february",
+  "home.events.months.march",
+  "home.events.months.april",
+  "home.events.months.may",
+  "home.events.months.june",
+  "home.events.months.july",
+  "home.events.months.august",
+  "home.events.months.september",
+  "home.events.months.october",
+  "home.events.months.november",
+  "home.events.months.december",
+] satisfies WebTextKey[]
 
-const DIAS_SEMANA = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"]
+const WEEKDAY_KEYS = [
+  "home.events.weekdays.mondayShort",
+  "home.events.weekdays.tuesdayShort",
+  "home.events.weekdays.wednesdayShort",
+  "home.events.weekdays.thursdayShort",
+  "home.events.weekdays.fridayShort",
+  "home.events.weekdays.saturdayShort",
+  "home.events.weekdays.sundayShort",
+] satisfies WebTextKey[]
 
 const LABEL_COLORS: Record<string, string> = {
   cartas: "#ec4899",
@@ -27,9 +45,9 @@ function isoDate(year: number, month: number, day: number): string {
   return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
 }
 
-function formatFecha(isoStr: string): string {
+function formatFecha(isoStr: string, text: (key: WebTextKey) => string): string {
   const [y, m, d] = isoStr.split("-")
-  return `${parseInt(d)} de ${MESES_ES[parseInt(m) - 1]} de ${y}`
+  return `${parseInt(d)} ${text("home.events.dateConnector")} ${text(MONTH_KEYS[parseInt(m) - 1])} ${text("home.events.dateConnector")} ${y}`
 }
 
 const val = (v: string | number | undefined, emptyText: string) =>
@@ -107,7 +125,7 @@ const EventoModal = ({
           </div>
           <div className="ec-modal-field">
             <dt>{text("home.events.modal.date")}</dt>
-            <dd>{val(formatFecha(ev.fecha), text("home.events.emptyValue"))}</dd>
+            <dd>{val(formatFecha(ev.fecha, text), text("home.events.emptyValue"))}</dd>
           </div>
           <div className="ec-modal-field">
             <dt>{text("home.events.modal.time")}</dt>
@@ -199,7 +217,7 @@ export const EventCalendar = () => {
   const titleDate = selectedDate
     ? (() => {
         const [, m, d] = selectedDate.split("-")
-        return `${parseInt(d)} de ${MESES_ES[parseInt(m) - 1]}`
+        return `${parseInt(d)} ${text("home.events.dateConnector")} ${text(MONTH_KEYS[parseInt(m) - 1])}`
       })()
     : null
 
@@ -219,13 +237,13 @@ export const EventCalendar = () => {
         <div className="ec-calendar">
           <div className="ec-cal-nav">
             <button className="ec-nav-btn" onClick={prevMonth} aria-label={text("home.events.aria.previousMonth")}>‹</button>
-            <span className="ec-cal-month">{MESES_ES[month]} {year}</span>
+            <span className="ec-cal-month">{text(MONTH_KEYS[month])} {year}</span>
             <button className="ec-nav-btn" onClick={nextMonth} aria-label={text("home.events.aria.nextMonth")}>›</button>
           </div>
 
           <div className="ec-cal-grid">
-            {DIAS_SEMANA.map(d => (
-              <div key={d} className="ec-cal-weekday">{d}</div>
+            {WEEKDAY_KEYS.map(dayKey => (
+              <div key={dayKey} className="ec-cal-weekday">{text(dayKey)}</div>
             ))}
 
             {cells.map((day, idx) => {
@@ -248,7 +266,7 @@ export const EventCalendar = () => {
                     evs.length && "ec-cal-cell--has-events",
                   ].filter(Boolean).join(" ")}
                   onClick={() => setSelectedDate(prev => prev === iso ? null : iso)}
-                  aria-label={`${day} de ${MESES_ES[month]}`}
+                  aria-label={`${day} ${text("home.events.dateConnector")} ${text(MONTH_KEYS[month])}`}
                   aria-pressed={isSelected}
                 >
                   <span className="ec-cal-day-num">{day}</span>
@@ -327,7 +345,7 @@ export const EventCalendar = () => {
                       </div>
                       {ev.descripcion && <p className="ec-event-desc">{ev.descripcion}</p>}
                       <div className="ec-event-meta">
-                        <span title={text("home.events.modal.date")}>📅 {formatFecha(ev.fecha)}</span>
+                        <span title={text("home.events.modal.date")}>📅 {formatFecha(ev.fecha, text)}</span>
                         {ev.hora && <span title={text("home.events.modal.time")}>🕐 {ev.hora}</span>}
                         {ev.asistentes > 0 && (
                           <span className="ec-event-plazas" title={text("home.events.modal.attendees")}>

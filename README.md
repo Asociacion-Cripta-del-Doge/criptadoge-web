@@ -207,6 +207,63 @@ Renovar certificados:
 make certbot-renew-prod
 ```
 
+### Produccion local
+
+Para probar las imagenes y el arranque de produccion en local sin dominio ni certificados TLS, usa `docker-compose.prod-local.yml`.
+
+Esta variante:
+
+- Construye frontend y backend con los targets `prod`.
+- Sirve el frontend compilado desde Nginx en `http://localhost:8080`.
+- Expone solo Nginx al host.
+- Ejecuta `prisma migrate deploy` y `seed:prod` antes de arrancar el backend.
+- Usa volumenes separados de la produccion real.
+- No requiere `NGINX_SERVER_NAME`, `TLS_CERTIFICATE` ni `TLS_CERTIFICATE_KEY`.
+
+Revisa que `.env.production` tenga valores locales para las URLs publicas:
+
+```env
+FRONTEND_URL=http://localhost:8080
+VITE_API_URL=http://localhost:8080/api
+GOOGLE_CALLBACK_URL=http://localhost:8080/api/auth/google/callback
+```
+
+Reconstruir imagenes y arrancar:
+
+```bash
+make up-prod-local-build
+```
+
+Arrancar sin reconstruir:
+
+```bash
+make up-prod-local
+```
+
+Ver estado y logs:
+
+```bash
+make ps-prod-local
+make logs-prod-local
+```
+
+Detener:
+
+```bash
+make down-prod-local
+```
+
+Limpiar servicios y volumenes de produccion local:
+
+```bash
+make clean-prod-local
+```
+
+Accesos:
+
+- App: `http://localhost:8080`
+- API via Nginx: `http://localhost:8080/api`
+
 ### Produccion sin Make
 
 Arrancar:
@@ -317,5 +374,6 @@ Si corres front/back de forma local, asegurate de tener PostgreSQL y MongoDB act
 +-- nginx/                   # Config de reverse proxy
 +-- docker-compose.yml       # Desarrollo
 +-- docker-compose.prod.yml  # Produccion
++-- docker-compose.prod-local.yml # Produccion local sin TLS
 `-- Makefile
 ```
