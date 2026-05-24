@@ -338,6 +338,295 @@ La solicitud se guarda con estado inicial `Pendiente` y envia un email de confir
 
 ---
 
+## Admin `/admin`
+
+> Todos los endpoints requieren JWT + rol **ADMIN**.
+
+| Metodo | Ruta | Body / uso |
+| ------ | ---- | ---------- |
+| GET | `/admin/dashboard` | Resumen rapido para el panel de administracion |
+| GET | `/admin/pack-config` | Configuracion activa de sobres; si no existe, crea una por defecto |
+| PATCH | `/admin/pack-config` | Actualiza precio, cartas por sobre o estado activo |
+| GET | `/admin/cards/stats` | Estadisticas de posesion y distribucion de cartas |
+
+**PATCH `/admin/pack-config`:** todos los campos son opcionales.
+
+```json
+{
+  "price": 100,
+  "cardsPerPack": 2,
+  "isActive": true
+}
+```
+
+**Response GET `/admin/dashboard`:**
+
+```json
+{
+  "totalCards": 10,
+  "totalCollections": 2,
+  "totalPacks": 25,
+  "totalUsers": 7,
+  "packsOpened": 12,
+  "packsUnopened": 13
+}
+```
+
+**Response GET `/admin/cards/stats`:**
+
+```json
+[
+  {
+    "id": 1,
+    "name": "Carta ejemplo",
+    "rarity": "COMUN | RARA | EPICA | LEGENDARIA",
+    "dropWeight": 100,
+    "imageUrl": "string | null",
+    "collection": {
+      "id": 1,
+      "name": "Coleccion ejemplo"
+    },
+    "ownersCount": 3,
+    "totalCopies": 8
+  }
+]
+```
+
+---
+
+## Coins `/coins`
+
+> Todos los endpoints requieren JWT. `POST /coins/grant` requiere ademas rol **ADMIN**.
+
+| Metodo | Ruta | Auth | Roles | Body / uso |
+| ------ | ---- | ---- | ----- | ---------- |
+| GET | `/coins/balance` | JWT | Usuario autenticado | Saldo de monedas del usuario autenticado |
+| GET | `/coins/history` | JWT | Usuario autenticado | Ultimas 50 transacciones del usuario autenticado |
+| POST | `/coins/grant` | JWT | ADMIN | Concede monedas al admin autenticado |
+
+**POST `/coins/grant`:**
+
+```json
+{
+  "amount": 500
+}
+```
+
+Si no se envia `amount`, el backend usa `500`.
+
+**Response GET `/coins/balance` y POST `/coins/grant`:**
+
+```json
+{
+  "coins": 250
+}
+```
+
+**Response GET `/coins/history`:**
+
+```json
+[
+  {
+    "id": 1,
+    "userId": "uuid",
+    "amount": 50,
+    "reason": "weekly_reward | manual_grant | pack_purchase",
+    "createdAt": "ISO 8601"
+  }
+]
+```
+
+Notas:
+
+- Cada usuario empieza con `100` monedas.
+- Un cron semanal concede `50` monedas a los usuarios con `status = "Activo"` cada lunes a las 09:00.
+- Las compras de sobres registran una transaccion negativa con `reason = "pack_purchase"`.
+
+---
+
+## Collections `/collections`
+
+| Metodo | Ruta | Auth | Roles | Body / uso |
+| ------ | ---- | ---- | ----- | ---------- |
+| GET | `/collections` | No | Publico | Lista colecciones con contador de cartas |
+| GET | `/collections/:id` | No | Publico | Detalle de coleccion con sus cartas |
+| POST | `/collections` | JWT | ADMIN | Crea una coleccion |
+| PATCH | `/collections/:id` | JWT | ADMIN | Actualiza una coleccion |
+| DELETE | `/collections/:id` | JWT | ADMIN | Borra una coleccion |
+| POST | `/collections/:id/image` | JWT | ADMIN | Sube portada de coleccion a Cloudinary |
+
+**CreateCollectionDto:**
+
+```json
+{
+  "name": "string (requerido)",
+  "description": "string (opcional)",
+  "isActive": "boolean (opcional)"
+}
+```
+
+**UpdateCollectionDto:** todos los campos son opcionales.
+
+```json
+{
+  "name": "string",
+  "description": "string",
+  "isActive": true
+}
+```
+
+**POST `/collections/:id/image`:**
+
+```json
+{
+  "base64": "data:image/png;base64,..."
+}
+```
+
+---
+
+## Cards `/cards`
+
+| Metodo | Ruta | Auth | Roles | Body / uso |
+| ------ | ---- | ---- | ----- | ---------- |
+| GET | `/cards` | No | Publico | Lista cartas con su coleccion |
+| GET | `/cards/my` | JWT | Usuario autenticado | Cartas del usuario autenticado con cantidad |
+| GET | `/cards/:id` | No | Publico | Detalle de una carta |
+| POST | `/cards` | JWT | ADMIN | Crea una carta |
+| PATCH | `/cards/:id` | JWT | ADMIN | Actualiza una carta |
+| DELETE | `/cards/:id` | JWT | ADMIN | Elimina una carta |
+| POST | `/cards/:id/image` | JWT | ADMIN | Sube imagen de carta a Cloudinary |
+
+**CreateCardDto:**
+
+```json
+{
+  "name": "string (requerido)",
+  "rarity": "COMUN | RARA | EPICA | LEGENDARIA",
+  "dropWeight": "number (requerido, mayor = mas probable)",
+  "collectionId": "number (opcional)"
+}
+```
+
+**UpdateCardDto:** todos los campos son opcionales.
+
+```json
+{
+  "name": "string",
+  "rarity": "COMUN | RARA | EPICA | LEGENDARIA",
+  "dropWeight": 100,
+  "collectionId": "number | null"
+}
+```
+
+**POST `/cards/:id/image`:**
+
+```json
+{
+  "base64": "data:image/png;base64,..."
+}
+```
+
+**Response GET `/cards/my`:**
+
+```json
+[
+  {
+    "id": 1,
+    "userId": "uuid",
+    "cardId": 1,
+    "quantity": 2,
+    "card": {
+      "id": 1,
+      "name": "Carta ejemplo",
+      "rarity": "COMUN",
+      "dropWeight": 100,
+      "imageUrl": "string | null",
+      "collectionId": 1,
+      "createdAt": "ISO 8601",
+      "collection": {
+        "id": 1,
+        "name": "Coleccion ejemplo"
+      }
+    }
+  }
+]
+```
+
+---
+
+## Packs `/packs`
+
+| Metodo | Ruta | Auth | Roles | Body / uso |
+| ------ | ---- | ---- | ----- | ---------- |
+| GET | `/packs/price` | No | Publico | Precio del sobre y cartas incluidas |
+| GET | `/packs/my` | JWT | Usuario autenticado | Sobres del usuario autenticado, abiertos y cerrados |
+| POST | `/packs/buy` | JWT | Usuario autenticado | Compra un sobre descontando monedas |
+| POST | `/packs/:id/open` | JWT | Propietario del sobre | Abre un sobre y anade cartas a la coleccion del usuario |
+
+**Response GET `/packs/price`:**
+
+```json
+{
+  "price": 100,
+  "cardsPerPack": 2
+}
+```
+
+**Response POST `/packs/buy`:**
+
+Devuelve el sobre creado con las cartas ya sorteadas, pero todavia sin sumar al album del usuario.
+
+```json
+{
+  "id": 1,
+  "userId": "uuid",
+  "openedAt": null,
+  "createdAt": "ISO 8601",
+  "cards": [
+    {
+      "id": 1,
+      "packId": 1,
+      "cardId": 3,
+      "card": {
+        "id": 3,
+        "name": "Carta ejemplo",
+        "rarity": "RARA",
+        "dropWeight": 25,
+        "imageUrl": "string | null",
+        "collectionId": 1,
+        "createdAt": "ISO 8601"
+      }
+    }
+  ]
+}
+```
+
+**Response POST `/packs/:id/open`:**
+
+```json
+[
+  {
+    "id": 3,
+    "name": "Carta ejemplo",
+    "rarity": "RARA",
+    "dropWeight": 25,
+    "imageUrl": "string | null",
+    "collectionId": 1,
+    "createdAt": "ISO 8601"
+  }
+]
+```
+
+Notas:
+
+- Solo el propietario puede abrir su sobre.
+- Un sobre no se puede abrir dos veces.
+- El sorteo es ponderado por `dropWeight` y sin duplicados dentro del mismo sobre.
+- Al abrir un sobre, las cartas se insertan o incrementan en `UserCard.quantity`.
+
+---
+
 ## Mesas `/mesas`
 
 | Metodo | Ruta | Auth | Roles | Body / uso |
@@ -561,6 +850,5 @@ Authorization: Bearer <access_token>
 - `/api/auth/` tiene rate limit de **5 req/min** por IP via Nginx.
 - `/api/auth/me` tiene una regla especifica en Nginx y no usa ese rate limit.
 - El backend acepta JSON y URL encoded con limite de **10 MB**.
-- Usuarios se almacenan en **PostgreSQL** con Prisma.
-- Mesas y reservas de mesa se almacenan en **PostgreSQL** con Prisma.
+- Usuarios, monedas, colecciones, cartas, sobres, mesas y reservas de mesa se almacenan en **PostgreSQL** con Prisma.
 - Eventos, etiquetas de eventos y solicitudes de membresia se almacenan en **MongoDB** con Mongoose.
