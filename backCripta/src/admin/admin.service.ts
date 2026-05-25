@@ -1,15 +1,24 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
 
 export class UpdatePackConfigDto {
   price?: number;
   cardsPerPack?: number;
+  packCoverImageUrl?: string | null;
   isActive?: boolean;
+}
+
+export class UploadPackCoverDto {
+  base64!: string;
 }
 
 @Injectable()
 export class AdminService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private cloudinary: CloudinaryService,
+  ) {}
 
   /* ── Pack Config ────────────────────────────────────────────────
      Devuelve la config activa. Si no existe, la crea con defaults. */
@@ -29,6 +38,16 @@ export class AdminService {
     return this.prisma.packConfig.update({
       where: { id: config.id },
       data: dto,
+    });
+  }
+
+  async uploadPackCover(base64: string) {
+    const config = await this.getPackConfig();
+    const packCoverImageUrl = await this.cloudinary.uploadPackCoverImage(base64);
+
+    return this.prisma.packConfig.update({
+      where: { id: config.id },
+      data: { packCoverImageUrl },
     });
   }
 

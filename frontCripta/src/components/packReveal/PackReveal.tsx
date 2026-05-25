@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, useCallback } from 'react'
+import { useRef, useEffect, useState, useCallback, type CSSProperties } from 'react'
 import './packReveal.scss'
 import { useAuth } from '../../context/AuthContext'
 import { useWebTexts } from '../../hooks/useWebTexts'
@@ -40,6 +40,7 @@ interface Props {
   onCardRevealed?:  (cardId: number) => boolean  // devuelve true si era duplicado
   onPackOpened?:    () => void                   // llamado una vez tras revelar
   packPrice?:       number
+  packCoverImageUrl?: string | null
 }
 
 interface RevealedCard {
@@ -74,8 +75,17 @@ async function openPackWithRetry(packId: number, token: string): Promise<boolean
 /* ═══════════════════════════════════════════════════════════════
    COMPONENTE
    ═══════════════════════════════════════════════════════════════ */
-export const PackReveal = ({ onClose, onCardRevealed, onPackOpened, packPrice = 100 }: Props) => {
+export const PackReveal = ({
+  onClose,
+  onCardRevealed,
+  onPackOpened,
+  packPrice = 100,
+  packCoverImageUrl,
+}: Props) => {
   const text = useWebTexts('cards')
+  const packImageStyle = packCoverImageUrl
+    ? ({ '--pack-cover-image': `url("${packCoverImageUrl}")` } as CSSProperties)
+    : undefined
   const onCloseRef        = useRef(onClose)
   const onCardRevealedRef = useRef(onCardRevealed)
   const onPackOpenedRef   = useRef(onPackOpened)
@@ -518,7 +528,10 @@ export const PackReveal = ({ onClose, onCardRevealed, onPackOpened, packPrice = 
       {/* ── Pantalla de compra ───────────────────────────────── */}
       {phase === 'buy' && (
         <div className="pack-reveal__buy-screen">
-          <div className="pack-reveal__buy-pack-icon" />
+          <div
+            className={`pack-reveal__buy-pack-icon ${packCoverImageUrl ? 'has-pack-cover' : ''}`}
+            style={packImageStyle}
+          />
 
           <h2 className="pack-reveal__buy-title">{text('cards.pack.title')}</h2>
           <p className="pack-reveal__buy-subtitle">{text('cards.pack.subtitle')}</p>
@@ -608,14 +621,20 @@ export const PackReveal = ({ onClose, onCardRevealed, onPackOpened, packPrice = 
               {/* Sobre */}
               <div className="pack-reveal__pack" ref={packRef}>
                 <div className="pack-reveal__pack-back">
-                  <div className="pack-reveal__pack-back-img">
+                  <div
+                    className={`pack-reveal__pack-back-img ${packCoverImageUrl ? 'has-pack-cover' : ''}`}
+                    style={packImageStyle}
+                  >
                     {text('cards.pack.backLine1')}
                     <br />
                     {text('cards.pack.backLine2')}
                   </div>
                 </div>
                 <div className="pack-reveal__pack-top" ref={packTopRef}>
-                  <div className="pack-reveal__pack-top-img">
+                  <div
+                    className={`pack-reveal__pack-top-img ${packCoverImageUrl ? 'has-pack-cover' : ''}`}
+                    style={packImageStyle}
+                  >
                     {text('cards.pack.topLine1')}
                     <br />
                     {text('cards.pack.topLine2')}
@@ -630,7 +649,10 @@ export const PackReveal = ({ onClose, onCardRevealed, onPackOpened, packPrice = 
                   </div>
                 </div>
                 <div className="pack-reveal__pack-bot" ref={packBotRef}>
-                  <div className="pack-reveal__pack-bot-img">
+                  <div
+                    className={`pack-reveal__pack-bot-img ${packCoverImageUrl ? 'has-pack-cover' : ''}`}
+                    style={packImageStyle}
+                  >
                     {text('cards.pack.frontLine1')}
                     <br />
                     {text('cards.pack.frontLine2')}

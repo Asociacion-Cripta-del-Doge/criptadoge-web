@@ -346,7 +346,8 @@ La solicitud se guarda con estado inicial `Pendiente` y envia un email de confir
 | ------ | ---- | ---------- |
 | GET | `/admin/dashboard` | Resumen rapido para el panel de administracion |
 | GET | `/admin/pack-config` | Configuracion activa de sobres; si no existe, crea una por defecto |
-| PATCH | `/admin/pack-config` | Actualiza precio, cartas por sobre o estado activo |
+| PATCH | `/admin/pack-config` | Actualiza precio, cartas por sobre, imagen del sobre o estado activo |
+| POST | `/admin/pack-config/cover` | Sube imagen del sobre a Cloudinary y la deja activa |
 | GET | `/admin/cards/stats` | Estadisticas de posesion y distribucion de cartas |
 
 **PATCH `/admin/pack-config`:** todos los campos son opcionales.
@@ -355,7 +356,16 @@ La solicitud se guarda con estado inicial `Pendiente` y envia un email de confir
 {
   "price": 100,
   "cardsPerPack": 2,
+  "packCoverImageUrl": "https://res.cloudinary.com/.../pack_cover.png",
   "isActive": true
+}
+```
+
+**POST `/admin/pack-config/cover`:**
+
+```json
+{
+  "base64": "data:image/png;base64,..."
 }
 ```
 
@@ -569,7 +579,8 @@ Notas:
 ```json
 {
   "price": 100,
-  "cardsPerPack": 2
+  "cardsPerPack": 2,
+  "packCoverImageUrl": "string | null"
 }
 ```
 
