@@ -15,6 +15,7 @@ export const Navbar = () => {
   const [showAlbum, setShowAlbum] = useState(false);
   const [noCoinsMsg, setNoCoinsMsg] = useState(false);
   const [packPrice, setPackPrice] = useState(100);
+  const [packCoverImageUrl, setPackCoverImageUrl] = useState<string | null>(null);
   const [albumRefreshKey, setAlbumRefreshKey] = useState(0);
   const albumRef = useRef<CardAlbumHandle>(null);
   const { user, loading } = useAuth();
@@ -25,6 +26,7 @@ export const Navbar = () => {
       .then((r) => r.json())
       .then((data) => {
         if (data?.price) setPackPrice(data.price);
+        setPackCoverImageUrl(data?.packCoverImageUrl ?? null);
       })
       .catch(() => {});
   }, []);
@@ -187,6 +189,7 @@ export const Navbar = () => {
             onCardRevealed={handleCardRevealed}
             onPackOpened={handlePackOpened}
             packPrice={packPrice}
+            packCoverImageUrl={packCoverImageUrl}
           />,
           document.body,
         )}

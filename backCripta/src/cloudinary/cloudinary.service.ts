@@ -50,4 +50,17 @@ export class CloudinaryService {
     })
     return result.secure_url
   }
+
+  async uploadPackCoverImage(base64: string): Promise<string> {
+    const result = await cloudinary.uploader.upload(base64, {
+      folder: 'packs',
+      public_id: 'pack_cover',
+      overwrite: true,
+      transformation: [
+        { width: 400, height: 680, crop: 'fill' },
+        { quality: 'auto', fetch_format: 'auto' },
+      ],
+    })
+    return result.secure_url
+  }
 }

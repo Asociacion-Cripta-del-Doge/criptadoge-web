@@ -1,5 +1,5 @@
-import { Controller, Get, Patch, Body, UseGuards } from '@nestjs/common';
-import { AdminService, UpdatePackConfigDto } from './admin.service';
+import { Controller, Get, Patch, Body, UseGuards, Post } from '@nestjs/common';
+import { AdminService, UpdatePackConfigDto, UploadPackCoverDto } from './admin.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -23,11 +23,18 @@ export class AdminController {
     return this.adminService.getPackConfig();
   }
 
-  /* PATCH /admin/pack-config — actualizar precio, cartas/sobre, etc.
-     Body: { price?, cardsPerPack?, isActive? }                     */
+  /* PATCH /admin/pack-config — actualizar precio, cartas/sobre, imagen, etc.
+     Body: { price?, cardsPerPack?, packCoverImageUrl?, isActive? } */
   @Patch('pack-config')
   updatePackConfig(@Body() dto: UpdatePackConfigDto) {
     return this.adminService.updatePackConfig(dto);
+  }
+
+  /* POST /admin/pack-config/cover — subir imagen del sobre a Cloudinary
+     Body: { base64: "data:image/png;base64,..." } */
+  @Post('pack-config/cover')
+  uploadPackCover(@Body() dto: UploadPackCoverDto) {
+    return this.adminService.uploadPackCover(dto.base64);
   }
 
   /* GET /admin/cards/stats — posesión y distribución de cartas */

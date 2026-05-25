@@ -101,6 +101,12 @@ $card-radius: 10px;
     0 0 80px rgba(124, 61, 255, 0.15);
   margin-bottom: 8px;
   animation: packFloat 2.6s ease-in-out infinite;
+
+  &.has-pack-cover {
+    background-image: var(--pack-cover-image);
+    background-size: cover;
+    background-position: center;
+  }
 }
 
 @keyframes packFloat {
@@ -353,6 +359,14 @@ $card-radius: 10px;
   letter-spacing: 2px;
   text-transform: uppercase;
   line-height: 1.8;
+
+  &.has-pack-cover {
+    background-image:
+      linear-gradient(rgba(10, 8, 24, 0.58), rgba(10, 8, 24, 0.58)),
+      var(--pack-cover-image);
+    background-size: cover;
+    background-position: center;
+  }
 }
 
 .pack-reveal__pack-top {
@@ -381,6 +395,14 @@ $card-radius: 10px;
   letter-spacing: 2px;
   text-transform: uppercase;
   line-height: 1.8;
+
+  &.has-pack-cover {
+    background-image: var(--pack-cover-image);
+    background-size: $pack-w $pack-h;
+    background-position: top center;
+    color: transparent;
+    text-shadow: none;
+  }
 }
 
 /* ── Zona de perforación ─────────────────────────────────────── */
@@ -452,6 +474,14 @@ $card-radius: 10px;
   text-transform: uppercase;
   line-height: 1.8;
   padding: 8px;
+
+  &.has-pack-cover {
+    background-image: var(--pack-cover-image);
+    background-size: $pack-w $pack-h;
+    background-position: center calc(-1 * #{$pack-h} * 0.18);
+    color: transparent;
+    text-shadow: none;
+  }
 }
 
 .pack-reveal__pack-glare {

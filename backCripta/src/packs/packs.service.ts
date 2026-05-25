@@ -124,7 +124,11 @@ export class PacksService {
   /* Devuelve el precio y cartas por sobre (para mostrar en la UI) */
   async getPackPrice() {
     const config = await this.getConfig();
-    return { price: config.price, cardsPerPack: config.cardsPerPack };
+    return {
+      price: config.price,
+      cardsPerPack: config.cardsPerPack,
+      packCoverImageUrl: config.packCoverImageUrl,
+    };
   }
 
   /* ── Sorteo ponderado sin reemplazo ────────────────────────────
