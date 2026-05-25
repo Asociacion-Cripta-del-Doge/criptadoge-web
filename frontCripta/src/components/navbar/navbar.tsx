@@ -14,6 +14,7 @@ export const Navbar = () => {
   const [showPackReveal, setShowPackReveal] = useState(false);
   const [showAlbum, setShowAlbum] = useState(false);
   const [noCoinsMsg, setNoCoinsMsg] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [packPrice, setPackPrice] = useState(100);
   const [packCoverImageUrl, setPackCoverImageUrl] = useState<string | null>(null);
   const [albumRefreshKey, setAlbumRefreshKey] = useState(0);
@@ -69,6 +70,7 @@ export const Navbar = () => {
   }, []);
 
   const isMember = user?.status === "Activo";
+  const closeMenu = () => setIsMenuOpen(false);
 
   return (
     <>
@@ -78,32 +80,63 @@ export const Navbar = () => {
             <img src={logo} alt={text("nav.logoAlt")} />
             <span className="brand-text"> {text("nav.brand")} </span>
           </div>
-          <ul className="navbar-links">
-            <li>
-              <a href="/#inicio">{text("nav.links.home")}</a>
-            </li>
-            <li>
-              <a href="/#eventos">{text("nav.links.events")}</a>
-            </li>
-            <li>
-              <a href="/reservas">{text("nav.links.booking")}</a>
-            </li>
-            <li>
-              <a href="/#ubicacion">{text("nav.links.location")}</a>
-            </li>
-            <li>
-              <a href="/#patrocinadores">{text("nav.links.sponsors")}</a>
-            </li>
-            <li>
-              <a href="/#contacto">{text("nav.links.contact")}</a>
-            </li>
-          </ul>
-          <div className="navbar-buttons">
+          <button
+            type="button"
+            className={`navbar-toggle ${isMenuOpen ? "is-open" : ""}`}
+            aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
+            aria-controls="navbar-menu"
+            aria-expanded={isMenuOpen}
+            onClick={() => setIsMenuOpen((open) => !open)}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+          <div
+            id="navbar-menu"
+            className={`navbar-menu ${isMenuOpen ? "is-open" : ""}`}
+          >
+            <ul className="navbar-links">
+              <li>
+                <a href="/#inicio" onClick={closeMenu}>
+                  {text("nav.links.home")}
+                </a>
+              </li>
+              <li>
+                <a href="/#eventos" onClick={closeMenu}>
+                  {text("nav.links.events")}
+                </a>
+              </li>
+              <li>
+                <a href="/reservas" onClick={closeMenu}>
+                  {text("nav.links.booking")}
+                </a>
+              </li>
+              <li>
+                <a href="/#ubicacion" onClick={closeMenu}>
+                  {text("nav.links.location")}
+                </a>
+              </li>
+              <li>
+                <a href="/#patrocinadores" onClick={closeMenu}>
+                  {text("nav.links.sponsors")}
+                </a>
+              </li>
+              <li>
+                <a href="/#contacto" onClick={closeMenu}>
+                  {text("nav.links.contact")}
+                </a>
+              </li>
+            </ul>
+            <div className="navbar-buttons">
             {!loading && (
               <>
                 <button
                   className="btn-icon"
-                  onClick={openPackReveal}
+                  onClick={() => {
+                    closeMenu();
+                    openPackReveal();
+                  }}
                   aria-label={text("nav.packs")}
                   data-tooltip={text("nav.packs")}
                 >
@@ -118,7 +151,10 @@ export const Navbar = () => {
                 {user && (
                   <button
                     className="btn-icon"
-                    onClick={() => setShowAlbum(true)}
+                    onClick={() => {
+                      closeMenu();
+                      setShowAlbum(true);
+                    }}
                     aria-label={text("nav.collection")}
                     data-tooltip={text("nav.collection")}
                   >
@@ -132,7 +168,10 @@ export const Navbar = () => {
                 <button
                   key={user.name}
                   className="btn-outline navbar-profile-btn"
-                  onClick={() => setShowProfile(true)}
+                  onClick={() => {
+                    closeMenu();
+                    setShowProfile(true);
+                  }}
                 >
                   {user.avatar && (
                     <img
@@ -163,15 +202,16 @@ export const Navbar = () => {
                   )}
                 </button>
               ) : (
-                <a href="/login" className="btn-outline">
+                <a href="/login" className="btn-outline" onClick={closeMenu}>
                   {text("nav.login")}
                 </a>
               ))}
             {!isMember && (
-              <a href="/#membresia" className="btn-pink">
+              <a href="/#membresia" className="btn-pink" onClick={closeMenu}>
                 {text("nav.membership")}
               </a>
             )}
+            </div>
           </div>
         </div>
       </nav>
